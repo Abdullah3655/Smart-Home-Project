@@ -1,0 +1,12 @@
+target/
+*.class
+*.iml
+.idea/
+.vscode/
+.DS_Store
+*.db
+
+# Maven Wrapper: keep the jar, ignore local download/extract caches
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar.sha
+.mvn/wrapper/dists/
