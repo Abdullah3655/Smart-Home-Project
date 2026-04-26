@@ -1,0 +1,17 @@
+# Default: let git auto-detect text and normalize on commit
+* text=auto eol=lf
+
+# Maven wrapper bash script MUST stay LF (Linux/macOS execute it directly)
+mvnw         text eol=lf
+mvnwDebug    text eol=lf
+
+# Windows batch files MUST stay CRLF
+*.cmd        text eol=crlf
+*.bat        text eol=crlf
+
+# Binary
+*.jar        binary
+*.png        binary
+*.jpg        binary
+*.ico        binary
+*.db         binary
