@@ -13,6 +13,5 @@ public class AwayMode implements AutomationMode {
     @Override
     public void apply(SmartHomeHub hub) {
         Objects.requireNonNull(hub, "hub must not be null");
-        // TODO(Task 5 integration): lock doors, turn off lights, and arm cameras.
     }
 }

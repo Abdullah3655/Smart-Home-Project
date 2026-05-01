@@ -283,7 +283,6 @@ Then on GitHub:
 **Total: ~400 lines of Java, 14 files, 5 patterns implemented.**
 
 ---
-
 ## Hard contracts — DO NOT change these
 
 Other layers compile against these — change them and other people's code breaks.
@@ -302,3 +301,4 @@ Other layers compile against these — change them and other people's code break
 - Questions about a specific task? Ask in the team chat.
 - Spec ambiguous? Read `prompt-parts/01_FOUNDATION_CORE/*.md` for the precise contract.
 - Stuck more than 45 min on one task? Stop and ask — likely overengineering.
+

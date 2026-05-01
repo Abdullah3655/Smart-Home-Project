@@ -2,13 +2,14 @@ package com.smarthome.core;
 
 import com.smarthome.strategy.AutomationMode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SmartHomeHub {
+public class SmartHomeHub implements RoomIterableCollection {
     private static final SmartHomeHub INSTANCE = new SmartHomeHub();
 
     private final Map<String, Room> roomsById = new ConcurrentHashMap<>();
@@ -40,5 +41,10 @@ public class SmartHomeHub {
 
     public AutomationMode getAutomationMode() {
         return automationMode;
+    }
+
+    @Override
+    public RoomIterator createIterator() {
+        return new HubRoomIterator(new ArrayList<>(roomsById.values()));
     }
 }
