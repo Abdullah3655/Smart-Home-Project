@@ -7,11 +7,11 @@ import com.smarthome.devices.Device;
 import com.smarthome.devices.Light;
 import com.smarthome.devices.Lock;
 import com.smarthome.devices.Thermostat;
-import com.smarthome.devices.legacy.OldLight;
-import com.smarthome.devices.newgen.NewLight;
+import com.smarthome.devices.version1.Version1Light;
+import com.smarthome.devices.version2.Version2Light;
 import com.smarthome.factory.DeviceFactory;
-import com.smarthome.factory.NewDeviceFactory;
-import com.smarthome.factory.OldDeviceFactory;
+import com.smarthome.factory.Version2DeviceFactory;
+import com.smarthome.factory.Version1DeviceFactory;
 import com.smarthome.strategy.AwayMode;
 import com.smarthome.strategy.EcoMode;
 import com.smarthome.strategy.SleepMode;
@@ -35,7 +35,7 @@ class FoundationSmokeTest {
 
     @Test
     void factoryCreatesDeviceWithUuid() {
-        Device light = new NewDeviceFactory().createLight("Kitchen Light");
+        Device light = new Version2DeviceFactory().createLight("Kitchen Light");
         assertNotNull(light.getId());
         assertFalse(light.getId().isEmpty());
     }
@@ -43,7 +43,7 @@ class FoundationSmokeTest {
     @Test
     void roomDevicesReturnsEnumeration() {
         Room room = new Room("r1", "Kitchen");
-        DeviceFactory factory = new NewDeviceFactory();
+        DeviceFactory factory = new Version2DeviceFactory();
         room.addDevice(factory.createLight("L1"));
         room.addDevice(factory.createLight("L2"));
 
@@ -59,7 +59,7 @@ class FoundationSmokeTest {
 
     @Test
     void observerReceivesUpdateOnDeviceChange() {
-        Light light = (Light) new NewDeviceFactory().createLight("L1");
+        Light light = (Light) new Version2DeviceFactory().createLight("L1");
         StringBuilder captured = new StringBuilder();
 
         light.attach((device, event) -> captured.append(event));
@@ -79,40 +79,40 @@ class FoundationSmokeTest {
     }
 
     @Test
-    void newFactoryCreatesNewFamilyTypes() {
-        DeviceFactory factory = new NewDeviceFactory();
-        assertTrue(factory.createLight("L") instanceof com.smarthome.devices.newgen.NewLight);
-        assertTrue(factory.createThermostat("T") instanceof com.smarthome.devices.newgen.NewThermostat);
-        assertTrue(factory.createDoorLock("D") instanceof com.smarthome.devices.newgen.NewLock);
-        assertTrue(factory.createCamera("C") instanceof com.smarthome.devices.newgen.NewCamera);
+    void version2FactoryCreatesVersion2FamilyTypes() {
+        DeviceFactory factory = new Version2DeviceFactory();
+        assertTrue(factory.createLight("L") instanceof com.smarthome.devices.version2.Version2Light);
+        assertTrue(factory.createThermostat("T") instanceof com.smarthome.devices.version2.Version2Thermostat);
+        assertTrue(factory.createDoorLock("D") instanceof com.smarthome.devices.version2.Version2Lock);
+        assertTrue(factory.createCamera("C") instanceof com.smarthome.devices.version2.Version2Camera);
     }
 
     @Test
-    void oldFactoryCreatesOldFamilyTypes() {
-        DeviceFactory factory = new OldDeviceFactory();
-        assertTrue(factory.createLight("L") instanceof com.smarthome.devices.legacy.OldLight);
-        assertTrue(factory.createThermostat("T") instanceof com.smarthome.devices.legacy.OldThermostat);
-        assertTrue(factory.createDoorLock("D") instanceof com.smarthome.devices.legacy.OldLock);
-        assertTrue(factory.createCamera("C") instanceof com.smarthome.devices.legacy.OldCamera);
+    void version1FactoryCreatesVersion1FamilyTypes() {
+        DeviceFactory factory = new Version1DeviceFactory();
+        assertTrue(factory.createLight("L") instanceof com.smarthome.devices.version1.Version1Light);
+        assertTrue(factory.createThermostat("T") instanceof com.smarthome.devices.version1.Version1Thermostat);
+        assertTrue(factory.createDoorLock("D") instanceof com.smarthome.devices.version1.Version1Lock);
+        assertTrue(factory.createCamera("C") instanceof com.smarthome.devices.version1.Version1Camera);
     }
 
     @Test
-    void oldAndNewLightBehaveDifferently() {
-        NewLight newLight = (NewLight) new NewDeviceFactory().createLight("New");
-        OldLight oldLight = (OldLight) new OldDeviceFactory().createLight("Old");
+    void version1AndVersion2LightBehaveDifferently() {
+        Version2Light version2Light = (Version2Light) new Version2DeviceFactory().createLight("Version2");
+        Version1Light version1Light = (Version1Light) new Version1DeviceFactory().createLight("Version1");
 
-        newLight.setBrightness(61);
-        oldLight.setBrightness(61);
+        version2Light.setBrightness(61);
+        version1Light.setBrightness(61);
 
-        assertEquals(61, newLight.getBrightness());
-        assertEquals(50, oldLight.getBrightness());
+        assertEquals(61, version2Light.getBrightness());
+        assertEquals(50, version1Light.getBrightness());
     }
 
     @Test
     void ecoModeDimsLightsAndSetsModerateTemp() {
         SmartHomeHub hub = SmartHomeHub.getInstance();
         Room room = new Room("k1-" + UUID.randomUUID(), "Kitchen");
-        NewDeviceFactory factory = new NewDeviceFactory();
+        Version2DeviceFactory factory = new Version2DeviceFactory();
         Light light = (Light) factory.createLight("Kitchen Light");
         Thermostat thermo = (Thermostat) factory.createThermostat("Kitchen Thermo");
         light.turnOn();
@@ -131,7 +131,7 @@ class FoundationSmokeTest {
     void awayModeLocksDoorsAndArmsCameras() {
         SmartHomeHub hub = SmartHomeHub.getInstance();
         Room room = new Room("s1-" + UUID.randomUUID(), "Security");
-        NewDeviceFactory factory = new NewDeviceFactory();
+        Version2DeviceFactory factory = new Version2DeviceFactory();
         Lock doorLock = (Lock) factory.createDoorLock("Front Door");
         Camera camera = (Camera) factory.createCamera("Front Camera");
         room.addDevice(doorLock);
@@ -144,3 +144,4 @@ class FoundationSmokeTest {
         assertTrue(camera.isPoweredOn());
     }
 }
+

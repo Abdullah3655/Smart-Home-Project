@@ -1,9 +1,9 @@
-package com.smarthome.devices.newgen;
+package com.smarthome.devices.version2;
 
 import com.smarthome.devices.Light;
 
-public class NewLight extends Light {
-    public NewLight(String id, String name) {
+public class Version2Light extends Light {
+    public Version2Light(String id, String name) {
         super(id, name);
     }
 
@@ -12,3 +12,4 @@ public class NewLight extends Light {
         super.setBrightness(value);
     }
 }
+

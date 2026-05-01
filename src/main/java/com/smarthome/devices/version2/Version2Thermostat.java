@@ -1,9 +1,9 @@
-package com.smarthome.devices.newgen;
+package com.smarthome.devices.version2;
 
 import com.smarthome.devices.Thermostat;
 
-public class NewThermostat extends Thermostat {
-    public NewThermostat(String id, String name) {
+public class Version2Thermostat extends Thermostat {
+    public Version2Thermostat(String id, String name) {
         super(id, name);
     }
 
@@ -13,3 +13,4 @@ public class NewThermostat extends Thermostat {
         super.setTemperature(clamped);
     }
 }
+

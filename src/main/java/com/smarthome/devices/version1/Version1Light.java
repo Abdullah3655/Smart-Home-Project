@@ -1,9 +1,9 @@
-package com.smarthome.devices.legacy;
+package com.smarthome.devices.version1;
 
 import com.smarthome.devices.Light;
 
-public class OldLight extends Light {
-    public OldLight(String id, String name) {
+public class Version1Light extends Light {
+    public Version1Light(String id, String name) {
         super(id, name);
     }
 
@@ -14,3 +14,4 @@ public class OldLight extends Light {
         super.setBrightness(stepped);
     }
 }
+

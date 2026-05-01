@@ -3,9 +3,9 @@ package com.smarthome.command;
 import com.smarthome.core.SmartHomeHub;
 import com.smarthome.devices.Lock;
 import com.smarthome.devices.Thermostat;
-import com.smarthome.devices.newgen.NewLight;
-import com.smarthome.devices.newgen.NewLock;
-import com.smarthome.devices.newgen.NewThermostat;
+import com.smarthome.devices.version2.Version2Light;
+import com.smarthome.devices.version2.Version2Lock;
+import com.smarthome.devices.version2.Version2Thermostat;
 import com.smarthome.strategy.AwayMode;
 import com.smarthome.strategy.EcoMode;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class CommandTest {
 
     @Test
     void turnOnExecuteAndUndoRestoresOriginalState() {
-        NewLight light = new NewLight(UUID.randomUUID().toString(), "Living Light");
+        Version2Light light = new Version2Light(UUID.randomUUID().toString(), "Living Light");
         assertFalse(light.isPoweredOn());
 
         CommandInvoker invoker = new CommandInvoker();
@@ -35,7 +35,7 @@ class CommandTest {
 
     @Test
     void undoOnAlreadyOnDeviceLeavesItOn() {
-        NewLight light = new NewLight(UUID.randomUUID().toString(), "Living Light");
+        Version2Light light = new Version2Light(UUID.randomUUID().toString(), "Living Light");
         light.turnOn();
         assertTrue(light.isPoweredOn());
 
@@ -55,7 +55,7 @@ class CommandTest {
 
     @Test
     void historyReflectsExecutionOrder() {
-        NewLight light = new NewLight(UUID.randomUUID().toString(), "L");
+        Version2Light light = new Version2Light(UUID.randomUUID().toString(), "L");
         CommandInvoker invoker = new CommandInvoker();
 
         invoker.execute(new TurnOnCommand(light));
@@ -67,7 +67,7 @@ class CommandTest {
 
     @Test
     void setTemperatureUndoRestoresExactPreviousValue() {
-        Thermostat thermostat = new NewThermostat(UUID.randomUUID().toString(), "T");
+        Thermostat thermostat = new Version2Thermostat(UUID.randomUUID().toString(), "T");
         thermostat.setTemperature(22.0);
 
         CommandInvoker invoker = new CommandInvoker();
@@ -80,8 +80,8 @@ class CommandTest {
 
     @Test
     void lockAndUnlockCommandsAreReversible() {
-        Lock lock = new NewLock(UUID.randomUUID().toString(), "Front Door");
-        // NewLock starts locked=true (inherits Lock's default). Unlock first to set up.
+        Lock lock = new Version2Lock(UUID.randomUUID().toString(), "Front Door");
+        // Version2Lock starts locked=true (inherits Lock's default). Unlock first to set up.
         lock.unlock();
         assertFalse(lock.isLocked());
 
@@ -112,7 +112,7 @@ class CommandTest {
 
     @Test
     void describeProducesHumanReadableText() {
-        NewLight light = new NewLight(UUID.randomUUID().toString(), "Kitchen Light");
+        Version2Light light = new Version2Light(UUID.randomUUID().toString(), "Kitchen Light");
         DeviceCommand cmd = new TurnOnCommand(light);
 
         String description = cmd.describe();
@@ -122,7 +122,7 @@ class CommandTest {
 
     @Test
     void multipleUndosReplayInReverseOrder() {
-        NewLight light = new NewLight(UUID.randomUUID().toString(), "L");
+        Version2Light light = new Version2Light(UUID.randomUUID().toString(), "L");
         CommandInvoker invoker = new CommandInvoker();
 
         invoker.execute(new TurnOnCommand(light));    // light: off → on
@@ -140,3 +140,4 @@ class CommandTest {
         assertFalse(invoker.canUndo());
     }
 }
+

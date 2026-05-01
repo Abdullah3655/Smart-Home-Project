@@ -1,9 +1,9 @@
-package com.smarthome.devices.legacy;
+package com.smarthome.devices.version1;
 
 import com.smarthome.devices.Thermostat;
 
-public class OldThermostat extends Thermostat {
-    public OldThermostat(String id, String name) {
+public class Version1Thermostat extends Thermostat {
+    public Version1Thermostat(String id, String name) {
         super(id, name);
         setTemperature(20.0);
     }
@@ -15,3 +15,4 @@ public class OldThermostat extends Thermostat {
         super.setTemperature(rounded);
     }
 }
+

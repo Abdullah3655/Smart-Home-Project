@@ -8,9 +8,9 @@ Two known gaps remain in the foundation. Both small (~1 hour total).
 
 ---
 
-## Task A — New/Old device families with Abstract Factory
+## Task A — Versioned device families with Abstract Factory
 
-**Why:** you need a real Abstract Factory where each family produces the same product set in different ways. This means both factories can create Light/Thermostat/Lock/Camera, but each returns its own variant implementation (`New...` vs `Old...`).
+**Why:** you need a real Abstract Factory where each family produces the same product set in different ways. This means both factories can create Light/Thermostat/Lock/Camera, but each returns its own variant implementation (`Version2...` vs `Version1...`).
 
 ### What to change
 
@@ -26,27 +26,27 @@ public abstract class DeviceFactory {
 ```
 
 **Add concrete family factories:**
-- `src/main/java/com/smarthome/factory/NewDeviceFactory.java`
-- `src/main/java/com/smarthome/factory/OldDeviceFactory.java`
+- `src/main/java/com/smarthome/factory/Version2DeviceFactory.java`
+- `src/main/java/com/smarthome/factory/Version1DeviceFactory.java`
 
 Each factory must implement all 4 methods:
-- `NewDeviceFactory` returns `NewLight`, `NewThermostat`, `NewLock`, `NewCamera`
-- `OldDeviceFactory` returns `OldLight`, `OldThermostat`, `OldLock`, `OldCamera`
+- `Version2DeviceFactory` returns `Version2Light`, `Version2Thermostat`, `Version2Lock`, `Version2Camera`
+- `Version1DeviceFactory` returns `Version1Light`, `Version1Thermostat`, `Version1Lock`, `Version1Camera`
 
 **Add new concrete device variants:**
-- `src/main/java/com/smarthome/devices/newgen/NewLight.java`
-- `src/main/java/com/smarthome/devices/newgen/NewThermostat.java`
-- `src/main/java/com/smarthome/devices/newgen/NewLock.java`
-- `src/main/java/com/smarthome/devices/newgen/NewCamera.java`
-- `src/main/java/com/smarthome/devices/legacy/OldLight.java`
-- `src/main/java/com/smarthome/devices/legacy/OldThermostat.java`
-- `src/main/java/com/smarthome/devices/legacy/OldLock.java`
-- `src/main/java/com/smarthome/devices/legacy/OldCamera.java`
+- `src/main/java/com/smarthome/devices/version2/Version2Light.java`
+- `src/main/java/com/smarthome/devices/version2/Version2Thermostat.java`
+- `src/main/java/com/smarthome/devices/version2/Version2Lock.java`
+- `src/main/java/com/smarthome/devices/version2/Version2Camera.java`
+- `src/main/java/com/smarthome/devices/version1/Version1Light.java`
+- `src/main/java/com/smarthome/devices/version1/Version1Thermostat.java`
+- `src/main/java/com/smarthome/devices/version1/Version1Lock.java`
+- `src/main/java/com/smarthome/devices/version1/Version1Camera.java`
 
-### New/Old behavior contract (minimum)
+### Version behavior contract (minimum)
 
-For each product type, New and Old must differ in behavior:
-- **Light:** different brightness policy (e.g., new = smooth/clamped, old = stepped or stricter max).
+For each product type, Version2 and Version1 must differ in behavior:
+- **Light:** different brightness policy (e.g., version2 = smooth/clamped, version1 = stepped or stricter max).
 - **Thermostat:** different defaults/range handling.
 - **Lock:** different default lock state or lock/unlock policy.
 - **Camera:** different default power/arm behavior.
@@ -59,31 +59,31 @@ Both variants must still be usable by existing layers:
 Add tests like:
 
 ```java
-@Test void newFactoryCreatesNewFamilyTypes() {
-    DeviceFactory f = new NewDeviceFactory();
-    assertTrue(f.createLight("L") instanceof NewLight);
-    assertTrue(f.createThermostat("T") instanceof NewThermostat);
-    assertTrue(f.createDoorLock("D") instanceof NewLock);
-    assertTrue(f.createCamera("C") instanceof NewCamera);
+@Test void version2FactoryCreatesVersion2FamilyTypes() {
+    DeviceFactory f = new Version2DeviceFactory();
+    assertTrue(f.createLight("L") instanceof Version2Light);
+    assertTrue(f.createThermostat("T") instanceof Version2Thermostat);
+    assertTrue(f.createDoorLock("D") instanceof Version2Lock);
+    assertTrue(f.createCamera("C") instanceof Version2Camera);
 }
 
-@Test void oldFactoryCreatesOldFamilyTypes() {
-    DeviceFactory f = new OldDeviceFactory();
-    assertTrue(f.createLight("L") instanceof OldLight);
-    assertTrue(f.createThermostat("T") instanceof OldThermostat);
-    assertTrue(f.createDoorLock("D") instanceof OldLock);
-    assertTrue(f.createCamera("C") instanceof OldCamera);
+@Test void version1FactoryCreatesVersion1FamilyTypes() {
+    DeviceFactory f = new Version1DeviceFactory();
+    assertTrue(f.createLight("L") instanceof Version1Light);
+    assertTrue(f.createThermostat("T") instanceof Version1Thermostat);
+    assertTrue(f.createDoorLock("D") instanceof Version1Lock);
+    assertTrue(f.createCamera("C") instanceof Version1Camera);
 }
 ```
 
-Also add one behavior-difference test (New vs Old for same device type).
+Also add one behavior-difference test (Version2 vs Version1 for same device type).
 
 ### Acceptance
 
 - All tests pass.
 - `DeviceFactory` is abstract with 4 factory methods.
-- `NewDeviceFactory` and `OldDeviceFactory` both implement all 4 methods.
-- New/Old variants exist for all 4 device products and are behaviorally different.
+- `Version2DeviceFactory` and `Version1DeviceFactory` both implement all 4 methods.
+- Version1/Version2 variants exist for all 4 device products and are behaviorally different.
 
 ---
 
@@ -219,3 +219,4 @@ git push -u origin m1-foundation-polish
 ```
 
 PR title: `Foundation polish: Abstract Factory family grouping + Strategy bodies`
+
