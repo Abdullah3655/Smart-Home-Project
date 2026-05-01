@@ -11,14 +11,7 @@ import com.smarthome.devices.Thermostat;
 import java.util.Enumeration;
 import java.util.Objects;
 
-/**
- * STRATEGY PATTERN — Away mode.
- * Secures and minimises activity for an empty house: lights off,
- * doors locked, cameras armed, thermostat set to vacation temperature.
- */
 public class AwayMode implements AutomationMode {
-    private static final double AWAY_TEMPERATURE_C = 15.0;
-
     @Override
     public String name() {
         return "AWAY";
@@ -33,12 +26,15 @@ public class AwayMode implements AutomationMode {
                 Device device = devices.nextElement();
                 if (device instanceof Light light) {
                     light.turnOff();
-                } else if (device instanceof Lock lock) {
+                }
+                if (device instanceof Lock lock) {
                     lock.lock();
-                } else if (device instanceof Camera camera) {
+                }
+                if (device instanceof Camera camera) {
                     camera.turnOn();
-                } else if (device instanceof Thermostat thermostat) {
-                    thermostat.setTemperature(AWAY_TEMPERATURE_C);
+                }
+                if (device instanceof Thermostat thermostat) {
+                    thermostat.setTemperature(15.0);
                 }
             }
         }

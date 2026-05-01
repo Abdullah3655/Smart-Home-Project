@@ -8,107 +8,82 @@ Two known gaps remain in the foundation. Both small (~1 hour total).
 
 ---
 
-## Task A — Promote `DeviceFactory` to a true Abstract Factory
+## Task A — New/Old device families with Abstract Factory
 
-**Why:** the assignment brief says *"Abstract Factory with Factory Methods"* — we currently have only Factory Methods. Without family-grouped factories, we lose marks on the Abstract Factory half of that requirement.
+**Why:** you need a real Abstract Factory where each family produces the same product set in different ways. This means both factories can create Light/Thermostat/Lock/Camera, but each returns its own variant implementation (`New...` vs `Old...`).
 
 ### What to change
 
-**Replace** `src/main/java/com/smarthome/factory/DeviceFactory.java`:
+**Replace** `src/main/java/com/smarthome/factory/DeviceFactory.java` with an abstract factory that declares all 4 factory methods:
 
 ```java
-package com.smarthome.factory;
-
-import com.smarthome.devices.Device;
-import java.util.UUID;
-
-/**
- * ABSTRACT FACTORY PATTERN
- * Declares the family of related smart-home device products.
- * Each create... method is a FACTORY METHOD that subclasses implement
- * for the device families they own.
- */
 public abstract class DeviceFactory {
     public abstract Device createLight(String name);
     public abstract Device createThermostat(String name);
     public abstract Device createDoorLock(String name);
     public abstract Device createCamera(String name);
-
-    protected String newId() { return UUID.randomUUID().toString(); }
 }
 ```
 
-**Add** `src/main/java/com/smarthome/factory/ComfortFactory.java`:
+**Add concrete family factories:**
+- `src/main/java/com/smarthome/factory/NewDeviceFactory.java`
+- `src/main/java/com/smarthome/factory/OldDeviceFactory.java`
 
-```java
-package com.smarthome.factory;
+Each factory must implement all 4 methods:
+- `NewDeviceFactory` returns `NewLight`, `NewThermostat`, `NewLock`, `NewCamera`
+- `OldDeviceFactory` returns `OldLight`, `OldThermostat`, `OldLock`, `OldCamera`
 
-import com.smarthome.devices.*;
+**Add new concrete device variants:**
+- `src/main/java/com/smarthome/devices/newgen/NewLight.java`
+- `src/main/java/com/smarthome/devices/newgen/NewThermostat.java`
+- `src/main/java/com/smarthome/devices/newgen/NewLock.java`
+- `src/main/java/com/smarthome/devices/newgen/NewCamera.java`
+- `src/main/java/com/smarthome/devices/legacy/OldLight.java`
+- `src/main/java/com/smarthome/devices/legacy/OldThermostat.java`
+- `src/main/java/com/smarthome/devices/legacy/OldLock.java`
+- `src/main/java/com/smarthome/devices/legacy/OldCamera.java`
 
-/**
- * Concrete Abstract Factory for the COMFORT family
- * (lights + thermostats: ambient living conditions).
- */
-public class ComfortFactory extends DeviceFactory {
-    @Override public Device createLight(String n)      { return new Light(newId(), n); }
-    @Override public Device createThermostat(String n) { return new Thermostat(newId(), n); }
-    @Override public Device createDoorLock(String n) {
-        throw new UnsupportedOperationException("ComfortFactory does not produce locks");
-    }
-    @Override public Device createCamera(String n) {
-        throw new UnsupportedOperationException("ComfortFactory does not produce cameras");
-    }
-}
-```
+### New/Old behavior contract (minimum)
 
-**Add** `src/main/java/com/smarthome/factory/SecurityFactory.java`:
+For each product type, New and Old must differ in behavior:
+- **Light:** different brightness policy (e.g., new = smooth/clamped, old = stepped or stricter max).
+- **Thermostat:** different defaults/range handling.
+- **Lock:** different default lock state or lock/unlock policy.
+- **Camera:** different default power/arm behavior.
 
-```java
-package com.smarthome.factory;
-
-import com.smarthome.devices.*;
-
-/**
- * Concrete Abstract Factory for the SECURITY family
- * (locks + cameras: home protection).
- */
-public class SecurityFactory extends DeviceFactory {
-    @Override public Device createLight(String n) {
-        throw new UnsupportedOperationException("SecurityFactory does not produce lights");
-    }
-    @Override public Device createThermostat(String n) {
-        throw new UnsupportedOperationException("SecurityFactory does not produce thermostats");
-    }
-    @Override public Device createDoorLock(String n) { return new Lock(newId(), n); }
-    @Override public Device createCamera(String n)   { return new Camera(newId(), n); }
-}
-```
-
-**Existing `LightFactory`/`ThermostatFactory`/`LockFactory`/`CameraFactory`:** keep as helpers OR delete. Either is fine; deleting is cleaner.
+Both variants must still be usable by existing layers:
+- extend core classes (`Light`, `Thermostat`, `Lock`, `Camera`) so Strategy `instanceof` checks still work.
 
 ### Update the smoke test
 
+Add tests like:
+
 ```java
-@Test void comfortFactoryCreatesItsFamily() {
-    ComfortFactory f = new ComfortFactory();
-    assertNotNull(f.createLight("L"));
-    assertNotNull(f.createThermostat("T"));
-    assertThrows(UnsupportedOperationException.class, () -> f.createDoorLock("X"));
+@Test void newFactoryCreatesNewFamilyTypes() {
+    DeviceFactory f = new NewDeviceFactory();
+    assertTrue(f.createLight("L") instanceof NewLight);
+    assertTrue(f.createThermostat("T") instanceof NewThermostat);
+    assertTrue(f.createDoorLock("D") instanceof NewLock);
+    assertTrue(f.createCamera("C") instanceof NewCamera);
 }
 
-@Test void securityFactoryCreatesItsFamily() {
-    SecurityFactory f = new SecurityFactory();
-    assertNotNull(f.createDoorLock("D"));
-    assertNotNull(f.createCamera("C"));
-    assertThrows(UnsupportedOperationException.class, () -> f.createLight("X"));
+@Test void oldFactoryCreatesOldFamilyTypes() {
+    DeviceFactory f = new OldDeviceFactory();
+    assertTrue(f.createLight("L") instanceof OldLight);
+    assertTrue(f.createThermostat("T") instanceof OldThermostat);
+    assertTrue(f.createDoorLock("D") instanceof OldLock);
+    assertTrue(f.createCamera("C") instanceof OldCamera);
 }
 ```
+
+Also add one behavior-difference test (New vs Old for same device type).
 
 ### Acceptance
 
 - All tests pass.
-- `DeviceFactory` is an abstract class with **4 factory methods**.
-- 2 concrete family factories exist.
+- `DeviceFactory` is abstract with 4 factory methods.
+- `NewDeviceFactory` and `OldDeviceFactory` both implement all 4 methods.
+- New/Old variants exist for all 4 device products and are behaviorally different.
 
 ---
 

@@ -10,14 +10,7 @@ import com.smarthome.devices.Thermostat;
 import java.util.Enumeration;
 import java.util.Objects;
 
-/**
- * STRATEGY PATTERN — Sleep mode.
- * Prepares the home for night: lights off, doors locked, thermostat
- * lowered to a comfortable sleeping temperature.
- */
 public class SleepMode implements AutomationMode {
-    private static final double SLEEP_TEMPERATURE_C = 20.0;
-
     @Override
     public String name() {
         return "SLEEP";
@@ -32,10 +25,12 @@ public class SleepMode implements AutomationMode {
                 Device device = devices.nextElement();
                 if (device instanceof Light light) {
                     light.turnOff();
-                } else if (device instanceof Lock lock) {
+                }
+                if (device instanceof Lock lock) {
                     lock.lock();
-                } else if (device instanceof Thermostat thermostat) {
-                    thermostat.setTemperature(SLEEP_TEMPERATURE_C);
+                }
+                if (device instanceof Thermostat thermostat) {
+                    thermostat.setTemperature(20.0);
                 }
             }
         }

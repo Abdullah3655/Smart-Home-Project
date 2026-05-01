@@ -1,7 +1,7 @@
 package com.smarthome.devices;
 
 public class Lock extends Device {
-    private boolean locked = true;
+    private boolean locked = false;
 
     public Lock(String id, String name) {
         super(id, name);

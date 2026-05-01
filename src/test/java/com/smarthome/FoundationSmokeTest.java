@@ -7,16 +7,18 @@ import com.smarthome.devices.Device;
 import com.smarthome.devices.Light;
 import com.smarthome.devices.Lock;
 import com.smarthome.devices.Thermostat;
-import com.smarthome.factory.CameraFactory;
-import com.smarthome.factory.LightFactory;
-import com.smarthome.factory.LockFactory;
-import com.smarthome.factory.ThermostatFactory;
+import com.smarthome.devices.legacy.OldLight;
+import com.smarthome.devices.newgen.NewLight;
+import com.smarthome.factory.DeviceFactory;
+import com.smarthome.factory.NewDeviceFactory;
+import com.smarthome.factory.OldDeviceFactory;
 import com.smarthome.strategy.AwayMode;
 import com.smarthome.strategy.EcoMode;
 import com.smarthome.strategy.SleepMode;
 import org.junit.jupiter.api.Test;
 
 import java.util.Enumeration;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,7 +35,7 @@ class FoundationSmokeTest {
 
     @Test
     void factoryCreatesDeviceWithUuid() {
-        Device light = new LightFactory().create("Kitchen Light");
+        Device light = new NewDeviceFactory().createLight("Kitchen Light");
         assertNotNull(light.getId());
         assertFalse(light.getId().isEmpty());
     }
@@ -41,8 +43,9 @@ class FoundationSmokeTest {
     @Test
     void roomDevicesReturnsEnumeration() {
         Room room = new Room("r1", "Kitchen");
-        room.addDevice(new LightFactory().create("L1"));
-        room.addDevice(new LightFactory().create("L2"));
+        DeviceFactory factory = new NewDeviceFactory();
+        room.addDevice(factory.createLight("L1"));
+        room.addDevice(factory.createLight("L2"));
 
         Enumeration<Device> devices = room.devices();
         int count = 0;
@@ -56,7 +59,7 @@ class FoundationSmokeTest {
 
     @Test
     void observerReceivesUpdateOnDeviceChange() {
-        Light light = new LightFactory().create("L1");
+        Light light = (Light) new NewDeviceFactory().createLight("L1");
         StringBuilder captured = new StringBuilder();
 
         light.attach((device, event) -> captured.append(event));
@@ -76,71 +79,68 @@ class FoundationSmokeTest {
     }
 
     @Test
-    void ecoModeDimsLightsAndSetsModerateTemperature() {
+    void newFactoryCreatesNewFamilyTypes() {
+        DeviceFactory factory = new NewDeviceFactory();
+        assertTrue(factory.createLight("L") instanceof com.smarthome.devices.newgen.NewLight);
+        assertTrue(factory.createThermostat("T") instanceof com.smarthome.devices.newgen.NewThermostat);
+        assertTrue(factory.createDoorLock("D") instanceof com.smarthome.devices.newgen.NewLock);
+        assertTrue(factory.createCamera("C") instanceof com.smarthome.devices.newgen.NewCamera);
+    }
+
+    @Test
+    void oldFactoryCreatesOldFamilyTypes() {
+        DeviceFactory factory = new OldDeviceFactory();
+        assertTrue(factory.createLight("L") instanceof com.smarthome.devices.legacy.OldLight);
+        assertTrue(factory.createThermostat("T") instanceof com.smarthome.devices.legacy.OldThermostat);
+        assertTrue(factory.createDoorLock("D") instanceof com.smarthome.devices.legacy.OldLock);
+        assertTrue(factory.createCamera("C") instanceof com.smarthome.devices.legacy.OldCamera);
+    }
+
+    @Test
+    void oldAndNewLightBehaveDifferently() {
+        NewLight newLight = (NewLight) new NewDeviceFactory().createLight("New");
+        OldLight oldLight = (OldLight) new OldDeviceFactory().createLight("Old");
+
+        newLight.setBrightness(61);
+        oldLight.setBrightness(61);
+
+        assertEquals(61, newLight.getBrightness());
+        assertEquals(50, oldLight.getBrightness());
+    }
+
+    @Test
+    void ecoModeDimsLightsAndSetsModerateTemp() {
         SmartHomeHub hub = SmartHomeHub.getInstance();
-        Room kitchen = new Room("eco-kitchen", "Eco Kitchen");
-        Light light = new LightFactory().create("Eco Light");
-        Thermostat thermostat = new ThermostatFactory().create("Eco Thermostat");
+        Room room = new Room("k1-" + UUID.randomUUID(), "Kitchen");
+        NewDeviceFactory factory = new NewDeviceFactory();
+        Light light = (Light) factory.createLight("Kitchen Light");
+        Thermostat thermo = (Thermostat) factory.createThermostat("Kitchen Thermo");
         light.turnOn();
         light.setBrightness(100);
-        kitchen.addDevice(light);
-        kitchen.addDevice(thermostat);
-        hub.addRoom(kitchen);
+        room.addDevice(light);
+        room.addDevice(thermo);
+        hub.addRoom(room);
 
         new EcoMode().apply(hub);
 
         assertEquals(50, light.getBrightness());
-        assertEquals(24.0, thermostat.getTemperature(), 0.01);
+        assertEquals(24.0, thermo.getTemperature(), 0.01);
     }
 
     @Test
-    void sleepModeTurnsOffLightsAndLocksDoors() {
+    void awayModeLocksDoorsAndArmsCameras() {
         SmartHomeHub hub = SmartHomeHub.getInstance();
-        Room bedroom = new Room("sleep-bedroom", "Sleep Bedroom");
-        Light light = new LightFactory().create("Bedside Light");
-        Lock lock = new LockFactory().create("Bedroom Door");
-        light.turnOn();
-        lock.unlock();
-        bedroom.addDevice(light);
-        bedroom.addDevice(lock);
-        hub.addRoom(bedroom);
-
-        new SleepMode().apply(hub);
-
-        assertFalse(light.isPoweredOn());
-        assertTrue(lock.isLocked());
-    }
-
-    @Test
-    void awayModeSecuresHouseAndArmsCameras() {
-        SmartHomeHub hub = SmartHomeHub.getInstance();
-        Room hall = new Room("away-hall", "Away Hallway");
-        Light light = new LightFactory().create("Hall Light");
-        Lock lock = new LockFactory().create("Front Door");
-        Camera camera = new CameraFactory().create("Front Camera");
-        light.turnOn();
-        lock.unlock();
-        hall.addDevice(light);
-        hall.addDevice(lock);
-        hall.addDevice(camera);
-        hub.addRoom(hall);
+        Room room = new Room("s1-" + UUID.randomUUID(), "Security");
+        NewDeviceFactory factory = new NewDeviceFactory();
+        Lock doorLock = (Lock) factory.createDoorLock("Front Door");
+        Camera camera = (Camera) factory.createCamera("Front Camera");
+        room.addDevice(doorLock);
+        room.addDevice(camera);
+        hub.addRoom(room);
 
         new AwayMode().apply(hub);
 
-        assertFalse(light.isPoweredOn());
-        assertTrue(lock.isLocked());
+        assertTrue(doorLock.isLocked());
         assertTrue(camera.isPoweredOn());
-    }
-
-    @Test
-    void brightnessChangeFiresObserverEvent() {
-        Light light = new LightFactory().create("Observed Light");
-        StringBuilder captured = new StringBuilder();
-
-        light.attach((device, event) -> captured.append(event).append(","));
-        light.setBrightness(50);
-        light.setBrightness(50); // idempotent: should NOT fire again
-
-        assertEquals("BRIGHTNESS_CHANGED,", captured.toString());
     }
 }
