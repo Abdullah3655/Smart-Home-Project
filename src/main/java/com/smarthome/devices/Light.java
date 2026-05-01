@@ -16,6 +16,9 @@ public class Light extends Device {
         if (brightness < 0 || brightness > 100) {
             throw new IllegalArgumentException("brightness must be between 0 and 100");
         }
-        this.brightness = brightness;
+        if (this.brightness != brightness) {
+            this.brightness = brightness;
+            notifyObservers("BRIGHTNESS_CHANGED");
+        }
     }
 }
