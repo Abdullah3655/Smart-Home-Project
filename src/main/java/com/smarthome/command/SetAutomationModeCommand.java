@@ -26,15 +26,13 @@ public class SetAutomationModeCommand implements DeviceCommand {
     public void execute() {
         previousMode = receiver.getAutomationMode();
         receiver.setAutomationMode(newMode);
-        newMode.apply(receiver);
+        receiver.applyAutomationMode();
     }
 
     @Override
     public void undo() {
         receiver.setAutomationMode(previousMode);
-        if (previousMode != null) {
-            previousMode.apply(receiver);
-        }
+        receiver.applyAutomationMode();
     }
 
     @Override

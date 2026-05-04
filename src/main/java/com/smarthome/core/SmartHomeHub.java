@@ -43,6 +43,22 @@ public class SmartHomeHub implements RoomIterableCollection {
         return automationMode;
     }
 
+    /**
+     * STRATEGY PATTERN — Context delegate method.
+     *
+     * Per Refactoring Guru's canonical Strategy structure, the Context
+     * exposes a method that internally delegates to the configured Strategy,
+     * so callers do not need to know about concrete strategy classes.
+     *
+     * Use this instead of {@code hub.getAutomationMode().apply(hub)} —
+     * it keeps the strategy reference encapsulated inside the hub.
+     */
+    public void applyAutomationMode() {
+        if (automationMode != null) {
+            automationMode.apply(this);
+        }
+    }
+
     @Override
     public RoomIterator createIterator() {
         return new HubRoomIterator(new ArrayList<>(roomsById.values()));

@@ -143,5 +143,20 @@ class FoundationSmokeTest {
         assertTrue(doorLock.isLocked());
         assertTrue(camera.isPoweredOn());
     }
+
+    @Test
+    void hubApplyAutomationModeDelegatesToConfiguredStrategy() {
+        SmartHomeHub hub = SmartHomeHub.getInstance();
+        Room room = new Room("ctx-" + UUID.randomUUID(), "Context Room");
+        Version2DeviceFactory factory = new Version2DeviceFactory();
+        Lock doorLock = (Lock) factory.createDoorLock("Door");
+        room.addDevice(doorLock);
+        hub.addRoom(room);
+
+        hub.setAutomationMode(new AwayMode());
+        hub.applyAutomationMode();   // Context delegates to Strategy (RG canonical shape)
+
+        assertTrue(doorLock.isLocked());
+    }
 }
 
