@@ -163,7 +163,7 @@ Each pattern has a visible fingerprint a grader can identify within 5 seconds.
 | **Abstract Factory** | Device card subtitle ("Lighting · Version2") |
 | **Strategy** | Segmented mode picker (ECO/SLEEP/AWAY); cards visibly mutate when tapped |
 | **Command** | Undo button reverses last action with banner narration |
-| **DAO** | History feed reads from `DeviceEventDAO` when available |
+| **DAO** | History feed is **persisted** via `DeviceEventDAO`; reopening the app restores past events from `smarthome.db` |
 | **Decorator** | Dedicated screen with wrap/unwrap + 🎁 badge propagation |
 | **Facade** | Every button click maps to one `HomeController` method (code-visible) |
 
@@ -184,12 +184,15 @@ Each pattern has a visible fingerprint a grader can identify within 5 seconds.
 
 ### New / changed Java
 
-- `com.smarthome.ui.App` — change window size to 400×800, set initial scene to `main.fxml`
+- `com.smarthome.ui.App` — change window size to 400×800, set initial scene to `main.fxml`, initialise `Database.getInstance()` and attach `DaoEventBridge` to every seeded device
 - `com.smarthome.ui.MainController` — owns top bar, mode picker, status banner, bottom nav; loads sub-views into the center pane
 - `com.smarthome.ui.HomeController` (rename of current `DashboardController`) — renders the Home screen
-- `com.smarthome.ui.HistoryController` — renders the History screen
+- `com.smarthome.ui.HistoryController` — renders the History screen, reads from `DeviceEventDAO`
 - `com.smarthome.ui.DecoratorController` — renders the Decorator showcase
 - `com.smarthome.ui.StatusBanner` — small reusable component for the sliding banner
+- `com.smarthome.ui.DaoEventBridge` — implements `Observer`, forwards device events to `DeviceEventDAO.insert(...)`. The single allowed UI-layer DAO touchpoint.
+- Update `com.smarthome.facade.HomeController` constructor wiring: `App` instantiates it with real `DeviceEventDAO` + `CommandsLogDAO`, replacing the current `null` defaults.
+- Update `com.smarthome.command.CommandInvoker` to accept an optional `CommandsLogDAO` (constructor overload) and write a `commands_log` row after each successful `execute()`.
 
 ### Things to delete
 
@@ -209,12 +212,21 @@ User tap → JavaFX event handler in <Screen>Controller
            - StatusBanner shows live message
            - HistoryController appends to feed
            - HomeController refreshes the affected card
-        → If DAO present: DeviceEventDAO.insert(deviceId, eventType)
+        → DaoEventBridge Observer → DeviceEventDAO.insert(deviceId, eventType)
+        → CommandInvoker.execute() also writes to CommandsLogDAO.insert(...)
 ```
 
 The UI is purely **reactive** — controllers don't poll the hub. Every refresh is driven by the Observer chain.
 
-**Note on DAO wiring:** the existing backend does NOT auto-persist Observer events to `DeviceEventDAO`. The History screen's "DAO present" branch is a stretch that requires an additional `DaoEventBridge` Observer that calls `DeviceEventDAO.insert(...)` on each callback. If time runs short, ship History as in-memory-only — still demonstrably the Observer pattern, just without persistence.
+**DAO wiring (required, not optional):**
+
+1. `App.start()` initialises `Database.getInstance()` early so tables exist before the UI loads. SQLite file is `smarthome.db` at project root (already gitignored).
+2. A new `com.smarthome.ui.DaoEventBridge` class implements `Observer` and forwards every device event to `DeviceEventDAO.insert(deviceId, eventType)`. One instance is attached to every device at startup, alongside the in-memory listeners.
+3. The `HomeController` (Facade) is wired with a real `DeviceEventDAO` and `CommandsLogDAO` so `getEventHistory()` and `getCommandHistory()` return persisted rows, not empty lists.
+4. The Facade is updated so `CommandInvoker.execute()` writes a row to `commands_log` after each command — visible in History feed and across restarts.
+5. The `HistoryController` reads `facade.getEventHistory()` once at screen load (for past events from prior sessions) and then appends new events live via Observer.
+
+**Demo payoff:** on the demo video, narrate "I'm closing the app and reopening it — notice the history is still here, because the DAO persisted every event to SQLite." That's a 5-second moment that proves DAO + persistence rather than just demonstrating its existence in code.
 
 ---
 
@@ -252,7 +264,9 @@ The redesign is "done" when:
 6. History feed shows newest-first, auto-updates on every device event.
 7. Decorator screen lets the user wrap a device and see logged actions.
 8. All 45 existing tests still pass — UI changes do not regress backend behavior.
-9. No imports from `com.smarthome.persistence.dao.*` in any UI controller (Facade-only access).
+9. No imports from `com.smarthome.persistence.dao.*` in any UI controller **except** `DaoEventBridge` (which is the explicit, isolated bridge between the Observer and DAO layers — equivalent to RG's "Adapter at the boundary" pattern).
+10. Closing and re-opening the app restores past events from `smarthome.db` — proves DAO is wired in, not just present.
+11. After any command, a new row appears in `commands_log` (verifiable via DB Browser for SQLite or by tailing the History tab).
 
 ---
 
