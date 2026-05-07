@@ -1,0 +1,354 @@
+@startuml SmartHomeClassDiagram
+
+title Smart Home Automation — Class Diagram\nCSE3202 / SE 491 — All 9 design patterns
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam classFontSize 11
+skinparam classBackgroundColor #FFFFFF
+skinparam stereotypeCBackgroundColor #FFD99C
+skinparam stereotypeIBackgroundColor #B8D8E8
+skinparam packageBackgroundColor #F8F9FB
+
+' ═════════════════════════════════════════════════════════════
+' DOMAIN LAYER
+' ═════════════════════════════════════════════════════════════
+
+package "core" {
+    class SmartHomeHub <<Singleton>> {
+        - INSTANCE : SmartHomeHub {static}
+        - roomsById : Map
+        - automationMode : AutomationMode
+        --
+        + getInstance() : SmartHomeHub {static}
+        + addRoom(Room)
+        + getRoom(String) : Room
+        + getRooms() : Collection<Room>
+        + setAutomationMode(AutomationMode)
+        + applyAutomationMode()
+        + createIterator() : RoomIterator
+    }
+
+    class Room <<Iterator host>> {
+        - roomId : String
+        - name : String
+        - devicesById : Map
+        --
+        + addDevice(Device)
+        + removeDevice(String)
+        + getDevice(String) : Device
+        + devices() : Enumeration<Device>
+    }
+
+    interface RoomIterator <<Iterator>> {
+        + hasMore() : boolean
+        + getNext() : Room
+    }
+
+    class HubRoomIterator {
+        - rooms : List<Room>
+        - position : int
+        + hasMore() : boolean
+        + getNext() : Room
+    }
+
+    interface RoomIterableCollection {
+        + createIterator() : RoomIterator
+    }
+}
+
+package "observer" {
+    interface Observer <<Observer>> {
+        + update(Device d, String event)
+    }
+    interface Observable <<Subject>> {
+        + attach(Observer)
+        + detach(Observer)
+        + notifyObservers(String event)
+    }
+}
+
+package "devices" {
+    abstract class Device {
+        - id : String
+        - name : String
+        - poweredOn : boolean
+        - observers : List<Observer>
+        --
+        + turnOn()
+        + turnOff()
+        + isPoweredOn() : boolean
+        + attach(Observer)
+        + detach(Observer)
+        + notifyObservers(String)
+    }
+
+    class Light {
+        - brightness : int
+        + setBrightness(int)
+    }
+    class Thermostat {
+        - temperature : double
+        + setTemperature(double)
+    }
+    class Lock {
+        - locked : boolean
+        + lock()
+        + unlock()
+    }
+    class Camera
+
+    package "version1" {
+        class Version1Light
+        class Version1Thermostat
+        class Version1Lock
+        class Version1Camera
+    }
+    package "version2" {
+        class Version2Light
+        class Version2Thermostat
+        class Version2Lock
+        class Version2Camera
+    }
+
+    package "decorator" {
+        abstract class DeviceDecorator <<Decorator>> {
+            # wrappee : Device
+            + turnOn()
+            + turnOff()
+        }
+        class LoggingDeviceDecorator {
+            - log : List<String>
+            + getLog() : List<String>
+        }
+        class EnergyTrackedDecorator {
+            - totalOnMillis : long
+            + getTotalOnMillis() : long
+        }
+    }
+}
+
+package "factory" {
+    abstract class DeviceFactory <<Abstract Factory>> {
+        + {abstract} createLight(String) : Device
+        + {abstract} createThermostat(String) : Device
+        + {abstract} createDoorLock(String) : Device
+        + {abstract} createCamera(String) : Device
+        # newId() : String
+    }
+    class Version1DeviceFactory <<Concrete Factory>>
+    class Version2DeviceFactory <<Concrete Factory>>
+}
+
+package "strategy" {
+    interface AutomationMode <<Strategy>> {
+        + name() : String
+        + apply(SmartHomeHub)
+    }
+    class EcoMode <<Concrete Strategy>>
+    class SleepMode <<Concrete Strategy>>
+    class AwayMode <<Concrete Strategy>>
+}
+
+' ═════════════════════════════════════════════════════════════
+' APPLICATION LAYER
+' ═════════════════════════════════════════════════════════════
+
+package "command" {
+    interface DeviceCommand <<Command>> {
+        + execute()
+        + undo()
+        + describe() : String
+    }
+    class TurnOnCommand <<Concrete Command>>
+    class TurnOffCommand <<Concrete Command>>
+    class SetTemperatureCommand <<Concrete Command>>
+    class LockCommand <<Concrete Command>>
+    class UnlockCommand <<Concrete Command>>
+    class SetAutomationModeCommand <<Concrete Command>>
+
+    class CommandInvoker <<Invoker>> {
+        - history : Deque<DeviceCommand>
+        - auditLog : CommandsLogDAO
+        + execute(DeviceCommand)
+        + undo() : DeviceCommand
+        + canUndo() : boolean
+    }
+}
+
+package "facade" {
+    class HomeController <<Facade>> {
+        - hub : SmartHomeHub
+        - invoker : CommandInvoker
+        - eventDAO : DeviceEventDAO
+        - commandsLogDAO : CommandsLogDAO
+        --
+        + turnOnDevice(String)
+        + turnOffDevice(String)
+        + lockDevice(String)
+        + unlockDevice(String)
+        + setTemperature(String, double)
+        + setAutomationMode(String)
+        + getDevicesForRoom(String) : List<Device>
+        + getEventHistory() : List<DeviceEvent>
+        + getCommandHistory() : List<CommandLog>
+        + undoLastAction() : boolean
+    }
+}
+
+' ═════════════════════════════════════════════════════════════
+' PERSISTENCE LAYER
+' ═════════════════════════════════════════════════════════════
+
+package "persistence" {
+    class Database <<Singleton>> {
+        - INSTANCE : Database {static}
+        - connection : Connection
+        + getInstance() : Database {static}
+        + getConnection() : Connection
+    }
+
+    package "dao" {
+        class UserDAO <<DAO>>
+        class RoomDAO <<DAO>>
+        class DeviceDAO <<DAO>>
+        class DeviceEventDAO <<DAO>>
+        class CommandsLogDAO <<DAO>>
+    }
+}
+
+' ═════════════════════════════════════════════════════════════
+' UI LAYER (briefly)
+' ═════════════════════════════════════════════════════════════
+
+package "ui" {
+    class App <<JavaFX entry>> {
+        + start(Stage)
+    }
+    class DaoEventBridge <<Observer adapter>> {
+        - eventDao : DeviceEventDAO
+        - deviceDao : DeviceDAO
+        + update(Device, String)
+    }
+}
+
+' ═════════════════════════════════════════════════════════════
+' RELATIONSHIPS
+' ═════════════════════════════════════════════════════════════
+
+' Inheritance
+Light --|> Device
+Thermostat --|> Device
+Lock --|> Device
+Camera --|> Device
+
+Version1Light --|> Light
+Version1Thermostat --|> Thermostat
+Version1Lock --|> Lock
+Version1Camera --|> Camera
+Version2Light --|> Light
+Version2Thermostat --|> Thermostat
+Version2Lock --|> Lock
+Version2Camera --|> Camera
+
+DeviceDecorator --|> Device
+LoggingDeviceDecorator --|> DeviceDecorator
+EnergyTrackedDecorator --|> DeviceDecorator
+
+Version1DeviceFactory --|> DeviceFactory
+Version2DeviceFactory --|> DeviceFactory
+
+' Realization
+HubRoomIterator ..|> RoomIterator
+SmartHomeHub ..|> RoomIterableCollection
+Device ..|> Observable
+DaoEventBridge ..|> Observer
+
+EcoMode ..|> AutomationMode
+SleepMode ..|> AutomationMode
+AwayMode ..|> AutomationMode
+
+TurnOnCommand ..|> DeviceCommand
+TurnOffCommand ..|> DeviceCommand
+SetTemperatureCommand ..|> DeviceCommand
+LockCommand ..|> DeviceCommand
+UnlockCommand ..|> DeviceCommand
+SetAutomationModeCommand ..|> DeviceCommand
+
+' Composition / aggregation
+SmartHomeHub o-- Room : "rooms"
+Room o-- Device : "devices"
+Device o-- Observer : "observers"
+DeviceDecorator o-- Device : "wraps"
+SmartHomeHub --> AutomationMode : "current strategy"
+CommandInvoker o-- DeviceCommand : "undo stack"
+
+' Receiver references
+TurnOnCommand --> Device : "receiver"
+TurnOffCommand --> Device : "receiver"
+SetTemperatureCommand --> Thermostat : "receiver"
+LockCommand --> Lock : "receiver"
+UnlockCommand --> Lock : "receiver"
+SetAutomationModeCommand --> SmartHomeHub : "receiver"
+
+' Facade dependencies
+HomeController --> SmartHomeHub
+HomeController --> CommandInvoker
+HomeController --> DeviceEventDAO
+HomeController --> CommandsLogDAO
+
+' Invoker uses DAO
+CommandInvoker --> CommandsLogDAO : "audit log"
+
+' DAO ↔ Database
+UserDAO --> Database
+RoomDAO --> Database
+DeviceDAO --> Database
+DeviceEventDAO --> Database
+CommandsLogDAO --> Database
+
+' DAO uses Abstract Factory at runtime
+DeviceDAO ..> DeviceFactory : "reconstructs via"
+
+' UI wiring
+App --> SmartHomeHub : "seeds rooms"
+App --> Database : "initialises"
+App --> DaoEventBridge : "attaches to every device"
+DaoEventBridge --> DeviceEventDAO
+DaoEventBridge --> DeviceDAO
+
+note bottom of SmartHomeHub
+  Singleton owning all rooms.
+  Hosts the active Strategy (AutomationMode).
+  Iterable via custom RoomIterator.
+end note
+
+note right of HomeController
+  Facade — single entry point
+  for every UI controller.
+  Routes mutations through Command,
+  reads through DAO.
+end note
+
+note bottom of DeviceFactory
+  Abstract Factory + Factory Methods.
+  Two families:
+    - Version1 (legacy variants)
+    - Version2 (modern variants)
+  Each family creates the same product set.
+end note
+
+note left of DeviceDecorator
+  Wraps a Device transparently.
+  Stackable: LoggingDecorator can wrap
+  EnergyTrackedDecorator can wrap a Light.
+end note
+
+note right of CommandInvoker
+  Holds undo stack.
+  Optionally writes to commands_log
+  via CommandsLogDAO on every execute.
+end note
+
+@enduml
