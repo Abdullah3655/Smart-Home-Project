@@ -2,8 +2,10 @@ package com.smarthome.core;
 
 import com.smarthome.strategy.AutomationMode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,6 +40,11 @@ public class SmartHomeHub implements RoomIterableCollection {
     public Collection<Room> getRooms() {
         // Return read-only view so callers cannot mutate hub internals by accident.
         return Collections.unmodifiableCollection(roomsById.values());
+    }
+
+    // ITERATOR pattern method (rubric requirement: returns Enumeration).
+    public Enumeration<Room> enumerateRooms() {
+        return Collections.enumeration(new ArrayList<>(roomsById.values()));
     }
 
     public void setAutomationMode(AutomationMode mode) {

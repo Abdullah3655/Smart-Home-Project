@@ -92,7 +92,7 @@ isolation, UI cleanliness).
 | # | Pattern | Where it lives | Required methods |
 |---|---|---|---|
 | 1 | Singleton | `core.SmartHomeHub`, `persistence.Database` | `getInstance()`, private constructor |
-| 2 | Iterator | `core.Room.devices()`, `core.RoomIterator` | `devices() : Enumeration<Device>`; `hasMore()`, `getNext()` |
+| 2 | Iterator | `core.Room.enumerateDevices()`, `core.SmartHomeHub.enumerateRooms()`, `core.RoomIterator` | `enumerateDevices() : Enumeration<Device>`, `enumerateRooms() : Enumeration<Room>`; `hasMore()`, `getNext()` |
 | 3 | Observer | `observer.Observer/Observable`, `devices.Device` | `attach`, `detach`, `notifyObservers`, `update(Device, String)` |
 | 4 | Abstract Factory + Factory Methods | `factory.DeviceFactory` + `Version1/Version2DeviceFactory` | `createLight`, `createThermostat`, `createDoorLock`, `createCamera` |
 | 5 | Strategy | `strategy.AutomationMode` + 3 modes; `SmartHomeHub` is the Context | `name()`, `apply(SmartHomeHub)` |
@@ -108,11 +108,13 @@ isolation, UI cleanliness).
   and competing JDBC connections. Both use eager initialisation, which
   the JVM guarantees thread-safe via class-loading.
 
-- **Iterator** — `Room.devices()` returns `Enumeration<Device>` to
-  honour the brief's exact wording. A custom `RoomIterator`
-  (`hasMore() / getNext()`) is also implemented at the hub level,
-  demonstrating the textbook Gang-of-Four shape alongside the
-  Enumeration form.
+- **Iterator** — `Room.enumerateDevices()` and
+  `SmartHomeHub.enumerateRooms()` both return `java.util.Enumeration`
+  to honour the brief's exact wording (mirroring the Airport reference
+  example which has `Enumeration` at both `Airport` and `Terminal`
+  levels). A custom `RoomIterator` (`hasMore() / getNext()`) is also
+  implemented at the hub level, demonstrating the textbook Gang-of-Four
+  shape alongside the Enumeration form.
 
 - **Observer** — devices fire `notifyObservers(event)` after every
   state change, pushing both the affected device and a short event

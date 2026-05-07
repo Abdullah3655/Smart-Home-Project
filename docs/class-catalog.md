@@ -49,9 +49,10 @@ application sees one authoritative state.
 - `void addRoom(Room r)`
 - `Room getRoom(String roomId)`
 - `Collection<Room> getRooms()`
+- `Enumeration<Room> enumerateRooms()` — Iterator pattern method (rubric requirement)
 - `void setAutomationMode(AutomationMode mode)` — install a Strategy
 - `void applyAutomationMode()` — Context delegate
-- `RoomIterator createIterator()` — Iterator pattern accessor
+- `RoomIterator createIterator()` — Iterator pattern accessor (custom GoF interface)
 
 ---
 
@@ -72,7 +73,8 @@ Exposes its devices via the **Iterator pattern** as an
 - `void addDevice(Device d)`
 - `void removeDevice(String deviceId)`
 - `Device getDevice(String deviceId)`
-- `Enumeration<Device> devices()` — Iterator pattern method (rubric requirement)
+- `List<Device> devices()` — modern accessor for callers
+- `Enumeration<Device> enumerateDevices()` — Iterator pattern method (rubric requirement)
 
 ---
 
