@@ -9,11 +9,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+
+import java.util.Optional;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -99,6 +104,9 @@ public class MainController implements Initializable {
     @FXML private void onModeAway()  { applyMode("AWAY",  modeAwayButton);  }
 
     private void applyMode(String name, Button activated) {
+        if (!confirmModeChange(name)) {
+            return;
+        }
         try {
             sharedFacade.setAutomationMode(name);
             highlightMode(activated);
@@ -109,6 +117,30 @@ public class MainController implements Initializable {
             showBanner("Could not apply " + name + ": " + e.getMessage(),
                        "status-banner-error");
         }
+    }
+
+    /**
+     * Asks the user to confirm a mode change because mode strategies
+     * mutate every device in the home. Returns true if the user proceeds.
+     */
+    private boolean confirmModeChange(String name) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirm automation mode");
+        alert.setHeaderText("Apply " + name + " mode?");
+        alert.setContentText(consequenceFor(name) + "\n\nThis can be reversed with the Undo button.");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    private String consequenceFor(String name) {
+        return switch (name) {
+            case "ECO"   -> "ECO will set every thermostat to 24°C and dim every powered-on light to 50%.";
+            case "SLEEP" -> "SLEEP will turn off every light, lock every door, and set thermostats to 20°C.";
+            case "AWAY"  -> "AWAY will turn off every light, lock every door, arm every camera, and set thermostats to 15°C.";
+            default      -> "This will change the state of multiple devices across every room.";
+        };
     }
 
     private void highlightMode(Button activated) {

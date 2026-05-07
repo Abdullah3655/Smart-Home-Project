@@ -216,6 +216,11 @@ public class HomeController implements Initializable {
             badge.setText(lock.isLocked() ? "🔒 LOCKED" : "🔓 UNLOCKED");
             badge.getStyleClass().add(lock.isLocked()
                 ? "device-state-locked" : "device-state-off");
+        } else if (d instanceof Thermostat thermostat) {
+            // Thermostats are always "active" — show their target temperature
+            // instead of an on/off badge (semantically more honest).
+            badge.setText(String.format("%.0f°C", thermostat.getTemperature()));
+            badge.getStyleClass().add("device-state-on");
         } else {
             badge.setText(d.isPoweredOn() ? "● ON" : "○ OFF");
             badge.getStyleClass().add(d.isPoweredOn()
