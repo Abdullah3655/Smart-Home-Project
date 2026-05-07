@@ -5,7 +5,7 @@ This folder contains the visuals embedded in `../report.md` under
 
 ## What's here now
 
-5 SVG mockups generated from the actual app's design tokens (same
+4 SVG mockups generated from the actual app's design tokens (same
 colours, spacing, fonts, layout as the running JavaFX UI). They render
 crisply in GitHub, in any markdown→PDF tool, and in Word.
 
@@ -14,7 +14,6 @@ crisply in GitHub, in any markdown→PDF tool, and in Word.
 | `home.svg` | Home screen — rooms with device cards, status banner, mode picker |
 | `mode-confirm.svg` | The confirmation dialog over the dimmed Home screen |
 | `history.svg` | History tab feed of device events |
-| `decorator.svg` | Decorator showcase with wrap/unwrap and captured log |
 | `add-device.svg` | Add Device modal showing type/family/name fields |
 
 ## Replacing with real screenshots (optional)
@@ -33,7 +32,6 @@ If you want to swap in real screenshots from the running app:
 | `home.png` | Default landing screen on launch |
 | `mode-confirm.png` | Tap ECO/SLEEP/AWAY in the top bar |
 | `history.png` | Tap a few devices, then tap 📋 History in bottom nav |
-| `decorator.png` | Tap 🎁 Demo, pick a device, "Wrap with Logging", then "Turn On (wrapped)" |
 | `add-device.png` | Tap "+ Add device to {Room}" at the bottom of any room |
 
 ## Why SVG by default
