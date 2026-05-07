@@ -272,16 +272,16 @@ factory implement every method meaningfully.
 
 <table>
   <tr>
-    <td align="center"><img src="images/home.svg" width="180" alt="Home"/><br/><b>Home</b><br/>Rooms + device cards</td>
-    <td align="center"><img src="images/mode-confirm.svg" width="180" alt="Mode confirm"/><br/><b>Mode confirm</b><br/>Strategy with consequence dialog</td>
-    <td align="center"><img src="images/history.svg" width="180" alt="History"/><br/><b>History</b><br/>Observer + DAO live feed</td>
+    <td align="center"><img src="images/home.svg" width="200" alt="Home"/><br/><b>Home</b><br/>Rooms + device cards</td>
+    <td align="center"><img src="images/mode-confirm.svg" width="200" alt="Mode confirm"/><br/><b>Mode confirm</b><br/>Strategy with consequence dialog</td>
   </tr>
   <tr>
-    <td align="center"><img src="images/decorator.svg" width="180" alt="Decorator"/><br/><b>Decorator</b><br/>Wrap + captured log</td>
-    <td align="center"><img src="images/add-device.svg" width="180" alt="Add device"/><br/><b>Add device</b><br/>Abstract Factory at runtime</td>
-    <td align="center" style="font-size:small; color:#5a6478">Run with<br/><code>./mvnw javafx:run</code><br/>Window: 400×800</td>
+    <td align="center"><img src="images/history.svg" width="200" alt="History"/><br/><b>History</b><br/>Observer + DAO live feed</td>
+    <td align="center"><img src="images/add-device.svg" width="200" alt="Add device"/><br/><b>Add device</b><br/>Abstract Factory at runtime</td>
   </tr>
 </table>
+
+Run the GUI with `./mvnw javafx:run` (window size 400×800).
 
 ---
 

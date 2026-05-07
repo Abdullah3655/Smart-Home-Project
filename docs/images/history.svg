@@ -8,78 +8,69 @@
   <rect x="290" y="22" width="92" height="34" rx="17" fill="#00504A"/>
   <text x="336" y="44" fill="#9CF1E3" font-size="13" font-weight="bold" text-anchor="middle">↶ Undo</text>
 
-  <!-- Mode picker (none active) -->
+  <!-- Mode picker (single outlined segmented) -->
   <text x="16" y="86" fill="#CAC4D0" font-size="11" letter-spacing="1.5" font-weight="bold">AUTOMATION MODE</text>
-  <rect x="16" y="100" width="120" height="44" rx="22" ry="22" fill="none" stroke="#938F99"/>
-  <text x="76" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">ECO</text>
-  <rect x="136" y="100" width="120" height="44" fill="none" stroke="#938F99"/>
-  <text x="196" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">SLEEP</text>
-  <rect x="256" y="100" width="120" height="44" rx="22" ry="22" fill="none" stroke="#938F99"/>
-  <text x="316" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">AWAY</text>
+  <rect x="16" y="100" width="368" height="44" rx="22" fill="none" stroke="#938F99"/>
+  <line x1="138" y1="100" x2="138" y2="144" stroke="#938F99"/>
+  <line x1="261" y1="100" x2="261" y2="144" stroke="#938F99"/>
+  <text x="77" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">ECO</text>
+  <text x="200" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">SLEEP</text>
+  <text x="322" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">AWAY</text>
 
-  <!-- Section title -->
-  <text x="22" y="184" fill="#E6E0E9" font-size="18" font-weight="bold">Activity</text>
-  <text x="22" y="204" fill="#CAC4D0" font-size="11">Device events from this session and earlier — persisted via the DAO pattern.</text>
+  <!-- Section -->
+  <text x="22" y="194" fill="#E6E0E9" font-size="22" font-weight="bold">Activity</text>
+  <text x="22" y="220" fill="#CAC4D0" font-size="12">Device events from this session and earlier — persisted</text>
+  <text x="22" y="236" fill="#CAC4D0" font-size="12">via the DAO pattern.</text>
 
-  <!-- Event row template (M3 list with leading icon, two lines) -->
-  <!-- Row 1 -->
-  <rect x="16" y="220" width="368" height="56" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="248" r="14" fill="#684626"/>
-  <text x="44" y="253" fill="#FFDDB7" font-size="13" text-anchor="middle">●</text>
-  <text x="74" y="244" fill="#E6E0E9" font-size="13" font-weight="bold">Ceiling Light</text>
-  <text x="74" y="262" fill="#CAC4D0" font-size="11">TURNED_ON</text>
-  <text x="368" y="244" fill="#79747E" font-size="11" text-anchor="end">14:23:01</text>
+  <!-- Row template: rounded card, leading icon avatar, two-line text, trailing time -->
+  <!-- Row 1: hih · Temperature changed -->
+  <rect x="16" y="262" width="368" height="60" rx="16" fill="#211F26"/>
+  <circle cx="48" cy="292" r="16" fill="#9D3F1A"/>
+  <text x="48" y="298" fill="#FFFFFF" font-size="14" text-anchor="middle">🌡</text>
+  <text x="78" y="288" fill="#E6E0E9" font-size="13" font-weight="bold">hih</text>
+  <text x="78" y="306" fill="#CAC4D0" font-size="11">Temperature changed</text>
+  <text x="368" y="296" fill="#79747E" font-size="11" text-anchor="end">22:21:23</text>
 
   <!-- Row 2 -->
-  <rect x="16" y="288" width="368" height="56" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="316" r="14" fill="#684626"/>
-  <text x="44" y="321" fill="#FFDDB7" font-size="13" text-anchor="middle">✦</text>
-  <text x="74" y="312" fill="#E6E0E9" font-size="13" font-weight="bold">Ceiling Light</text>
-  <text x="74" y="330" fill="#CAC4D0" font-size="11">BRIGHTNESS_CHANGED</text>
-  <text x="368" y="312" fill="#79747E" font-size="11" text-anchor="end">14:22:47</text>
+  <rect x="16" y="334" width="368" height="60" rx="16" fill="#211F26"/>
+  <circle cx="48" cy="364" r="16" fill="#9D3F1A"/>
+  <text x="48" y="370" fill="#FFFFFF" font-size="14" text-anchor="middle">🌡</text>
+  <text x="78" y="360" fill="#E6E0E9" font-size="13" font-weight="bold">hih</text>
+  <text x="78" y="378" fill="#CAC4D0" font-size="11">Temperature changed</text>
+  <text x="368" y="368" fill="#79747E" font-size="11" text-anchor="end">22:21:21</text>
 
   <!-- Row 3 -->
-  <rect x="16" y="356" width="368" height="56" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="384" r="14" fill="#684626"/>
-  <text x="44" y="389" fill="#FFDDB7" font-size="13" text-anchor="middle">🌡</text>
-  <text x="74" y="380" fill="#E6E0E9" font-size="13" font-weight="bold">Kitchen Thermostat</text>
-  <text x="74" y="398" fill="#CAC4D0" font-size="11">TEMP_CHANGED</text>
-  <text x="368" y="380" fill="#79747E" font-size="11" text-anchor="end">14:22:47</text>
+  <rect x="16" y="406" width="368" height="60" rx="16" fill="#211F26"/>
+  <circle cx="48" cy="436" r="16" fill="#9D3F1A"/>
+  <text x="48" y="442" fill="#FFFFFF" font-size="14" text-anchor="middle">🌡</text>
+  <text x="78" y="432" fill="#E6E0E9" font-size="13" font-weight="bold">hih</text>
+  <text x="78" y="450" fill="#CAC4D0" font-size="11">Temperature changed</text>
+  <text x="368" y="440" fill="#79747E" font-size="11" text-anchor="end">22:21:16</text>
 
-  <!-- Row 4 -->
-  <rect x="16" y="424" width="368" height="56" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="452" r="14" fill="#00504A"/>
-  <text x="44" y="457" fill="#9CF1E3" font-size="13" text-anchor="middle">▣</text>
-  <text x="74" y="448" fill="#E6E0E9" font-size="13" font-weight="bold">Smart Lock</text>
-  <text x="74" y="466" fill="#CAC4D0" font-size="11">LOCKED</text>
-  <text x="368" y="448" fill="#79747E" font-size="11" text-anchor="end">14:21:08</text>
+  <!-- Row 4: light1 turned off -->
+  <rect x="16" y="478" width="368" height="60" rx="16" fill="#211F26"/>
+  <circle cx="48" cy="508" r="16" fill="#2B2930" stroke="#49454F"/>
+  <circle cx="48" cy="508" r="5" fill="none" stroke="#CAC4D0" stroke-width="1.5"/>
+  <text x="78" y="504" fill="#E6E0E9" font-size="13" font-weight="bold">light1</text>
+  <text x="78" y="522" fill="#CAC4D0" font-size="11">Turned off</text>
+  <text x="368" y="512" fill="#79747E" font-size="11" text-anchor="end">22:20:23</text>
 
-  <!-- Row 5 -->
-  <rect x="16" y="492" width="368" height="56" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="520" r="14" fill="#2B2930"/>
-  <text x="44" y="525" fill="#79747E" font-size="13" text-anchor="middle">○</text>
-  <text x="74" y="516" fill="#E6E0E9" font-size="13" font-weight="bold">Lamp</text>
-  <text x="74" y="534" fill="#CAC4D0" font-size="11">TURNED_OFF</text>
-  <text x="368" y="516" fill="#79747E" font-size="11" text-anchor="end">14:20:45</text>
-
-  <!-- Row 6 -->
-  <rect x="16" y="560" width="368" height="56" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="588" r="14" fill="#684626"/>
-  <text x="44" y="593" fill="#FFDDB7" font-size="13" text-anchor="middle">●</text>
-  <text x="74" y="584" fill="#E6E0E9" font-size="13" font-weight="bold">Lamp</text>
-  <text x="74" y="602" fill="#CAC4D0" font-size="11">TURNED_ON</text>
-  <text x="368" y="584" fill="#79747E" font-size="11" text-anchor="end">14:18:11</text>
+  <!-- Row 5: light1 brightness changed -->
+  <rect x="16" y="550" width="368" height="60" rx="16" fill="#211F26"/>
+  <circle cx="48" cy="580" r="16" fill="#9D3F1A"/>
+  <text x="48" y="586" fill="#FFFFFF" font-size="14" text-anchor="middle">✦</text>
+  <text x="78" y="576" fill="#E6E0E9" font-size="13" font-weight="bold">light1</text>
+  <text x="78" y="594" fill="#CAC4D0" font-size="11">Brightness changed</text>
+  <text x="368" y="584" fill="#79747E" font-size="11" text-anchor="end">22:20:20</text>
 
   <text x="200" y="660" fill="#79747E" font-size="11" text-anchor="middle" font-style="italic">… continues with older events …</text>
 
-  <!-- Bottom nav (History active) -->
-  <rect x="0" y="736" width="400" height="64" fill="#141218"/>
-  <line x1="0" y1="736" x2="400" y2="736" stroke="#49454F"/>
-  <text x="66" y="757" fill="#CAC4D0" font-size="14" text-anchor="middle">🏠</text>
-  <text x="66" y="784" fill="#CAC4D0" font-size="11" text-anchor="middle">Home</text>
-  <rect x="184" y="744" width="32" height="16" rx="8" fill="#00504A"/>
-  <text x="200" y="757" fill="#9CF1E3" font-size="14" text-anchor="middle">📋</text>
-  <text x="200" y="784" fill="#FFB870" font-size="11" font-weight="bold" text-anchor="middle">History</text>
-  <text x="334" y="757" fill="#CAC4D0" font-size="14" text-anchor="middle">✨</text>
-  <text x="334" y="784" fill="#CAC4D0" font-size="11" text-anchor="middle">Demo</text>
+  <!-- Bottom nav (Home + History; History active) -->
+  <rect x="0" y="720" width="400" height="80" fill="#141218"/>
+  <line x1="0" y1="720" x2="400" y2="720" stroke="#49454F"/>
+  <text x="100" y="746" fill="#CAC4D0" font-size="14" text-anchor="middle">🏠</text>
+  <text x="100" y="772" fill="#CAC4D0" font-size="11" text-anchor="middle">Home</text>
+  <rect x="276" y="730" width="48" height="22" rx="11" fill="#00504A"/>
+  <text x="300" y="746" fill="#9CF1E3" font-size="14" text-anchor="middle">📋</text>
+  <text x="300" y="772" fill="#FFB870" font-size="11" font-weight="bold" text-anchor="middle">History</text>
 </svg>

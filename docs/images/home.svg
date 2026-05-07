@@ -2,99 +2,86 @@
   <!-- M3 Dark surface -->
   <rect width="400" height="800" fill="#141218"/>
 
-  <!-- Top bar (M3 center-aligned with overline + title) -->
+  <!-- Top bar: overline + title + filled-tonal Undo pill -->
   <text x="20" y="34" fill="#FFB870" font-size="18">◐</text>
   <text x="40" y="32" fill="#CAC4D0" font-size="9" letter-spacing="1.5">WELCOME HOME</text>
   <text x="40" y="50" fill="#E6E0E9" font-size="20" font-weight="bold">Smart Home</text>
-  <!-- Filled-tonal Undo button (pill) -->
   <rect x="290" y="22" width="92" height="34" rx="17" fill="#00504A"/>
   <text x="336" y="44" fill="#9CF1E3" font-size="13" font-weight="bold" text-anchor="middle">↶ Undo</text>
 
   <!-- Mode picker overline -->
   <text x="16" y="86" fill="#CAC4D0" font-size="11" letter-spacing="1.5" font-weight="bold">AUTOMATION MODE</text>
 
-  <!-- Segmented buttons (pill ends) -->
-  <rect x="16" y="100" width="120" height="44" rx="22" ry="22" fill="#00504A"/>
-  <text x="76" y="127" fill="#9CF1E3" font-size="13" font-weight="bold" text-anchor="middle">ECO</text>
-  <rect x="136" y="100" width="120" height="44" fill="none" stroke="#938F99"/>
-  <text x="196" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">SLEEP</text>
-  <rect x="256" y="100" width="120" height="44" rx="22" ry="22" fill="none" stroke="#938F99"/>
-  <text x="316" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">AWAY</text>
+  <!-- Single outlined segmented button (3 cells, shared border) -->
+  <rect x="16" y="100" width="368" height="44" rx="22" fill="none" stroke="#938F99"/>
+  <line x1="138" y1="100" x2="138" y2="144" stroke="#938F99"/>
+  <line x1="261" y1="100" x2="261" y2="144" stroke="#938F99"/>
+  <text x="77" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">ECO</text>
+  <text x="200" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">SLEEP</text>
+  <text x="322" y="127" fill="#E6E0E9" font-size="13" font-weight="bold" text-anchor="middle">AWAY</text>
 
-  <!-- Snackbar (M3 inverse-surface) -->
-  <rect x="16" y="160" width="368" height="40" rx="4" fill="#E6E0E9" filter="url(#shadow)"/>
-  <text x="32" y="184" fill="#322F35" font-size="12">✓ Eco mode applied to the whole home.</text>
-  <defs>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.55)"/>
-    </filter>
-  </defs>
+  <!-- Front Door header + device count chip -->
+  <text x="22" y="194" fill="#E6E0E9" font-size="20" font-weight="bold">Front Door</text>
+  <rect x="318" y="178" width="62" height="22" rx="11" fill="#211F26"/>
+  <text x="349" y="194" fill="#CAC4D0" font-size="11" text-anchor="middle">3 devices</text>
 
-  <!-- Kitchen header -->
-  <text x="22" y="240" fill="#E6E0E9" font-size="18" font-weight="bold">Kitchen</text>
-  <rect x="318" y="226" width="62" height="20" rx="10" fill="#211F26"/>
-  <text x="349" y="240" fill="#CAC4D0" font-size="11" text-anchor="middle">2 devices</text>
+  <!-- ============= Device card 1: light1 (OFF) ============= -->
+  <rect x="16" y="212" width="368" height="116" rx="16" fill="#211F26"/>
+  <!-- Avatar: neutral container, dim icon (light off) -->
+  <circle cx="48" cy="244" r="18" fill="#E6E0E9"/>
+  <text x="48" y="251" fill="#322F35" font-size="18" text-anchor="middle">💡</text>
+  <text x="78" y="240" fill="#E6E0E9" font-size="16" font-weight="bold">light1</text>
+  <text x="78" y="258" fill="#79747E" font-size="11">Lighting · Version2</text>
+  <!-- State chip: OFF (neutral) -->
+  <rect x="316" y="226" width="60" height="22" rx="11" fill="#322F35"/>
+  <text x="346" y="241" fill="#CAC4D0" font-size="11" font-weight="bold" text-anchor="middle">OFF</text>
+  <!-- Filled "Turn On" -->
+  <rect x="32" y="280" width="100" height="34" rx="17" fill="#FFB870"/>
+  <text x="82" y="301" fill="#48290B" font-size="13" font-weight="bold" text-anchor="middle">Turn On</text>
 
-  <!-- Device card 1: Ceiling Light -->
-  <rect x="16" y="252" width="368" height="100" rx="16" fill="#211F26"/>
-  <!-- Icon avatar (M3 leading) -->
-  <circle cx="44" cy="282" r="18" fill="#684626"/>
-  <text x="44" y="288" fill="#FFDDB7" font-size="18" text-anchor="middle">💡</text>
-  <text x="74" y="280" fill="#E6E0E9" font-size="15" font-weight="bold">Ceiling Light</text>
-  <text x="74" y="296" fill="#79747E" font-size="11">Lighting · Version2</text>
-  <!-- State chip -->
-  <rect x="296" y="266" width="72" height="22" rx="11" fill="#684626"/>
-  <text x="332" y="281" fill="#FFDDB7" font-size="11" font-weight="bold" text-anchor="middle">● ON</text>
-  <!-- Action button -->
-  <rect x="74" y="312" width="100" height="28" rx="14" fill="none" stroke="#938F99"/>
-  <text x="124" y="330" fill="#E6E0E9" font-size="12" text-anchor="middle">Turn off</text>
+  <!-- ============= Device card 2: lock (LOCKED) ============= -->
+  <rect x="16" y="340" width="368" height="116" rx="16" fill="#211F26"/>
+  <!-- Avatar: teal -->
+  <circle cx="48" cy="372" r="18" fill="#00504A"/>
+  <text x="48" y="378" fill="#FFFFFF" font-size="16" text-anchor="middle">🔒</text>
+  <text x="78" y="368" fill="#E6E0E9" font-size="16" font-weight="bold">lock</text>
+  <text x="78" y="386" fill="#79747E" font-size="11">Security · Version2</text>
+  <!-- State chip: LOCKED (teal) -->
+  <rect x="296" y="354" width="80" height="22" rx="11" fill="#00504A"/>
+  <text x="336" y="369" fill="#9CF1E3" font-size="11" font-weight="bold" text-anchor="middle">LOCKED</text>
+  <!-- Outlined "Unlock" -->
+  <rect x="32" y="408" width="100" height="34" rx="17" fill="none" stroke="#938F99"/>
+  <text x="82" y="429" fill="#E6E0E9" font-size="13" text-anchor="middle">Unlock</text>
 
-  <!-- Device card 2: Thermostat -->
-  <rect x="16" y="364" width="368" height="100" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="394" r="18" fill="#684626"/>
-  <text x="44" y="400" fill="#FFDDB7" font-size="18" text-anchor="middle">🌡</text>
-  <text x="74" y="392" fill="#E6E0E9" font-size="15" font-weight="bold">Kitchen Thermostat</text>
-  <text x="74" y="408" fill="#79747E" font-size="11">Climate · Version2</text>
-  <!-- Temperature chip -->
-  <rect x="316" y="378" width="52" height="22" rx="11" fill="#684626"/>
-  <text x="342" y="393" fill="#FFDDB7" font-size="12" font-weight="bold" text-anchor="middle">24°C</text>
-  <!-- Spinner buttons -->
-  <circle cx="86" cy="436" r="14" fill="#2B2930"/>
-  <text x="86" y="441" fill="#E6E0E9" font-size="14" font-weight="bold" text-anchor="middle">−</text>
-  <text x="124" y="441" fill="#FFB870" font-size="16" font-weight="bold">24°C</text>
-  <circle cx="170" cy="436" r="14" fill="#2B2930"/>
-  <text x="170" y="441" fill="#E6E0E9" font-size="14" font-weight="bold" text-anchor="middle">+</text>
+  <!-- ============= Device card 3: hih (Climate) ============= -->
+  <rect x="16" y="468" width="368" height="116" rx="16" fill="#211F26"/>
+  <!-- Avatar: orange/red -->
+  <circle cx="48" cy="500" r="18" fill="#9D3F1A"/>
+  <text x="48" y="506" fill="#FFFFFF" font-size="16" text-anchor="middle">🌡</text>
+  <text x="78" y="496" fill="#E6E0E9" font-size="16" font-weight="bold">hih</text>
+  <text x="78" y="514" fill="#79747E" font-size="11">Climate · Version2</text>
+  <!-- Temp chip -->
+  <rect x="316" y="482" width="60" height="22" rx="11" fill="#684626"/>
+  <text x="346" y="497" fill="#FFDDB7" font-size="12" font-weight="bold" text-anchor="middle">15°C</text>
+  <!-- Spinner -->
+  <circle cx="60" cy="546" r="14" fill="#2B2930"/>
+  <text x="60" y="551" fill="#E6E0E9" font-size="14" font-weight="bold" text-anchor="middle">−</text>
+  <text x="120" y="552" fill="#FFB870" font-size="18" font-weight="bold">15°C</text>
+  <circle cx="194" cy="546" r="14" fill="#2B2930"/>
+  <text x="194" y="551" fill="#E6E0E9" font-size="14" font-weight="bold" text-anchor="middle">+</text>
 
-  <!-- + Add device chip -->
-  <rect x="16" y="480" width="368" height="36" rx="18" fill="none" stroke="#49454F" stroke-dasharray="4 3"/>
-  <text x="200" y="502" fill="#CAC4D0" font-size="12" text-anchor="middle">+ Add device to Kitchen</text>
+  <!-- + Add device pill -->
+  <rect x="16" y="600" width="368" height="40" rx="20" fill="none" stroke="#49454F" stroke-dasharray="4 3"/>
+  <text x="200" y="624" fill="#FFB870" font-size="13" font-weight="bold" text-anchor="middle">+ Add device to Front Door</text>
 
-  <!-- Living Room header -->
-  <text x="22" y="554" fill="#E6E0E9" font-size="18" font-weight="bold">Living Room</text>
-  <rect x="318" y="540" width="62" height="20" rx="10" fill="#211F26"/>
-  <text x="349" y="554" fill="#CAC4D0" font-size="11" text-anchor="middle">2 devices</text>
-
-  <!-- Lamp card -->
-  <rect x="16" y="566" width="368" height="100" rx="16" fill="#211F26"/>
-  <circle cx="44" cy="596" r="18" fill="#2B2930"/>
-  <text x="44" y="602" fill="#79747E" font-size="18" text-anchor="middle">💡</text>
-  <text x="74" y="594" fill="#E6E0E9" font-size="15" font-weight="bold">Lamp</text>
-  <text x="74" y="610" fill="#79747E" font-size="11">Lighting · Version2</text>
-  <rect x="304" y="580" width="72" height="22" rx="11" fill="#2B2930"/>
-  <text x="340" y="595" fill="#79747E" font-size="11" font-weight="bold" text-anchor="middle">○ OFF</text>
-  <!-- Filled primary action -->
-  <rect x="74" y="626" width="100" height="28" rx="14" fill="#FFB870"/>
-  <text x="124" y="644" fill="#48290B" font-size="12" font-weight="bold" text-anchor="middle">Turn on</text>
-
-  <!-- Bottom nav (M3) -->
-  <rect x="0" y="736" width="400" height="64" fill="#141218"/>
-  <line x1="0" y1="736" x2="400" y2="736" stroke="#49454F"/>
-  <!-- Active pill behind home icon -->
-  <rect x="50" y="744" width="32" height="16" rx="8" fill="#00504A"/>
-  <text x="66" y="757" fill="#9CF1E3" font-size="14" text-anchor="middle">🏠</text>
-  <text x="66" y="784" fill="#FFB870" font-size="11" font-weight="bold" text-anchor="middle">Home</text>
-  <text x="200" y="757" fill="#CAC4D0" font-size="14" text-anchor="middle">📋</text>
-  <text x="200" y="784" fill="#CAC4D0" font-size="11" text-anchor="middle">History</text>
-  <text x="334" y="757" fill="#CAC4D0" font-size="14" text-anchor="middle">✨</text>
-  <text x="334" y="784" fill="#CAC4D0" font-size="11" text-anchor="middle">Demo</text>
+  <!-- Bottom nav (M3, two destinations) -->
+  <rect x="0" y="720" width="400" height="80" fill="#141218"/>
+  <line x1="0" y1="720" x2="400" y2="720" stroke="#49454F"/>
+  <!-- Home (active) -->
+  <rect x="76" y="730" width="48" height="22" rx="11" fill="#00504A"/>
+  <text x="100" y="746" fill="#9CF1E3" font-size="14" text-anchor="middle">🏠</text>
+  <text x="100" y="772" fill="#FFB870" font-size="11" font-weight="bold" text-anchor="middle">Home</text>
+  <!-- History (inactive) -->
+  <text x="300" y="746" fill="#CAC4D0" font-size="14" text-anchor="middle">📋</text>
+  <text x="300" y="772" fill="#CAC4D0" font-size="11" text-anchor="middle">History</text>
 </svg>

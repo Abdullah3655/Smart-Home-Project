@@ -3,17 +3,16 @@
   <rect width="400" height="800" fill="#141218"/>
   <rect width="400" height="800" fill="#000000" opacity="0.55"/>
 
-  <!-- Modal (M3 dialog with rounded 28dp corners) -->
-  <rect x="40" y="160" width="320" height="500" rx="28" fill="#211F26"
-        filter="url(#shadow)"/>
+  <!-- Modal (M3 dialog 28dp corners) -->
   <defs>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="rgba(0,0,0,0.7)"/>
     </filter>
   </defs>
+  <rect x="40" y="160" width="320" height="500" rx="28" fill="#211F26" filter="url(#shadow)"/>
 
   <!-- Title -->
-  <text x="64" y="200" fill="#E6E0E9" font-size="18" font-weight="bold">Add device to Kitchen</text>
+  <text x="64" y="200" fill="#E6E0E9" font-size="18" font-weight="bold">Add device to Front Door</text>
   <text x="64" y="222" fill="#79747E" font-size="11" font-style="italic">Pattern in action: Abstract Factory + DAO</text>
 
   <!-- Field: Device type -->
@@ -33,15 +32,10 @@
   <rect x="64" y="418" width="272" height="40" rx="8" fill="#2B2930" stroke="#49454F"/>
   <text x="80" y="442" fill="#E6E0E9" font-size="13">Bedside Lamp</text>
 
-  <!-- Empty error label space -->
-  <text x="64" y="488" fill="#79747E" font-size="11" font-style="italic"></text>
-
   <!-- Buttons (M3 dialog: text + filled, right-aligned) -->
   <text x="232" y="616" fill="#FFB870" font-size="13" font-weight="bold" text-anchor="end">Cancel</text>
-
   <rect x="246" y="600" width="90" height="32" rx="16" fill="#FFB870"/>
   <text x="291" y="620" fill="#48290B" font-size="13" font-weight="bold" text-anchor="middle">Add device</text>
 
-  <text x="200" y="700" fill="#79747E" font-size="11" text-anchor="middle"
-        font-style="italic">(Home screen dimmed beneath the dialog)</text>
+  <text x="200" y="700" fill="#79747E" font-size="11" text-anchor="middle" font-style="italic">(Home screen dimmed beneath the dialog)</text>
 </svg>
