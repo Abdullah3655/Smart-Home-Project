@@ -67,38 +67,24 @@ Concretes: `EcoMode` (24°C, dim 50%), `SleepMode` (off + lock + 20°C),
 
 ## 3. Class Diagram and how each component meets the constraints
 
-```mermaid
-flowchart TB
-    subgraph A [A — Presentation]
-        App
-        Screens[Home / History / Decorator + AddDevice]
-        Bridge[DaoEventBridge]
-    end
-    subgraph B [B — Application]
-        Facade[HomeController «Facade»]
-        Invoker[CommandInvoker]
-        Cmds[6× DeviceCommand]
-    end
-    subgraph C [C — Domain]
-        Hub[SmartHomeHub «Singleton»]
-        Rooms[Room «Iterator»]
-        Devices[Device «Observer»]
-        Factories[DeviceFactory «Abstract Factory»]
-        Modes[AutomationMode «Strategy»]
-        Decorators[DeviceDecorator]
-    end
-    subgraph D [D — Persistence]
-        DB[(Database «Singleton»)]
-        DAOs[5× DAO]
-    end
-    A --> B --> C
-    A --> D
-    B --> D
-    DAOs --> DB
-```
+The system is organised into **four layers**. One mini class diagram per
+layer is shown below; full per-layer diagrams (with every class) and a
+cross-layer sequence diagram live in the companion document
+`class-diagram.md`.
 
-Per-layer detailed diagrams + a sequence diagram showing patterns
-collaborating live in `class-diagram.md`.
+<table>
+  <tr>
+    <td align="center"><img src="images/layer-presentation.svg" width="260" alt="Presentation layer"/><br/><b>A — Presentation (JavaFX UI)</b></td>
+    <td align="center"><img src="images/layer-application.svg" width="260" alt="Application layer"/><br/><b>B — Application (Facade + Command)</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="images/layer-domain.svg" width="260" alt="Domain layer"/><br/><b>C — Domain (6 of 9 patterns)</b></td>
+    <td align="center"><img src="images/layer-persistence.svg" width="260" alt="Persistence layer"/><br/><b>D — Persistence (Database + DAOs)</b></td>
+  </tr>
+</table>
+
+Dependencies flow downward only — UI never imports DAOs directly; the
+Domain layer is self-contained and reusable in isolation.
 
 - **Modularity & ease of expansion** — patterns isolate concerns by
   package. Adding a new mode (Strategy), device family (Abstract Factory),
