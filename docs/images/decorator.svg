@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" font-family="'Segoe UI', sans-serif">
+  <rect width="400" height="800" fill="#0e1626"/>
+
+  <!-- Top bar -->
+  <rect x="0" y="0" width="400" height="60" fill="#0e1626"/>
+  <line x1="0" y1="60" x2="400" y2="60" stroke="#1f2940"/>
+  <text x="16" y="38" fill="#ffb547" font-size="20" font-weight="bold">●</text>
+  <text x="36" y="38" fill="#f5f6fa" font-size="20" font-weight="bold">Smart Home</text>
+  <rect x="290" y="14" width="94" height="32" rx="8" fill="#161f33" stroke="#1f2940"/>
+  <text x="337" y="34" fill="#f5f6fa" font-size="13" text-anchor="middle">↶  Undo</text>
+
+  <!-- Mode picker -->
+  <text x="16" y="80" fill="#8a93a8" font-size="12">AUTOMATION</text>
+  <rect x="16" y="88" width="120" height="44" rx="8" fill="#161f33" stroke="#1f2940"/>
+  <text x="76" y="115" fill="#8a93a8" font-size="13" font-weight="bold" text-anchor="middle">ECO</text>
+  <rect x="136" y="88" width="120" height="44" fill="#161f33" stroke="#1f2940"/>
+  <text x="196" y="115" fill="#8a93a8" font-size="13" font-weight="bold" text-anchor="middle">SLEEP</text>
+  <rect x="256" y="88" width="120" height="44" rx="8" fill="#161f33" stroke="#1f2940"/>
+  <text x="316" y="115" fill="#8a93a8" font-size="13" font-weight="bold" text-anchor="middle">AWAY</text>
+
+  <!-- Section header -->
+  <text x="16" y="172" fill="#ffb547" font-size="14" font-weight="bold">Decorator pattern showcase</text>
+  <text x="16" y="192" fill="#8a93a8" font-size="12">Wrap any device to add behavior — logging, energy</text>
+  <text x="16" y="208" fill="#8a93a8" font-size="12">tracking — without modifying its class.</text>
+
+  <!-- Pick device -->
+  <text x="16" y="240" fill="#f5f6fa" font-size="14" font-weight="bold">Pick a device</text>
+  <rect x="16" y="252" width="368" height="36" rx="6" fill="#161f33" stroke="#1f2940"/>
+  <text x="32" y="275" fill="#f5f6fa" font-size="13">Kitchen · Ceiling Light</text>
+  <text x="368" y="275" fill="#8a93a8" font-size="13" text-anchor="end">▾</text>
+
+  <!-- Action buttons -->
+  <rect x="16" y="304" width="180" height="36" rx="8" fill="#ffb547"/>
+  <text x="106" y="327" fill="#0e1626" font-size="12" font-weight="bold" text-anchor="middle">Wrap with Logging</text>
+  <rect x="204" y="304" width="180" height="36" rx="8" fill="#1f2940" stroke="#2a3550"/>
+  <text x="294" y="327" fill="#f5f6fa" font-size="12" text-anchor="middle">Unwrap</text>
+
+  <!-- Status -->
+  <text x="16" y="364" fill="#5a6478" font-size="11" font-style="italic">Wrapped Ceiling Light with LoggingDeviceDecorator. Toggle it to see captured calls below.</text>
+
+  <!-- Wrapped action buttons -->
+  <rect x="16" y="384" width="180" height="36" rx="8" fill="#1f2940" stroke="#2a3550"/>
+  <text x="106" y="407" fill="#f5f6fa" font-size="12" text-anchor="middle">Turn On (wrapped)</text>
+  <rect x="204" y="384" width="180" height="36" rx="8" fill="#1f2940" stroke="#2a3550"/>
+  <text x="294" y="407" fill="#f5f6fa" font-size="12" text-anchor="middle">Turn Off (wrapped)</text>
+
+  <!-- Captured log header -->
+  <text x="16" y="448" fill="#ffb547" font-size="14" font-weight="bold">Captured by the decorator:</text>
+
+  <!-- Log entries (monospace, teal) -->
+  <text x="16" y="476" fill="#3ec3b5" font-size="11" font-family="'Consolas', monospace">• decorator attached at 14:35:22</text>
+  <text x="16" y="496" fill="#3ec3b5" font-size="11" font-family="'Consolas', monospace">• turnOn(Ceiling Light)</text>
+  <text x="16" y="516" fill="#3ec3b5" font-size="11" font-family="'Consolas', monospace">• turnOff(Ceiling Light)</text>
+  <text x="16" y="536" fill="#3ec3b5" font-size="11" font-family="'Consolas', monospace">• turnOn(Ceiling Light)</text>
+
+  <!-- Bottom nav (Demo highlighted) -->
+  <rect x="0" y="736" width="400" height="64" fill="#161f33"/>
+  <line x1="0" y1="736" x2="400" y2="736" stroke="#1f2940"/>
+  <text x="66" y="763" fill="#8a93a8" font-size="18" text-anchor="middle">🏠</text>
+  <text x="66" y="784" fill="#8a93a8" font-size="11" text-anchor="middle">Home</text>
+  <text x="200" y="763" fill="#8a93a8" font-size="18" text-anchor="middle">📋</text>
+  <text x="200" y="784" fill="#8a93a8" font-size="11" text-anchor="middle">History</text>
+  <text x="334" y="763" fill="#ffb547" font-size="18" text-anchor="middle">🎁</text>
+  <text x="334" y="784" fill="#ffb547" font-size="11" font-weight="bold" text-anchor="middle">Demo</text>
+</svg>

@@ -427,7 +427,7 @@ Refactoring-Guru-canonical sense.
 
 ### Home screen — rooms with device cards
 
-![Home screen showing rooms and device cards](images/home.png)
+![Home screen showing rooms and device cards](images/home.svg)
 
 The dashboard. Rooms are listed with their devices as cards (icon,
 name, family, state badge, contextual action button). Tapping a button
@@ -436,7 +436,7 @@ calls a single Facade method, which routes through `CommandInvoker` →
 
 ### Mode picker with confirmation dialog
 
-![ECO/SLEEP/AWAY mode picker showing a confirmation dialog](images/mode-confirm.png)
+![ECO/SLEEP/AWAY mode picker showing a confirmation dialog](images/mode-confirm.svg)
 
 Tapping ECO/SLEEP/AWAY opens a confirmation dialog explaining the
 consequences of the mode change before applying. Demonstrates the
@@ -445,7 +445,7 @@ will change and given a chance to cancel before bulk device mutations.
 
 ### History tab — Observer + DAO live feed
 
-![History tab showing recent device events](images/history.png)
+![History tab showing recent device events](images/history.svg)
 
 Every device state change fires through the Observer chain to both the
 UI's live event log and the SQLite `device_events` table via
@@ -454,7 +454,7 @@ demonstrating the DAO pattern's persistence contract.
 
 ### Decorator showcase
 
-![Decorator tab showing wrap/unwrap and captured calls](images/decorator.png)
+![Decorator tab showing wrap/unwrap and captured calls](images/decorator.svg)
 
 Pick a device, tap "Wrap with Logging", and any subsequent
 turn-on/turn-off calls are captured by `LoggingDeviceDecorator` without
@@ -463,7 +463,7 @@ transparent-wrapping contract and the OCP constraint.
 
 ### Add Device modal — Abstract Factory at runtime
 
-![Add Device modal selecting type and family](images/add-device.png)
+![Add Device modal selecting type and family](images/add-device.svg)
 
 The user picks a device type (Light/Thermostat/Lock/Camera) and a
 family (Version1/Version2). The Facade invokes the corresponding

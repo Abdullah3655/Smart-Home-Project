@@ -1,27 +1,44 @@
 # Report screenshots
 
-Place GUI screenshots here as PNG. The report (`../report.md`) references
-each image by exact filename — keep names matching.
+This folder contains the visuals embedded in `../report.md` under
+"Screenshots — GUI in action".
 
-## How to capture each shot
+## What's here now
 
-Run `./mvnw javafx:run` from the project root, then for each image:
+5 SVG mockups generated from the actual app's design tokens (same
+colours, spacing, fonts, layout as the running JavaFX UI). They render
+crisply in GitHub, in any markdown→PDF tool, and in Word.
 
-| Filename | What to capture | How to reproduce |
-|---|---|---|
-| `home.png` | The Home screen with at least 2 rooms and their device cards visible | Default landing screen on app launch |
-| `mode-confirm.png` | The ECO/SLEEP/AWAY confirmation dialog open on top of the Home screen | Tap ECO/SLEEP/AWAY in the top bar — the confirm dialog appears |
-| `history.png` | The History tab showing several event rows | Tap something on Home (e.g. turn a light on/off a few times), then tap 📋 History in the bottom nav |
-| `decorator.png` | The Decorator tab with a device wrapped and captured log entries visible | Tap 🎁 Demo, pick a device, tap "Wrap with Logging", then "Turn On (wrapped)" once or twice |
-| `add-device.png` | The Add Device modal with type and family choice boxes visible | Tap "+ Add device to {Room}" at the bottom of any room's device list |
+| File | Shows |
+|---|---|
+| `home.svg` | Home screen — rooms with device cards, status banner, mode picker |
+| `mode-confirm.svg` | The confirmation dialog over the dimmed Home screen |
+| `history.svg` | History tab feed of device events |
+| `decorator.svg` | Decorator showcase with wrap/unwrap and captured log |
+| `add-device.svg` | Add Device modal showing type/family/name fields |
 
-## Capturing on Windows
+## Replacing with real screenshots (optional)
 
-`Win + Shift + S` → drag a rectangle around the app window → screenshot
-copies to clipboard → paste into Paint or directly save. Save each PNG
-under this folder with the filename listed above.
+If you want to swap in real screenshots from the running app:
 
-## After capturing
+1. `cd "D:\SOFTWATE COMPONENT\smarthome"` and run `./mvnw javafx:run`
+2. Navigate to each screen listed below; capture with `Win+Shift+S`
+3. Save under this folder with the matching base name (e.g.
+   `home.png` instead of `home.svg`)
+4. In `../report.md`, replace `.svg` with `.png` in the matching
+   `![…](images/…)` lines
 
-Re-export the report (`docs/report.md` → `report.pdf`) and the images
-will appear inline in the **Screenshots — GUI in action** section.
+| Filename | How to get there |
+|---|---|
+| `home.png` | Default landing screen on launch |
+| `mode-confirm.png` | Tap ECO/SLEEP/AWAY in the top bar |
+| `history.png` | Tap a few devices, then tap 📋 History in bottom nav |
+| `decorator.png` | Tap 🎁 Demo, pick a device, "Wrap with Logging", then "Turn On (wrapped)" |
+| `add-device.png` | Tap "+ Add device to {Room}" at the bottom of any room |
+
+## Why SVG by default
+
+- **Resolution-independent** — scales to any size without pixelation
+- **Tiny file size** — each is <5 KB vs. ~50–200 KB for PNG screenshots
+- **Renders in markdown→PDF tools that support Mermaid** (most do support SVG)
+- **Diff-friendly** — text-based, so changes show up cleanly in git history

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" font-family="'Segoe UI', sans-serif">
+  <!-- Dimmed home behind the modal -->
+  <rect width="400" height="800" fill="#0e1626"/>
+  <rect width="400" height="800" fill="#000000" opacity="0.55"/>
+
+  <!-- Modal -->
+  <rect x="40" y="170" width="320" height="460" rx="12" fill="#161f33"
+        stroke="#1f2940" stroke-width="1.5"/>
+
+  <!-- Title -->
+  <text x="60" y="208" fill="#ffb547" font-size="14" font-weight="bold">Add device to Kitchen</text>
+
+  <!-- Pattern caption -->
+  <text x="60" y="232" fill="#5a6478" font-size="10" font-style="italic">Pattern in action: Abstract Factory + DAO</text>
+
+  <!-- Device type -->
+  <text x="60" y="266" fill="#f5f6fa" font-size="13" font-weight="bold">Device type</text>
+  <rect x="60" y="276" width="280" height="32" rx="6" fill="#1f2940" stroke="#2a3550"/>
+  <text x="76" y="297" fill="#f5f6fa" font-size="12">Light</text>
+  <text x="324" y="297" fill="#8a93a8" font-size="12" text-anchor="end">▾</text>
+
+  <!-- Family -->
+  <text x="60" y="332" fill="#f5f6fa" font-size="13" font-weight="bold">Family</text>
+  <rect x="60" y="342" width="280" height="32" rx="6" fill="#1f2940" stroke="#2a3550"/>
+  <text x="76" y="363" fill="#f5f6fa" font-size="12">Version2 (modern)</text>
+  <text x="324" y="363" fill="#8a93a8" font-size="12" text-anchor="end">▾</text>
+
+  <!-- Name -->
+  <text x="60" y="398" fill="#f5f6fa" font-size="13" font-weight="bold">Name</text>
+  <rect x="60" y="408" width="280" height="32" rx="6" fill="#1f2940" stroke="#2a3550"/>
+  <text x="76" y="429" fill="#f5f6fa" font-size="12">Bedside Lamp</text>
+
+  <!-- Empty error label space -->
+  <text x="60" y="468" fill="#5a6478" font-size="10" font-style="italic"></text>
+
+  <!-- Buttons -->
+  <rect x="60" y="544" width="130" height="40" rx="8" fill="#1f2940" stroke="#2a3550"/>
+  <text x="125" y="569" fill="#f5f6fa" font-size="13" text-anchor="middle">Cancel</text>
+
+  <rect x="210" y="544" width="130" height="40" rx="8" fill="#ffb547"/>
+  <text x="275" y="569" fill="#0e1626" font-size="13" font-weight="bold" text-anchor="middle">Add device</text>
+
+  <!-- Hint -->
+  <text x="200" y="700" fill="#8a93a8" font-size="11" text-anchor="middle"
+        font-style="italic">(Home screen dimmed beneath the modal)</text>
+</svg>
