@@ -1,7 +1,6 @@
 # Smart Home Automation — Design Report
 
-**CSE3202 / SE 491 — 12th Project Assessment** &nbsp;·&nbsp; **Submission: May 8, 2026**
-**Repository:** https://github.com/ahmefarouk1234d/smarthome
+**Repository:** https://github.com/mahmoud-3700/FinalSubmssion
 
 ---
 
