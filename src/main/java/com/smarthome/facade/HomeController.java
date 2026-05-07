@@ -43,7 +43,6 @@ public class HomeController {
         );
     }
 
-    // Injection-friendly constructor for tests and modular startup.
     public HomeController(SmartHomeHub hub,
                           CommandInvoker invoker,
                           DeviceEventDAO eventDAO,

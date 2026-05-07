@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 
-// Command pattern Invoker: triggers commands and owns undo history.
+// Command pattern Invoker: triggers commands and manages undo history.
 public class CommandInvoker {
     // LIFO stack so undo always affects the most recent action first.
     private final Deque<DeviceCommand> history = new ArrayDeque<>();
@@ -22,7 +22,6 @@ public class CommandInvoker {
         this(null);
     }
 
-    // Production mode with audit logging enabled.
     public CommandInvoker(CommandsLogDAO auditLog) {
         this.auditLog = auditLog;
     }
@@ -58,12 +57,10 @@ public class CommandInvoker {
         return last;
     }
 
-    // Read-only snapshot for history screens/debugging.
     public List<DeviceCommand> getHistory() {
         return Collections.unmodifiableList(List.copyOf(history));
     }
 
-    // Primarily useful in tests between scenarios.
     public void clearHistory() {
         history.clear();
     }
