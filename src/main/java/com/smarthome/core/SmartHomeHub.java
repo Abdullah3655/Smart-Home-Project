@@ -2,7 +2,6 @@ package com.smarthome.core;
 
 import com.smarthome.strategy.AutomationMode;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -58,7 +57,6 @@ public class SmartHomeHub implements RoomIterableCollection {
 
     @Override
     public RoomIterator createIterator() {
-        // Iterator pattern: returns dedicated iterator instead of exposing map directly.
-        return new HubRoomIterator(new ArrayList<>(roomsById.values()));
+        return new HubRoomIterator(this);
     }
 }
