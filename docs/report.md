@@ -181,25 +181,110 @@ controllers) is provided in the companion document **`class-catalog.md`**.
 
 ## Class Diagram and how each component meets the system requirements
 
-The full class diagram (one focused sub-diagram per architectural layer
-plus a sequence diagram showing patterns collaborating) is in
-**`class-diagram.md`** (Mermaid, renders on GitHub) and
-**`class-diagram.puml`** (high-resolution PlantUML).
-
 The system is organised into **four layers**, each depending only on
-layers below it:
+layers below it. Per-layer detailed diagrams (with all classes inside
+each layer) and a sequence diagram showing patterns collaborating are
+in the companion document **`class-diagram.md`**.
 
+### Architecture overview
+
+```mermaid
+flowchart TB
+    subgraph A [A — Presentation]
+        App
+        MainCtrl[MainController]
+        Screens[Home / History / Decorator + AddDevice]
+        Bridge[DaoEventBridge]
+    end
+
+    subgraph B [B — Application]
+        Facade[HomeController «Facade»]
+        Invoker[CommandInvoker]
+        Cmds[6× DeviceCommand]
+    end
+
+    subgraph C [C — Domain]
+        Hub[SmartHomeHub «Singleton»]
+        Rooms[Room «Iterator»]
+        Devices[Device hierarchy «Observer»]
+        Factories[2× DeviceFactory «Abstract Factory»]
+        Modes[3× AutomationMode «Strategy»]
+        Decorators[2× DeviceDecorator]
+    end
+
+    subgraph D [D — Persistence]
+        DB[(Database «Singleton»)]
+        DAOs[5× DAO]
+        SQLite[(smarthome.db)]
+    end
+
+    A --> B
+    B --> C
+    A --> C
+    A --> D
+    B --> D
+    DAOs --> DB
+    DB --> SQLite
 ```
-┌─────────────────────────────────────────────┐
-│  A — Presentation (JavaFX UI)               │
-├─────────────────────────────────────────────┤
-│  B — Application (Facade + Command)         │
-├─────────────────────────────────────────────┤
-│  C — Domain (Hub, Devices, 6 patterns live) │
-├─────────────────────────────────────────────┤
-│  D — Persistence (Database + 5 DAOs)        │
-└─────────────────────────────────────────────┘
+
+### Domain layer (where 6 of 9 patterns live)
+
+```mermaid
+classDiagram
+    direction TB
+
+    class SmartHomeHub {
+        «Singleton, Strategy Context»
+        +getInstance() SmartHomeHub$
+        +addRoom(Room)
+        +applyAutomationMode()
+        +createIterator() RoomIterator
+        +enumerateRooms() Enumeration~Room~
+    }
+
+    class Room {
+        «Iterator host»
+        +addDevice(Device)
+        +devices() List~Device~
+        +enumerateDevices() Enumeration~Device~
+    }
+
+    class Device {
+        «abstract, Subject, Receiver, Component»
+        +turnOn() / turnOff()
+        +attach(Observer)
+        +notifyObservers(String)
+    }
+
+    class DeviceFactory {
+        «Abstract Factory»
+        +createLight(String) Device
+        +createThermostat(String) Device
+        +createDoorLock(String) Device
+        +createCamera(String) Device
+    }
+
+    class AutomationMode {
+        «interface, Strategy»
+        +name() String
+        +apply(SmartHomeHub)
+    }
+
+    class DeviceDecorator {
+        «abstract Decorator»
+        #wrappee : Device
+    }
+
+    SmartHomeHub o-- Room : "rooms"
+    Room o-- Device : "devices"
+    DeviceDecorator --|> Device
+    DeviceDecorator o-- Device : "wraps"
+    SmartHomeHub --> AutomationMode : "current strategy"
 ```
+
+For the full per-class layer diagrams (Presentation, Application,
+Domain, Persistence) and the cross-layer sequence diagram, see
+**`class-diagram.md`** in the repository.
 
 How each layer contributes:
 
@@ -332,6 +417,59 @@ Refactoring-Guru-canonical sense.
 | **Modularity & ease of future expansion** | Each pattern lives in its own package; new modes, factories, and commands plug in by adding one class. |
 | **Prevent invalid/unsafe operations** | Null-safe constructors; Facade rejects type-mismatched calls; idempotent state changes; Command pre-state capture for reliable undo; PreparedStatement everywhere to prevent SQL injection. |
 | **Intuitive accessible GUI** | Mobile-styled 400×800 window; 48 px tap targets; high-contrast palette; mode changes show a confirmation dialog explaining the consequences; status banner narrates every action; observer-driven live refresh so cards update without polling. |
+
+---
+
+## Screenshots — GUI in action
+
+> Screenshots taken at 400×800 (mobile-styled JavaFX window). To
+> reproduce: clone the repo and run `./mvnw javafx:run`.
+
+### Home screen — rooms with device cards
+
+![Home screen showing rooms and device cards](images/home.png)
+
+The dashboard. Rooms are listed with their devices as cards (icon,
+name, family, state badge, contextual action button). Tapping a button
+calls a single Facade method, which routes through `CommandInvoker` →
+`DeviceCommand` → device → `notifyObservers`.
+
+### Mode picker with confirmation dialog
+
+![ECO/SLEEP/AWAY mode picker showing a confirmation dialog](images/mode-confirm.png)
+
+Tapping ECO/SLEEP/AWAY opens a confirmation dialog explaining the
+consequences of the mode change before applying. Demonstrates the
+"prevent invalid/unsafe operations" constraint: the user is shown what
+will change and given a chance to cancel before bulk device mutations.
+
+### History tab — Observer + DAO live feed
+
+![History tab showing recent device events](images/history.png)
+
+Every device state change fires through the Observer chain to both the
+UI's live event log and the SQLite `device_events` table via
+`DaoEventBridge`. Closing and reopening the app preserves history —
+demonstrating the DAO pattern's persistence contract.
+
+### Decorator showcase
+
+![Decorator tab showing wrap/unwrap and captured calls](images/decorator.png)
+
+Pick a device, tap "Wrap with Logging", and any subsequent
+turn-on/turn-off calls are captured by `LoggingDeviceDecorator` without
+modifying the wrapped device's class. Demonstrates the Decorator pattern's
+transparent-wrapping contract and the OCP constraint.
+
+### Add Device modal — Abstract Factory at runtime
+
+![Add Device modal selecting type and family](images/add-device.png)
+
+The user picks a device type (Light/Thermostat/Lock/Camera) and a
+family (Version1/Version2). The Facade invokes the corresponding
+`DeviceFactory.createXxx(name)` method, persists the device via
+`DeviceDAO`, and attaches a `DaoEventBridge` observer — a runtime
+demonstration of the **Abstract Factory + Factory Methods** pattern.
 
 ---
 
