@@ -21,8 +21,6 @@ import com.smarthome.strategy.AwayMode;
 import com.smarthome.strategy.EcoMode;
 import com.smarthome.strategy.SleepMode;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
@@ -109,13 +107,7 @@ public class HomeController {
         if (room == null) {
             throw new IllegalArgumentException("Unknown room: " + roomId);
         }
-        List<Device> devices = new ArrayList<>();
-        // Room exposes Enumeration (Iterator pattern requirement), facade converts to List.
-        Enumeration<Device> it = room.devices();
-        while (it.hasMoreElements()) {
-            devices.add(it.nextElement());
-        }
-        return devices;
+        return room.devices();
     }
 
     public List<DeviceEvent> getEventHistory() {

@@ -14,7 +14,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.Enumeration;
 import java.util.List;
 
 
@@ -86,9 +85,8 @@ public class App extends Application {
         roomDAO.insert(frontDoor);
 
         for (Room room : hub.getRooms()) {
-            Enumeration<Device> it = room.devices();
-            while (it.hasMoreElements()) {
-                deviceDAO.insert(it.nextElement(), room.getRoomId());
+            for (Device device : room.devices()) {
+                deviceDAO.insert(device, room.getRoomId());
             }
         }
     }
@@ -97,9 +95,8 @@ public class App extends Application {
     private void attachPersistenceObservers() {
         DaoEventBridge bridge = new DaoEventBridge(new DeviceEventDAO(), new DeviceDAO());
         for (Room room : SmartHomeHub.getInstance().getRooms()) {
-            Enumeration<Device> it = room.devices();
-            while (it.hasMoreElements()) {
-                it.nextElement().attach(bridge);
+            for (Device device : room.devices()) {
+                device.attach(bridge);
             }
         }
     }

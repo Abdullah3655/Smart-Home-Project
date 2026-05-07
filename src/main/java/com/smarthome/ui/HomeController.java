@@ -24,7 +24,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.ResourceBundle;
 
 
@@ -73,9 +72,8 @@ public class HomeController implements Initializable {
 
         section.getChildren().add(header);
 
-        Enumeration<Device> it = room.devices();
-        while (it.hasMoreElements()) {
-            section.getChildren().add(buildDeviceCard(it.nextElement()));
+        for (Device device : room.devices()) {
+            section.getChildren().add(buildDeviceCard(device));
         }
 
         Button addDevice = new Button("+ Add device to " + room.getName());
@@ -238,17 +236,13 @@ public class HomeController implements Initializable {
     }
 
     private int deviceCount(Room room) {
-        int n = 0;
-        Enumeration<Device> it = room.devices();
-        while (it.hasMoreElements()) { it.nextElement(); n++; }
-        return n;
+        return room.devices().size();
     }
 
     private void attachToAllDevices(Observer obs) {
         for (Room room : SmartHomeHub.getInstance().getRooms()) {
-            Enumeration<Device> it = room.devices();
-            while (it.hasMoreElements()) {
-                it.nextElement().attach(obs);
+            for (Device device : room.devices()) {
+                device.attach(obs);
             }
         }
     }

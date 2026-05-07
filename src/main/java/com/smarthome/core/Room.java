@@ -2,15 +2,14 @@ package com.smarthome.core;
 
 import com.smarthome.devices.Device;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 
-// ITERATOR pattern: Room aggregate exposes its devices as Enumeration<Device>.
+// Iterator pattern lives on SmartHomeHub (RoomIterator); Room just exposes its devices as a list.
 public class Room {
     private final String roomId;
     private final String name;
@@ -44,10 +43,7 @@ public class Room {
         return devicesById.get(deviceId);
     }
 
-    // Iterator-pattern style traversal API requested by the assignment.
-    // ITERATOR pattern method (rubric requirement: returns Enumeration).
-    public Enumeration<Device> devices() {
-        Collection<Device> values = devicesById.values();
-        return Collections.enumeration(values);
+    public List<Device> devices() {
+        return new ArrayList<>(devicesById.values());
     }
 }

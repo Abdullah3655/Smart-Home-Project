@@ -8,7 +8,6 @@ import com.smarthome.devices.Light;
 import com.smarthome.devices.Lock;
 import com.smarthome.devices.Thermostat;
 
-import java.util.Enumeration;
 import java.util.Objects;
 
 
@@ -23,9 +22,7 @@ public class AwayMode implements AutomationMode {
     public void apply(SmartHomeHub hub) {
         Objects.requireNonNull(hub, "hub must not be null");
         for (Room room : hub.getRooms()) {
-            Enumeration<Device> devices = room.devices();
-            while (devices.hasMoreElements()) {
-                Device device = devices.nextElement();
+            for (Device device : room.devices()) {
                 if (device instanceof Light light) {
                     light.turnOff();
                 }

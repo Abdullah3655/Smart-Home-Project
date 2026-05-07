@@ -18,7 +18,6 @@ import java.net.URL;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -59,9 +58,8 @@ public class HistoryController implements Initializable {
         liveObserver = (device, event) -> Platform.runLater(() ->
             prependRow(buildRowForLive(device.getName(), event)));
         for (Room room : SmartHomeHub.getInstance().getRooms()) {
-            Enumeration<Device> it = room.devices();
-            while (it.hasMoreElements()) {
-                it.nextElement().attach(liveObserver);
+            for (Device device : room.devices()) {
+                device.attach(liveObserver);
             }
         }
     }

@@ -17,7 +17,6 @@ import java.net.URL;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -43,10 +42,8 @@ public class DecoratorController implements Initializable {
     private void populateDeviceChoices() {
         List<DeviceChoice> choices = new ArrayList<>();
         for (Room room : SmartHomeHub.getInstance().getRooms()) {
-            Enumeration<Device> it = room.devices();
-            while (it.hasMoreElements()) {
-                Device d = it.nextElement();
-                choices.add(new DeviceChoice(room, d));
+            for (Device device : room.devices()) {
+                choices.add(new DeviceChoice(room, device));
             }
         }
         deviceChoiceBox.setItems(FXCollections.observableArrayList(choices));

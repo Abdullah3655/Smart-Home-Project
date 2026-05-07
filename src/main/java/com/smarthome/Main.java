@@ -15,7 +15,7 @@ import com.smarthome.factory.Version2DeviceFactory;
 import com.smarthome.strategy.AwayMode;
 import com.smarthome.strategy.EcoMode;
 
-import java.util.Enumeration;
+import java.util.List;
 
 
 // Application entry point.
@@ -24,8 +24,9 @@ public class Main {
     public static void main(String[] args) {
         section("1. SINGLETON — SmartHomeHub.getInstance()");
         SmartHomeHub hub = SmartHomeHub.getInstance();
-        System.out.println("hub == hub.getInstance()? " + (hub == SmartHomeHub.getInstance()));
+        System.out.println("Checking if hub is the same as hub.getInstance(): " + (hub == SmartHomeHub.getInstance()));
 
+        
         section("2. ABSTRACT FACTORY + FACTORY METHODS");
         DeviceFactory factory = new Version2DeviceFactory();
         Light kitchenLight = (Light) factory.createLight("Kitchen Light");
@@ -41,7 +42,7 @@ public class Main {
         kitchenLight.turnOn();
         kitchenLight.turnOff();
 
-        section("4. ITERATOR — Room.devices() returns Enumeration<Device>");
+        section("4. ITERATOR — Room.devices() returns List<Device>");
         Room kitchen = new Room("kitchen", "Kitchen");
         kitchen.addDevice(kitchenLight);
         kitchen.addDevice(thermostat);
@@ -50,10 +51,10 @@ public class Main {
         hub.addRoom(kitchen);
         hub.addRoom(frontDoor);
 
-        Enumeration<Device> devices = kitchen.devices();
+        List<Device> devices = kitchen.devices();
         System.out.println("Devices in Kitchen:");
-        while (devices.hasMoreElements()) {
-            System.out.println("    - " + devices.nextElement().getName());
+        for (Device d : devices) {
+            System.out.println("    - " + d.getName());
         }
 
         section("5. ITERATOR (custom RoomIterator) — walk all rooms");
