@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>report</title>
+<style>
+@page { size: A4; margin: 18mm; }
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.45;
+  color: #1f2940;
+  max-width: 920px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+h1 { font-size: 22pt; border-bottom: 2px solid #4a73c5; padding-bottom: 6px; }
+h2 { font-size: 16pt; color: #2a4d8f; margin-top: 28px; }
+h3 { font-size: 13pt; color: #2a4d8f; }
+h4 { font-size: 12pt; color: #4a5a70; }
+p { margin: 0.6em 0; }
+code {
+  background: #f4f6f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 10pt;
+}
+pre {
+  background: #f4f6f9;
+  padding: 10px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 9.5pt;
+}
+table {
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  width: 100%;
+}
+table, th, td {
+  border: 1px solid #c7d2e3;
+}
+th, td { padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: #eaf0fb; }
+img { max-width: 100%; height: auto; }
+blockquote {
+  border-left: 4px solid #c7d2e3;
+  margin: 0.8em 0;
+  padding: 6px 14px;
+  color: #5a6478;
+  background: #f8f9fb;
+}
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.2em 0; }
+hr { border: none; border-top: 1px solid #c7d2e3; margin: 1.6em 0; }
+</style>
+</head>
+<body>
+<h1 id="smart-home-automation-design-report">Smart Home Automation — Design Report</h1>
+<p><strong>CSE3202 / SE 491 — 12th Project Assessment</strong> &nbsp;·&nbsp; <strong>Submission: May 8, 2026</strong>
+<strong>Repository:</strong> https://github.com/ahmefarouk1234d/smarthome</p>
+<hr />
+<h2 id="1-project-description">1. Project Description</h2>
+<p>A simplified <strong>Smart Home Automation System</strong> in Java. The user navigates
+rooms, controls devices (lights, thermostats, locks, cameras), applies
+whole-home automation modes, views past events, and undoes recent actions
+through an intuitive JavaFX UI.</p>
+<p><strong>Users can:</strong> list rooms · enter a room and view its devices · turn devices
+on/off · lock/unlock doors · adjust thermostat temperature · apply
+automation modes (Eco/Sleep/Away) · add new devices · wrap a device with a
+logging decorator · view persisted device events · undo the most recent
+action · receive real-time state-change notifications.</p>
+<hr />
+<h2 id="2-class-descriptions">2. Class Descriptions</h2>
+<p><code>SmartHomeHub</code> — Singleton + Strategy Context + Iterator aggregate.
+<strong>Attrs:</strong> <code>INSTANCE</code>, <code>roomsById</code>, <code>automationMode</code>.
+<strong>Methods:</strong> <code>getInstance()</code>, <code>addRoom(Room)</code>, <code>getRoom(String)</code>,
+<code>getRooms()</code>, <code>enumerateRooms() : Enumeration&lt;Room&gt;</code>, <code>setAutomationMode</code>,
+<code>applyAutomationMode()</code>, <code>createIterator() : RoomIterator</code>.</p>
+<p><code>Room</code> — Iterator host; aggregates devices.
+<strong>Attrs:</strong> <code>roomId</code>, <code>name</code>, <code>devicesById</code>.
+<strong>Methods:</strong> <code>addDevice(Device)</code>, <code>removeDevice(String)</code>, <code>getDevice(String)</code>,
+<code>devices() : List&lt;Device&gt;</code>, <code>enumerateDevices() : Enumeration&lt;Device&gt;</code>.</p>
+<p><code>Device</code> (abstract) — Subject (Observer), Receiver (Command), Component (Decorator).
+<strong>Attrs:</strong> <code>id</code>, <code>name</code>, <code>poweredOn</code>, <code>observers</code>.
+<strong>Methods:</strong> <code>turnOn</code>, <code>turnOff</code>, <code>attach(Observer)</code>, <code>detach</code>, <code>notifyObservers(String)</code>.
+<strong>Concrete subclasses:</strong> <code>Light</code> (<code>setBrightness(int)</code>), <code>Thermostat</code>
+(<code>setTemperature(double)</code>), <code>Lock</code> (<code>lock()/unlock()</code>), <code>Camera</code>. Each has
+two family variants (<code>Version1*</code>, <code>Version2*</code>) produced by the
+corresponding <code>DeviceFactory</code>.</p>
+<p><code>DeviceFactory</code> (abstract) — Abstract Factory with four Factory Methods:
+<code>createLight</code>, <code>createThermostat</code>, <code>createDoorLock</code>, <code>createCamera</code>.
+Concrete subclasses: <code>Version1DeviceFactory</code>, <code>Version2DeviceFactory</code>.</p>
+<p><code>AutomationMode</code> (interface) — Strategy. Methods: <code>name()</code>, <code>apply(SmartHomeHub)</code>.
+Concretes: <code>EcoMode</code> (24°C, dim 50%), <code>SleepMode</code> (off + lock + 20°C),
+<code>AwayMode</code> (off + lock + arm + 15°C).</p>
+<p><code>DeviceCommand</code> (interface) — Command. Methods: <code>execute()</code>, <code>undo()</code>,
+<code>describe()</code>. Six concretes (<code>TurnOn/TurnOff/SetTemperature/Lock/Unlock/SetAutomationMode</code>).
+<code>CommandInvoker</code> runs commands and owns the undo stack.</p>
+<p><code>HomeController</code> — Facade; the UI's only entry point. Methods:
+<code>turnOnDevice/turnOffDevice/lockDevice/unlockDevice/setTemperature/setAutomationMode/getDevicesForRoom/getEventHistory/getCommandHistory/undoLastAction</code>.</p>
+<p><code>Database</code> — Singleton wrapping the SQLite connection. <code>getInstance()</code>,
+<code>getConnection()</code>. Five DAOs (<code>UserDAO</code>, <code>RoomDAO</code>, <code>DeviceDAO</code>,
+<code>DeviceEventDAO</code>, <code>CommandsLogDAO</code>) isolate SQL.</p>
+<p><em>A more detailed per-class catalogue is in the companion document
+<code>class-catalog.md</code>.</em></p>
+<hr />
+<h2 id="3-class-diagram-and-how-each-component-meets-the-constraints">3. Class Diagram and how each component meets the constraints</h2>
+<p>Full rendered class diagram (PlantUML — every class, all 9 patterns,
+every relationship):</p>
+<p align="center">
+  <img src="images/class-diagram-full.png" alt="Full class diagram of the Smart Home system" width="900"/>
+</p>
+
+<p>Per-pattern detailed class diagrams follow. Each one isolates a single
+pattern so the roles, methods, and relationships are immediately
+visible.</p>
+<h3 id="31-layer-a-presentation-ui">3.1 Layer A — Presentation (UI)</h3>
+<p align="center"><img src="images/pattern-presentation.png" width="540" alt="Presentation layer"/></p>
+
+<p>The UI is composed of <code>App</code> (JavaFX entry), <code>MainController</code> (top bar +
+nav), three screen controllers swapped through a central host
+(<code>HomeUIController</code>, <code>HistoryController</code>, <code>DecoratorController</code>), the
+<code>AddDeviceController</code> modal, and the <code>DaoEventBridge</code> boundary
+adapter that forwards device events to the persistence layer.</p>
+<h3 id="32-layer-b-application-facade-command">3.2 Layer B — Application (Facade + Command)</h3>
+<p align="center"><img src="images/pattern-application.png" width="540" alt="Application layer"/></p>
+
+<p><code>HomeController</code> (Facade) is the only class the UI calls. Each mutation
+call routes through <code>CommandInvoker</code>, which executes a concrete
+<code>DeviceCommand</code> (six exist: <code>TurnOn / TurnOff / SetTemperature / Lock /
+Unlock / SetAutomationMode</code>) and pushes it onto the undo stack. The
+Invoker imports zero domain classes — only <code>DeviceCommand</code>.</p>
+<h3 id="33-domain-core-singleton-iterator-base-devices">3.3 Domain core — Singleton + Iterator + base devices</h3>
+<p align="center"><img src="images/pattern-core.png" width="540" alt="Core entities"/></p>
+
+<p><code>SmartHomeHub</code> (Singleton + Strategy Context) owns the rooms.
+<code>Room</code> is the Iterator host — <code>enumerateDevices()</code> returns
+<code>Enumeration&lt;Device&gt;</code> per the rubric line. <code>RoomIterator</code> provides the
+custom GoF Iterator interface (<code>hasMore()</code>, <code>getNext()</code>).</p>
+<h3 id="34-observer-device-as-subject">3.4 Observer — Device as Subject</h3>
+<p align="center"><img src="images/pattern-observer.png" width="500" alt="Observer pattern"/></p>
+
+<p><code>Device</code> implements <code>Observable</code>; observers attach via <code>attach(Observer)</code>
+and receive <code>update(Device, String)</code> calls when state changes. UI
+controllers, history feeds, and <code>DaoEventBridge</code> are all observers —
+each independent of the others.</p>
+<h3 id="35-abstract-factory-two-device-families">3.5 Abstract Factory — two device families</h3>
+<p align="center"><img src="images/pattern-abstract-factory.png" width="540" alt="Abstract Factory"/></p>
+
+<p><code>DeviceFactory</code> declares four Factory Methods (<code>createLight</code>,
+<code>createThermostat</code>, <code>createDoorLock</code>, <code>createCamera</code>).
+<code>Version1DeviceFactory</code> and <code>Version2DeviceFactory</code> each implement all
+four methods, returning their family's variants — Liskov-substitutable,
+no <code>UnsupportedOperationException</code> stubs.</p>
+<h3 id="36-strategy-automation-modes">3.6 Strategy — automation modes</h3>
+<p align="center"><img src="images/pattern-strategy.png" width="540" alt="Strategy pattern"/></p>
+
+<p><code>AutomationMode</code> is the Strategy interface. <code>EcoMode</code>, <code>SleepMode</code>, and
+<code>AwayMode</code> are concrete strategies. <code>SmartHomeHub</code> is the Context — it
+holds the active strategy and exposes <code>applyAutomationMode()</code> so callers
+never need to know which concrete mode is loaded.</p>
+<h3 id="37-decorator-wrapping-devices">3.7 Decorator — wrapping devices</h3>
+<p align="center"><img src="images/pattern-decorator.png" width="540" alt="Decorator pattern"/></p>
+
+<p><code>DeviceDecorator</code> wraps a <code>Device</code> (the Component) and forwards every
+method to it. <code>LoggingDeviceDecorator</code> and <code>EnergyTrackedDecorator</code>
+override individual methods to add cross-cutting behaviour (logging,
+energy tracking) without modifying any device class.</p>
+<h3 id="how-each-component-meets-the-constraints">How each component meets the constraints</h3>
+<p>Dependencies flow downward only — UI never imports DAOs directly; the
+Domain layer is self-contained and reusable in isolation.</p>
+<ul>
+<li><strong>Modularity &amp; ease of expansion</strong> — each pattern lives in its own
+  package; new modes, new factories, or new commands plug in by adding
+  one class with zero edits to existing classes (Open–Closed Principle).</li>
+<li><strong>Prevent invalid/unsafe operations</strong> — null-safe constructors,
+  type-checked Facade rejects, idempotent state changes, Command
+  pre-state capture for reliable undo, <code>PreparedStatement</code> everywhere.</li>
+<li>
+<p><strong>Intuitive accessible GUI</strong> — mobile-styled 400×800 window; 48 px
+  tap targets; high-contrast palette (8.4 : 1 — WCAG AAA); confirmation
+  dialogs before destructive actions.</p>
+</li>
+<li>
+<p><strong>Modularity &amp; ease of expansion</strong> — patterns isolate concerns by
+  package. Adding a new mode (Strategy), device family (Abstract Factory),
+  or command (Command) requires <em>one new class</em> with zero edits to
+  existing code (Open–Closed Principle).</p>
+</li>
+<li><strong>Prevent invalid/unsafe operations</strong> — every public method validates
+  inputs (<code>Objects.requireNonNull</code>, type-checked downcasts in Facade,
+  factory UUID deduplication). Mode-change requests show a confirmation
+  dialog. Commands capture pre-state for reliable <code>undo()</code>. DAOs use
+  <code>PreparedStatement</code> exclusively (no SQL injection).</li>
+<li><strong>Intuitive accessible GUI</strong> — mobile-styled 400×800 window; 48 px tap
+  targets; high-contrast palette (amber on slate, 8.4 : 1 contrast — WCAG
+  AAA); state badges combine colour with text/icons.</li>
+</ul>
+<hr />
+<h2 id="4-implementation-of-design-patterns-9-total">4. Implementation of Design Patterns (9 total)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Pattern</th>
+<th>Where it lives</th>
+<th>Required methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Singleton</strong></td>
+<td><code>core.SmartHomeHub</code>, <code>persistence.Database</code></td>
+<td><code>getInstance()</code>, private constructor</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Iterator</strong></td>
+<td><code>Room.enumerateDevices()</code>, <code>SmartHomeHub.enumerateRooms()</code>, <code>core.RoomIterator</code></td>
+<td><code>enumerateDevices() : Enumeration&lt;Device&gt;</code>, <code>enumerateRooms() : Enumeration&lt;Room&gt;</code>, <code>hasMore()</code>, <code>getNext()</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Observer</strong></td>
+<td><code>observer.Observer/Observable</code>, <code>devices.Device</code></td>
+<td><code>attach</code>, <code>detach</code>, <code>notifyObservers(String)</code>, <code>update(Device, String)</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Abstract Factory + Factory Methods</strong></td>
+<td><code>factory.DeviceFactory</code> + <code>Version1/Version2DeviceFactory</code></td>
+<td><code>createLight</code>, <code>createThermostat</code>, <code>createDoorLock</code>, <code>createCamera</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Strategy</strong></td>
+<td><code>strategy.AutomationMode</code> + 3 modes; <code>SmartHomeHub</code> is the Context</td>
+<td><code>name()</code>, <code>apply(SmartHomeHub)</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Command</strong></td>
+<td><code>command.DeviceCommand</code> + 6 concretes; <code>CommandInvoker</code></td>
+<td><code>execute()</code>, <code>undo()</code>, <code>describe()</code>; <code>CommandInvoker.execute/undo/canUndo</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Decorator</strong></td>
+<td><code>devices.decorator.DeviceDecorator</code> + 2 wrappers</td>
+<td><code>wrappee</code> field; overridden <code>turnOn/turnOff</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>DAO</strong></td>
+<td><code>persistence.dao.*</code> (5 DAOs)</td>
+<td><code>insert</code>, <code>findById</code>, <code>findByRoom</code>, <code>findRecent</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Facade</strong></td>
+<td><code>facade.HomeController</code></td>
+<td><code>turnOnDevice</code>, <code>setAutomationMode</code>, <code>getEventHistory</code>, <code>undoLastAction</code>, …</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Justifications.</strong> <em>Singleton</em>: Hub and Database are global state; multiple
+instances would corrupt device state and connections. <em>Iterator</em>: returns
+<code>Enumeration</code> per the brief's exact wording, plus a custom GoF-style
+<code>RoomIterator</code>. <em>Observer</em> (push): devices push events to UI controllers,
+the history feed, and <code>DaoEventBridge</code> (persistence) without coupling.
+<em>Abstract Factory</em>: two coordinated families (Version1/Version2), every
+factory implements every method (Liskov-substitutable). <em>Strategy</em>: hub
+holds the active <code>AutomationMode</code>; new modes plug in without touching
+hub code. <em>Command</em>: every action is an object with reliable undo;
+Invoker imports zero domain classes. <em>Decorator</em>: stackable wrappers add
+behaviour without modifying any device class. <em>DAO</em>: SQL isolated behind
+plain Java APIs; domain layer never imports <code>java.sql</code>. <em>Facade</em>:
+single UI entry point routing through subsystems.</p>
+<hr />
+<h2 id="5-alternative-designs-and-trade-off-analysis">5. Alternative Designs and Trade-Off Analysis</h2>
+<h3 id="51-observer-push-vs-pull">5.1 Observer Push vs. Pull</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Push (chosen)</th>
+<th>Pull</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Notify signature</td>
+<td><code>update(Device d, String event)</code></td>
+<td><code>update(Device d)</code></td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Lower latency</td>
+<td>Slightly higher (round-trip)</td>
+</tr>
+<tr>
+<td><strong>Extensibility</strong></td>
+<td>New fields force observer changes</td>
+<td>Zero-cost field additions</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Larger payload at notify</td>
+<td>Smaller notify payload</td>
+</tr>
+<tr>
+<td><strong>Maintainability</strong></td>
+<td>Simple observers</td>
+<td>Tight subject-coupling</td>
+</tr>
+</tbody>
+</table>
+<p><em>Justification:</em> the small fixed event vocabulary (TURNED_ON, LOCKED,
+TEMP_CHANGED, …) makes the push payload tiny and stable. Push gives lower
+UI-refresh latency and keeps <code>DaoEventBridge</code> trivial.</p>
+<h3 id="52-abstract-factory-by-family-vs-factory-method-per-type">5.2 Abstract Factory by family vs. Factory Method per type</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Factory Method per type</th>
+<th>Abstract Factory by family (chosen)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class layout</td>
+<td>One factory per device type</td>
+<td>Abstract + 2 concrete families</td>
+</tr>
+<tr>
+<td>Rubric phrasing</td>
+<td>Partial — only Factory Methods</td>
+<td>Full — <em>"Abstract Factory with Factory Methods"</em></td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Identical</td>
+<td>Identical</td>
+</tr>
+<tr>
+<td><strong>Extensibility</strong></td>
+<td>Cheap new types; expensive new families</td>
+<td>Cheap new families; medium new types</td>
+</tr>
+<tr>
+<td><strong>Cost (LOC)</strong></td>
+<td>Lower per concrete factory</td>
+<td>Slightly higher (all 4 methods per factory)</td>
+</tr>
+<tr>
+<td><strong>Maintainability</strong></td>
+<td>Per-factory cohesion</td>
+<td>Family cohesion (compatible products)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Justification:</em> the brief explicitly demands "Abstract Factory <strong>with</strong>
+Factory Methods" — both must be visible. We rejected an earlier "Comfort
+vs. Security" axis because it required <code>UnsupportedOperationException</code>
+stubs (LSP violation). Version1 / Version2 generations let every
+factory implement every method meaningfully.</p>
+<hr />
+<h2 id="6-constraints-satisfied">6. Constraints Satisfied</h2>
+<table>
+<thead>
+<tr>
+<th>Constraint</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Modularity &amp; expansion</strong></td>
+<td>Patterns + per-package boundaries; new modes / factories / commands plug in by adding one class.</td>
+</tr>
+<tr>
+<td><strong>Prevent invalid/unsafe ops</strong></td>
+<td>Null guards, type-checked Facade rejects, idempotent state changes, Command pre-state for undo, prepared SQL.</td>
+</tr>
+<tr>
+<td><strong>Intuitive accessible GUI</strong></td>
+<td>Mobile-styled, 48 px tap targets, WCAG AAA contrast, mode-change confirmation dialogs, observer-driven live refresh.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-screenshots-gui-in-action">7. Screenshots — GUI in action</h2>
+<table>
+  <tr>
+    <td align="center"><img src="images/home.svg" width="180" alt="Home"/><br/><b>Home</b><br/>Rooms + device cards</td>
+    <td align="center"><img src="images/mode-confirm.svg" width="180" alt="Mode confirm"/><br/><b>Mode confirm</b><br/>Strategy with consequence dialog</td>
+    <td align="center"><img src="images/history.svg" width="180" alt="History"/><br/><b>History</b><br/>Observer + DAO live feed</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="images/decorator.svg" width="180" alt="Decorator"/><br/><b>Decorator</b><br/>Wrap + captured log</td>
+    <td align="center"><img src="images/add-device.svg" width="180" alt="Add device"/><br/><b>Add device</b><br/>Abstract Factory at runtime</td>
+    <td align="center" style="font-size:small; color:#5a6478">Run with<br/><code>./mvnw javafx:run</code><br/>Window: 400×800</td>
+  </tr>
+</table>
+
+<hr />
+<h2 id="8-references">8. References</h2>
+<ul>
+<li>Refactoring Guru — pattern reference structures (https://refactoring.guru/design-patterns)</li>
+<li>Gamma, Helm, Johnson, Vlissides — <em>Design Patterns: Elements of Reusable Object-Oriented Software</em></li>
+<li>Sun / Oracle Core J2EE Patterns — DAO definition</li>
+</ul>
+<p><em>Companion documents (also in the repo): <code>class-diagram.md</code>, <code>class-catalog.md</code>.</em></p>
+</body>
+</html>
