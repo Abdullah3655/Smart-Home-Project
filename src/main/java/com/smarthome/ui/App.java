@@ -5,7 +5,9 @@ import com.smarthome.core.SmartHomeHub;
 import com.smarthome.devices.Device;
 import com.smarthome.factory.Version2DeviceFactory;
 import com.smarthome.persistence.Database;
+import com.smarthome.persistence.dao.DeviceDAO;
 import com.smarthome.persistence.dao.DeviceEventDAO;
+import com.smarthome.persistence.dao.RoomDAO;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * JavaFX Application entry point for the Smart Home dashboard
@@ -32,7 +35,12 @@ public class App extends Application {
         // Start the database first so DAOs can be wired into the Facade.
         Database.getInstance();
 
-        seedDemoData();
+        // Order matters:
+        //   1. Load persisted state (silent — no observers attached yet)
+        //   2. Seed demo rooms/devices ONLY if database is empty
+        //   3. Attach DaoEventBridge so subsequent state changes persist
+        loadPersistedState();
+        seedDemoDataIfEmpty();
         attachPersistenceObservers();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
@@ -48,37 +56,74 @@ public class App extends Application {
         stage.show();
     }
 
-    /** Inserts demo rooms and devices so the UI is non-empty on first launch. */
-    private void seedDemoData() {
+    /**
+     * Loads any rooms and devices already persisted to SQLite. Devices
+     * appear with their saved family / type / state — the DAO uses the
+     * Abstract Factory at runtime to reconstruct the right variant.
+     */
+    private void loadPersistedState() {
+        SmartHomeHub hub = SmartHomeHub.getInstance();
+        RoomDAO roomDAO = new RoomDAO();
+        DeviceDAO deviceDAO = new DeviceDAO();
+
+        List<Room> rooms = roomDAO.findAll();
+        for (Room r : rooms) {
+            for (Device d : deviceDAO.findByRoom(r.getRoomId())) {
+                r.addDevice(d);
+            }
+            hub.addRoom(r);
+        }
+    }
+
+    /**
+     * Seeds demo rooms and devices only if the persistence layer is
+     * empty (first run). Persists everything so subsequent launches
+     * reload the same setup.
+     */
+    private void seedDemoDataIfEmpty() {
         SmartHomeHub hub = SmartHomeHub.getInstance();
         if (!hub.getRooms().isEmpty()) {
             return;
         }
         Version2DeviceFactory factory = new Version2DeviceFactory();
+        RoomDAO roomDAO = new RoomDAO();
+        DeviceDAO deviceDAO = new DeviceDAO();
 
         Room kitchen = new Room("kitchen", "Kitchen");
         kitchen.addDevice(factory.createLight("Ceiling Light"));
         kitchen.addDevice(factory.createThermostat("Kitchen Thermostat"));
         hub.addRoom(kitchen);
+        roomDAO.insert(kitchen);
 
         Room livingRoom = new Room("living-room", "Living Room");
         livingRoom.addDevice(factory.createLight("Lamp"));
         livingRoom.addDevice(factory.createCamera("Living Room Camera"));
         hub.addRoom(livingRoom);
+        roomDAO.insert(livingRoom);
 
         Room frontDoor = new Room("front-door", "Front Door");
         frontDoor.addDevice(factory.createDoorLock("Smart Lock"));
         frontDoor.addDevice(factory.createCamera("Doorbell Camera"));
         hub.addRoom(frontDoor);
+        roomDAO.insert(frontDoor);
+
+        // Persist every device created by the seed
+        for (Room room : hub.getRooms()) {
+            Enumeration<Device> it = room.devices();
+            while (it.hasMoreElements()) {
+                deviceDAO.insert(it.nextElement(), room.getRoomId());
+            }
+        }
     }
 
     /**
      * Attaches the {@link DaoEventBridge} to every device so each notify
-     * fires a persisted device_events row. This is the rubric's "DAO is
-     * actually used at runtime, not just present" line.
+     * (a) appends a row to the device_events audit log and (b) updates
+     * the device's live-state row in the devices table. Demo payoff:
+     * close and reopen the app and devices retain their last state.
      */
     private void attachPersistenceObservers() {
-        DaoEventBridge bridge = new DaoEventBridge(new DeviceEventDAO());
+        DaoEventBridge bridge = new DaoEventBridge(new DeviceEventDAO(), new DeviceDAO());
         for (Room room : SmartHomeHub.getInstance().getRooms()) {
             Enumeration<Device> it = room.devices();
             while (it.hasMoreElements()) {

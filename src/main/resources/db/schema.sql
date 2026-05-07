@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS rooms (
 CREATE TABLE IF NOT EXISTS devices (
     device_id    TEXT PRIMARY KEY,
     name         TEXT NOT NULL,
-    type         TEXT NOT NULL,
+    type         TEXT NOT NULL,                  -- LIGHT | THERMOSTAT | LOCK | CAMERA
+    family       TEXT NOT NULL DEFAULT 'VERSION2', -- VERSION1 | VERSION2 (Abstract Factory family)
     room_id      TEXT NOT NULL,
     powered_on   INTEGER NOT NULL DEFAULT 0,
-    state_json   TEXT,
+    state_blob   TEXT,                           -- key=value;key=value type-specific state
     FOREIGN KEY (room_id) REFERENCES rooms(room_id)
 );
 

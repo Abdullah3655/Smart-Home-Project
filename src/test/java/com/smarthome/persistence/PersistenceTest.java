@@ -133,4 +133,66 @@ class PersistenceTest {
         assertEquals(2, dev1Only.size());
         assertTrue(dev1Only.stream().allMatch(cl -> cl.deviceId().equals("dev-1")));
     }
+
+    @Test
+    void deviceDaoRoundTripsLightAcrossSubtypeAndFamily() {
+        // Seed a room first (FK constraint)
+        new RoomDAO(db.getConnection()).insert(new com.smarthome.core.Room("kitchen", "Kitchen"));
+
+        com.smarthome.devices.Light original = (com.smarthome.devices.Light)
+            new com.smarthome.factory.Version2DeviceFactory().createLight("Kitchen Light");
+        original.turnOn();
+        original.setBrightness(75);
+
+        com.smarthome.persistence.dao.DeviceDAO dao =
+            new com.smarthome.persistence.dao.DeviceDAO(db.getConnection());
+        dao.insert(original, "kitchen");
+
+        com.smarthome.devices.Device loaded = dao.findById(original.getId());
+        assertNotNull(loaded);
+        assertEquals(original.getId(), loaded.getId());
+        assertEquals("Kitchen Light", loaded.getName());
+        assertTrue(loaded.isPoweredOn());
+        // Reconstructed as a Version2Light because the row stored family=VERSION2
+        assertTrue(loaded instanceof com.smarthome.devices.version2.Version2Light);
+        assertEquals(75, ((com.smarthome.devices.Light) loaded).getBrightness());
+    }
+
+    @Test
+    void deviceDaoRoundTripsAcrossDeviceTypes() {
+        new RoomDAO(db.getConnection()).insert(new com.smarthome.core.Room("home", "Home"));
+        com.smarthome.persistence.dao.DeviceDAO dao =
+            new com.smarthome.persistence.dao.DeviceDAO(db.getConnection());
+
+        com.smarthome.factory.DeviceFactory factory = new com.smarthome.factory.Version2DeviceFactory();
+        com.smarthome.devices.Device thermo = factory.createThermostat("Living Thermo");
+        com.smarthome.devices.Device lock   = factory.createDoorLock("Front Door");
+        com.smarthome.devices.Device camera = factory.createCamera("Hall Cam");
+
+        ((com.smarthome.devices.Thermostat) thermo).setTemperature(19.5);
+        ((com.smarthome.devices.Lock) lock).lock();
+        camera.turnOn();
+
+        dao.insert(thermo, "home");
+        dao.insert(lock, "home");
+        dao.insert(camera, "home");
+
+        List<com.smarthome.devices.Device> loaded = dao.findByRoom("home");
+        assertEquals(3, loaded.size());
+    }
+
+    @Test
+    void deviceDaoPreservesVersion1FamilyOnReload() {
+        new RoomDAO(db.getConnection()).insert(new com.smarthome.core.Room("legacy-room", "Legacy"));
+        com.smarthome.persistence.dao.DeviceDAO dao =
+            new com.smarthome.persistence.dao.DeviceDAO(db.getConnection());
+
+        com.smarthome.devices.Device legacyLight =
+            new com.smarthome.factory.Version1DeviceFactory().createLight("Old Lamp");
+        dao.insert(legacyLight, "legacy-room");
+
+        com.smarthome.devices.Device loaded = dao.findById(legacyLight.getId());
+        // Round-trip preserves the family — Version1 stays Version1
+        assertTrue(loaded instanceof com.smarthome.devices.version1.Version1Light);
+    }
 }

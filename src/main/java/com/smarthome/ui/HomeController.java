@@ -10,13 +10,18 @@ import com.smarthome.devices.Thermostat;
 import com.smarthome.observer.Observer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -85,7 +90,38 @@ public class HomeController implements Initializable {
         while (it.hasMoreElements()) {
             section.getChildren().add(buildDeviceCard(it.nextElement()));
         }
+
+        // "+ Add device" full-width button at the end of the room's device list.
+        Button addDevice = new Button("+ Add device to " + room.getName());
+        addDevice.getStyleClass().add("action-button");
+        addDevice.setMaxWidth(Double.MAX_VALUE);
+        addDevice.setOnAction(e -> openAddDeviceModal(room));
+        section.getChildren().add(addDevice);
+
         return section;
+    }
+
+    /** Opens the Add Device modal targeting the given room. */
+    private void openAddDeviceModal(Room room) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/add-device.fxml"));
+            Parent modalRoot = loader.load();
+            AddDeviceController controller = loader.getController();
+            controller.setTargetRoom(room);
+
+            Stage modal = new Stage();
+            modal.setTitle("Add device");
+            modal.initModality(Modality.APPLICATION_MODAL);
+            modal.initOwner(roomsContainer.getScene().getWindow());
+
+            Scene scene = new Scene(modalRoot);
+            scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
+            modal.setScene(scene);
+            modal.showAndWait();
+        } catch (Exception ex) {
+            System.err.println("Could not open Add Device modal: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     private VBox buildDeviceCard(Device device) {
