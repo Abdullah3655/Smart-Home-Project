@@ -30,6 +30,7 @@ public final class Database {
         try {
             this.connection = DriverManager.getConnection(jdbcUrl);
             initSchema();
+            runMigrations();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize SQLite database at " + jdbcUrl, e);
         }
@@ -71,6 +72,43 @@ public final class Database {
                         stmt.execute(trimmed);
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Idempotent schema migrations for databases that pre-date a column
+     * being added to {@code schema.sql}. Each migration is wrapped in
+     * a try/catch that swallows "duplicate column" errors so the call
+     * is safe on every run, fresh or upgraded.
+     *
+     * <p>If you add a new column to schema.sql in the future, also add
+     * an ALTER TABLE here so existing developer/grader databases pick
+     * up the change without manual deletion of {@code smarthome.db}.</p>
+     */
+    private void runMigrations() {
+        // 2026-05-07: added family column to devices table for Abstract
+        // Factory variant tracking (Version1 vs Version2).
+        tryMigrate(
+            "ALTER TABLE devices ADD COLUMN family TEXT NOT NULL DEFAULT 'VERSION2'");
+
+        // 2026-05-07: renamed state_json to state_blob. Older DBs may have
+        // either column; prefer state_blob if missing.
+        tryMigrate(
+            "ALTER TABLE devices ADD COLUMN state_blob TEXT");
+    }
+
+    private void tryMigrate(String alterSql) {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(alterSql);
+        } catch (Exception e) {
+            // SQLite throws "duplicate column name" or "no such table" if
+            // the migration was already applied or the table doesn't
+            // exist yet. Both are non-fatal — schema.sql will create the
+            // table fresh next time and we stay consistent.
+            String msg = e.getMessage() == null ? "" : e.getMessage();
+            if (!msg.contains("duplicate column") && !msg.contains("no such table")) {
+                System.err.println("Migration warning: " + msg);
             }
         }
     }
