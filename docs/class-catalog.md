@@ -1,412 +1,364 @@
-# Smart Home — Class Catalog
+# Smart Home Automation — Project Description and Class Catalog
 
-A per-class description following the format from the assignment brief's
-Airport System reference example. Each class lists *Notable Attributes*
-and *Possible Methods*, plus the design pattern role(s) it plays.
-
-> **Reading aid:** classes are grouped by package (which is also a
-> stable design boundary). Within each package, abstract/interface
-> classes appear before their concrete subclasses.
+> Formatted to mirror the Airport System reference example in the
+> CSE3202 / SE 491 brief (`Notable Attributes` / `Possible Methods`
+> per class). This document is intended to be embedded in the
+> 5-page report.
 
 ---
 
-## Table of contents
+## Project Description
 
-1. [`com.smarthome.core`](#1-comsmarthomecore)
-2. [`com.smarthome.observer`](#2-comsmarthomeobserver)
-3. [`com.smarthome.devices`](#3-comsmarthomedevices)
-4. [`com.smarthome.devices.decorator`](#4-comsmarthomedevicesdecorator)
-5. [`com.smarthome.factory`](#5-comsmarthomefactory)
-6. [`com.smarthome.strategy`](#6-comsmarthomestrategy)
-7. [`com.smarthome.command`](#7-comsmarthomecommand)
-8. [`com.smarthome.facade`](#8-comsmarthomefacade)
-9. [`com.smarthome.persistence`](#9-comsmarthomepersistence)
-10. [`com.smarthome.ui`](#10-comsmarthomeui)
+In this project, we implement a simplified version of a **Smart Home
+Automation System** in Java. The system allows users to interact with
+their home, navigate rooms, control devices (lights, thermostats, locks,
+cameras), apply whole-home automation modes, view event history, and
+undo actions — while also discovering the world of design patterns!
+
+### Users can:
+
+- Get a list of all rooms in the home
+- Enter a room and view its devices
+- Turn devices on or off
+- Lock or unlock doors
+- Adjust thermostat temperatures (±1 °C, or set a specific value)
+- Apply automation modes (Eco, Sleep, Away) to the whole home
+- Add new devices to a room (selecting type and family)
+- Wrap a device with a logging decorator and view the captured calls
+- View past device events (persisted across app restarts)
+- View past command history with descriptions
+- Undo the most recent action
+
+Devices automatically push state-change events to all interested
+observers — the live UI updates and the persistent event log are both
+fed by the same Observer chain.
 
 ---
 
-## 1. `com.smarthome.core`
+## Here's a brief description of each class
 
 ### `SmartHomeHub`
-*The application's single domain hub.*
-**Pattern roles:** Singleton · Strategy Context · Iterator aggregate.
 
-**Notable attributes**
-- `INSTANCE : SmartHomeHub` — the lone static instance
-- `roomsById : Map<String, Room>` — every room in the home, keyed by id
-- `automationMode : AutomationMode` — the currently active strategy
+Represents the smart-home itself. The hub is responsible for owning the
+set of rooms, holding the currently active automation mode, and
+coordinating cross-cutting access to the domain model. Implemented as a
+**thread-safe Singleton** so the whole application sees one
+authoritative state.
 
-**Possible methods**
-- `getInstance() : SmartHomeHub` — Singleton accessor
-- `addRoom(Room) : void` — register a room
-- `getRoom(String) : Room` — look up a room by id
-- `getRooms() : Collection<Room>` — read-only view of all rooms
-- `setAutomationMode(AutomationMode) : void` — change the active strategy
-- `getAutomationMode() : AutomationMode` — current strategy
-- `applyAutomationMode() : void` — Context-side delegate to `mode.apply(this)`
-- `createIterator() : RoomIterator` — Iterator pattern accessor
+**Notable Attributes**
+
+- `INSTANCE` — the lone static instance of the hub
+- `roomsById` — map of every room in the home, keyed by room id
+- `automationMode` — the currently active `AutomationMode` strategy
+
+**Possible Methods**
+
+- `static SmartHomeHub getInstance()` — Singleton accessor
+- `void addRoom(Room r)` — register a room with the hub
+- `Room getRoom(String roomId)` — find a room by id
+- `Collection<Room> getRooms()` — return an unmodifiable view of all rooms
+- `void setAutomationMode(AutomationMode mode)` — install a Strategy
+- `AutomationMode getAutomationMode()` — read the active strategy
+- `void applyAutomationMode()` — Context delegate that runs the active strategy
+- `RoomIterator createIterator()` — Iterator pattern accessor for rooms
+
+---
 
 ### `Room`
-*A logical container of devices.*
-**Pattern roles:** Iterator host (returns `Enumeration<Device>`).
 
-**Notable attributes**
-- `roomId : String` — unique room id
-- `name : String` — human-readable name
-- `devicesById : Map<String, Device>` — devices in this room
+Represents a logical room inside the home (Kitchen, Living Room, Front
+Door). Each room contains a collection of devices and exposes them via
+the **Iterator pattern** as an `Enumeration<Device>` — the form
+required by the assignment brief.
 
-**Possible methods**
-- `getRoomId() : String`
-- `getName() : String`
-- `addDevice(Device) : void`
-- `removeDevice(String deviceId) : void`
-- `getDevice(String deviceId) : Device`
-- `devices() : Enumeration<Device>` — Iterator pattern method (rubric requirement)
+**Notable Attributes**
 
-### `RoomIterator`
-*Custom Gang-of-Four-style iterator interface.*
-**Pattern roles:** Iterator interface.
+- `roomId` — unique room id
+- `name` — human-readable name
+- `devicesById` — map of devices in this room, keyed by device id
 
-**Possible methods**
-- `hasMore() : boolean`
-- `getNext() : Room`
+**Possible Methods**
 
-### `HubRoomIterator`
-*Concrete iterator over the hub's rooms.*
-
-**Notable attributes**
-- `rooms : List<Room>`
-- `position : int`
-
-**Possible methods**
-- `hasMore() : boolean`
-- `getNext() : Room`
-
-### `RoomIterableCollection`
-*Marker interface implemented by anything that produces a `RoomIterator`.*
-
-**Possible methods**
-- `createIterator() : RoomIterator`
+- `String getRoomId()`
+- `String getName()`
+- `void addDevice(Device d)` — register a device with this room
+- `void removeDevice(String deviceId)`
+- `Device getDevice(String deviceId)`
+- `Enumeration<Device> devices()` — Iterator pattern method (returns rooms' devices)
 
 ---
-
-## 2. `com.smarthome.observer`
-
-### `Observer`
-*Reactive listener interface.*
-**Pattern roles:** Observer interface.
-
-**Possible methods**
-- `update(Device d, String event) : void` — locked push-style signature
-
-### `Observable`
-*Subject-side interface.*
-**Pattern roles:** Subject interface.
-
-**Possible methods**
-- `attach(Observer) : void`
-- `detach(Observer) : void`
-- `notifyObservers(String event) : void`
-
----
-
-## 3. `com.smarthome.devices`
 
 ### `Device`
-*Abstract base for every controllable thing in the home.*
-**Pattern roles:** Subject (Observer pattern) · Receiver (Command pattern) · Component (Decorator pattern).
 
-**Notable attributes**
-- `id : String` — UUID, immutable
-- `name : String` — display name
-- `poweredOn : boolean` — current power state
-- `observers : List<Observer>` — attached listeners
+Abstract superclass representing any controllable thing in the home.
+Each device has an immutable id, a human name, a power state, and a list
+of attached observers. Devices implement `Observable` — every
+state-changing method calls `notifyObservers(event)` to push the change
+to every listener.
 
-**Possible methods**
-- `getId() : String`
-- `getName() : String`
-- `setName(String) : void`
-- `isPoweredOn() : boolean`
-- `turnOn() : void` — fires `TURNED_ON` event
-- `turnOff() : void` — fires `TURNED_OFF` event
-- `attach(Observer) : void`
-- `detach(Observer) : void`
-- `notifyObservers(String event) : void`
+**Notable Attributes**
 
-### `Light extends Device`
-**Notable attributes**
-- `brightness : int` — 0..100
+- `id` — UUID, immutable, set at construction
+- `name` — display name
+- `poweredOn` — current power state
+- `observers` — list of `Observer` instances attached to this device
 
-**Possible methods**
-- `getBrightness() : int`
-- `setBrightness(int) : void` — fires `BRIGHTNESS_CHANGED`
+**Possible Methods**
 
-### `Thermostat extends Device`
-**Notable attributes**
-- `temperature : double` — target °C
-
-**Possible methods**
-- `getTemperature() : double`
-- `setTemperature(double) : void` — fires `TEMP_CHANGED`
-
-### `Lock extends Device`
-**Notable attributes**
-- `locked : boolean`
-
-**Possible methods**
-- `isLocked() : boolean`
-- `lock() : void` — fires `LOCKED`
-- `unlock() : void` — fires `UNLOCKED`
-
-### `Camera extends Device`
-*Inherits all behaviour from `Device`; no extra fields.*
-
-### `Version1Light / Version1Thermostat / Version1Lock / Version1Camera`
-*Legacy family — concrete products of `Version1DeviceFactory`. Each may
-override its base behaviour (e.g. `Version1Light` snaps brightness to
-discrete 25% steps).*
-
-### `Version2Light / Version2Thermostat / Version2Lock / Version2Camera`
-*Modern family — concrete products of `Version2DeviceFactory`. Smooth
-behaviour (e.g. `Version2Light` accepts any 0..100 brightness).*
+- `String getId()`
+- `String getName()`
+- `boolean isPoweredOn()`
+- `void turnOn()` — fires `TURNED_ON` event
+- `void turnOff()` — fires `TURNED_OFF` event
+- `void attach(Observer o)` — register a listener (Observable contract)
+- `void detach(Observer o)` — unregister a listener
+- `void notifyObservers(String event)` — push an event to every listener
 
 ---
 
-## 4. `com.smarthome.devices.decorator`
+### `Light` / `Thermostat` / `Lock` / `Camera`
 
-### `DeviceDecorator extends Device`
-*Abstract base for transparent device wrappers.*
-**Pattern roles:** Base Decorator (Decorator pattern).
+Concrete subclasses of `Device`. Each adds type-specific state and
+behaviour:
 
-**Notable attributes**
-- `wrappee : Device` — the wrapped instance
+- **`Light`** — `brightness : int`, `setBrightness(int)`. Fires `BRIGHTNESS_CHANGED`.
+- **`Thermostat`** — `temperature : double`, `setTemperature(double)`. Fires `TEMP_CHANGED`.
+- **`Lock`** — `locked : boolean`, `lock()`, `unlock()`. Fires `LOCKED` / `UNLOCKED`.
+- **`Camera`** — uses only the inherited on/off behaviour to represent armed/disarmed.
 
-**Possible methods**
-- All `Device` methods, each delegating to `wrappee`.
-
-### `LoggingDeviceDecorator extends DeviceDecorator`
-*Captures every state-changing call.*
-
-**Notable attributes**
-- `log : List<String>` — captured action log
-
-**Possible methods**
-- `getLog() : List<String>`
-- `turnOn() / turnOff()` — overrides record the call before delegating
-
-### `EnergyTrackedDecorator extends DeviceDecorator`
-*Tracks total time-on for energy reports.*
-
-**Notable attributes**
-- `onSinceMillis : long`
-- `totalOnMillis : long`
-
-**Possible methods**
-- `getTotalOnMillis() : long`
+Each base class has two further family variants: `Version1Light`,
+`Version2Light`, `Version1Thermostat`, etc. — products of the
+**Abstract Factory** family (`Version1DeviceFactory` /
+`Version2DeviceFactory`). Variants differ in policy (e.g.
+`Version1Light` snaps brightness to 25 % steps, while `Version2Light`
+accepts any 0–100 value).
 
 ---
 
-## 5. `com.smarthome.factory`
+### `Observer` / `Observable` (interfaces)
+
+The two halves of the **Observer pattern**.
+
+`Observable` is implemented by anything that may mutate (primarily
+`Device`). It exposes:
+
+- `void attach(Observer o)`
+- `void detach(Observer o)`
+- `void notifyObservers(String event)`
+
+`Observer` is implemented by anything that wants to react to a device
+change. It exposes a single method:
+
+- `void update(Device d, String event)` — locked push-style signature
+
+The signature is intentionally fixed: every observer receives the
+affected device and a short uppercase event name (e.g. `"TURNED_ON"`,
+`"LOCKED"`). UI controllers, the history feed, and the persistence
+bridge all implement this same interface.
+
+---
 
 ### `DeviceFactory`
-*Abstract Factory declaring the family of device-creation methods.*
-**Pattern roles:** Abstract Factory + Factory Methods.
 
-**Possible methods**
-- `createLight(String name) : Device` — Factory Method
-- `createThermostat(String name) : Device` — Factory Method
-- `createDoorLock(String name) : Device` — Factory Method
-- `createCamera(String name) : Device` — Factory Method
-- `newId() : String` — protected helper, generates a UUID
+Abstract superclass declaring the family of device-creation methods.
+This is the **Abstract Factory** half of the rubric line *"Abstract
+Factory with Factory Methods"* — each `createXxx(String name)` is a
+**Factory Method** that subclasses override to instantiate the variant
+belonging to their family.
 
-### `Version1DeviceFactory extends DeviceFactory`
-*Produces the `Version1*` family — every method returns the legacy variant.*
+**Notable Attributes**
 
-### `Version2DeviceFactory extends DeviceFactory`
-*Produces the `Version2*` family — every method returns the modern variant.*
+- (none — factories are stateless)
 
----
+**Possible Methods**
 
-## 6. `com.smarthome.strategy`
+- `abstract Device createLight(String name)` — Factory Method
+- `abstract Device createThermostat(String name)` — Factory Method
+- `abstract Device createDoorLock(String name)` — Factory Method
+- `abstract Device createCamera(String name)` — Factory Method
+- `protected String newId()` — generates a UUID for the next device
 
-### `AutomationMode`
-*Strategy interface for whole-home automation modes.*
-**Pattern roles:** Strategy interface.
+### `Version1DeviceFactory` / `Version2DeviceFactory`
 
-**Possible methods**
-- `name() : String` — UI-displayable mode name
-- `apply(SmartHomeHub) : void` — runs the mode's algorithm against the hub
-
-### `EcoMode implements AutomationMode`
-*Energy-saving mode: thermostats → 24°C, on-lights → 50% brightness.*
-
-### `SleepMode implements AutomationMode`
-*Night mode: lights off, doors locked, thermostats → 20°C.*
-
-### `AwayMode implements AutomationMode`
-*Vacation mode: lights off, doors locked, cameras armed, thermostats → 15°C.*
+Concrete factories. Each implements **all four** factory methods,
+returning the variant of its family. Both factories are
+Liskov-substitutable for `DeviceFactory` — no
+`UnsupportedOperationException` stubs.
 
 ---
 
-## 7. `com.smarthome.command`
+### `AutomationMode` (interface)
 
-### `DeviceCommand`
-*Command interface — one action object per UI gesture.*
-**Pattern roles:** Command interface.
+The **Strategy** interface for whole-home automation behaviour. Each
+concrete strategy walks all rooms via the Iterator and mutates devices
+according to its policy, firing observer events along the way.
 
-**Possible methods**
-- `execute() : void` — perform the action
-- `undo() : void` — restore pre-execute state
-- `describe() : String` — human-readable label for history UI
+**Possible Methods**
 
-### `TurnOnCommand / TurnOffCommand / SetTemperatureCommand / LockCommand / UnlockCommand / SetAutomationModeCommand`
-*Concrete commands wrapping a `Device` (or `Thermostat`, `Lock`, or
-`SmartHomeHub`) as Receiver. Each one captures pre-execute state in a
-field so `undo()` can restore it precisely.*
+- `String name()` — UI-displayable mode name
+- `void apply(SmartHomeHub hub)` — runs the strategy's algorithm
+
+### `EcoMode` / `SleepMode` / `AwayMode`
+
+Concrete strategies. Each defines a different home behaviour:
+
+- **`EcoMode`** — sets every thermostat to 24 °C and dims every powered-on light to 50 %.
+- **`SleepMode`** — turns off every light, locks every door, sets thermostats to 20 °C.
+- **`AwayMode`** — turns off every light, locks every door, arms every camera, sets thermostats to 15 °C.
+
+---
+
+### `DeviceCommand` (interface)
+
+The **Command** interface — every user action becomes an object of
+this type. Commands hold a reference to a Receiver (a `Device`,
+`Lock`, `Thermostat`, or `SmartHomeHub`) and capture pre-execute state
+in fields so `undo()` can restore it precisely.
+
+**Possible Methods**
+
+- `void execute()` — perform the action
+- `void undo()` — reverse the action's effect, restoring pre-execute state
+- `String describe()` — human-readable label for command-history UI
+
+### `TurnOnCommand` / `TurnOffCommand` / `SetTemperatureCommand` / `LockCommand` / `UnlockCommand` / `SetAutomationModeCommand`
+
+Six concrete commands, one per user action. Each captures pre-state in
+a field so undo is reliable across multiple intermediate actions.
 
 ### `CommandInvoker`
-*Runs commands and keeps an undo stack.*
-**Pattern roles:** Invoker (Command pattern).
 
-**Notable attributes**
+The **Invoker**. Runs commands and maintains the undo stack. Optionally
+writes a row to `commands_log` (via `CommandsLogDAO`) on every successful
+execute.
+
+**Notable Attributes**
+
 - `history : Deque<DeviceCommand>` — LIFO undo stack
-- `auditLog : CommandsLogDAO` — optional, writes a row per execute
+- `auditLog : CommandsLogDAO` — optional, writes one row per execute
 
-**Possible methods**
-- `execute(DeviceCommand) : void` — runs + pushes onto history
-- `canUndo() : boolean`
-- `undo() : DeviceCommand` — pops history, calls `command.undo()`
-- `getHistory() : List<DeviceCommand>` — read-only view
-- `clearHistory() : void`
+**Possible Methods**
+
+- `void execute(DeviceCommand c)` — runs `c.execute()` and pushes onto history
+- `boolean canUndo()`
+- `DeviceCommand undo()` — pops history, calls `last.undo()`
+- `List<DeviceCommand> getHistory()` — read-only view of the stack
+- `void clearHistory()`
 
 ---
 
-## 8. `com.smarthome.facade`
+### `DeviceDecorator`
 
-### `HomeController`
-*The single entry point from the UI into the system.*
-**Pattern roles:** Facade.
+Abstract base for transparent **Decorator** wrappers around a `Device`.
+The decorator's wrappee field carries the wrapped instance; every
+`Device` method delegates to it. Subclasses override individual methods
+to add cross-cutting behaviour (logging, energy tracking) without
+modifying any device class.
 
-**Notable attributes**
+**Notable Attributes**
+
+- `wrappee : Device` — the wrapped device
+
+**Possible Methods**
+
+- All of `Device`'s methods, each forwarded to `wrappee` by default.
+
+### `LoggingDeviceDecorator`
+
+Captures every state-changing call. Adds:
+
+- `List<String> getLog()` — read-only view of captured actions
+
+### `EnergyTrackedDecorator`
+
+Tracks total time the wrapped device has spent powered on.
+
+- `long getTotalOnMillis()` — total ms powered on, including the current session
+
+---
+
+### `HomeController` (the **Facade**)
+
+The single class the JavaFX UI talks to. Wraps every mutation in a
+`DeviceCommand` and hands it to the `CommandInvoker`. Reads route
+through DAOs. Domain logic stays out of this class — it is purely
+orchestration.
+
+**Notable Attributes**
+
 - `hub : SmartHomeHub`
 - `invoker : CommandInvoker`
 - `eventDAO : DeviceEventDAO`
 - `commandsLogDAO : CommandsLogDAO`
 
-**Possible methods**
-- `turnOnDevice(String deviceId) : void`
-- `turnOffDevice(String deviceId) : void`
-- `lockDevice(String deviceId) : void`
-- `unlockDevice(String deviceId) : void`
-- `setTemperature(String deviceId, double value) : void`
-- `setAutomationMode(String modeName) : void`
-- `getDevicesForRoom(String roomId) : List<Device>`
-- `getEventHistory() : List<DeviceEvent>`
-- `getCommandHistory() : List<CommandLog>`
-- `createSchedule(ScheduleRequest) : void` — placeholder for M4
-- `undoLastAction() : boolean` — convenience over invoker.undo()
+**Possible Methods**
 
-### `ScheduleRequest`
-*DTO for `createSchedule`. Records `(deviceId, modeName, cronExpression)`.*
+- `void turnOnDevice(String deviceId)` — routes through `TurnOnCommand`
+- `void turnOffDevice(String deviceId)`
+- `void lockDevice(String deviceId)` — rejects non-Lock devices with `IllegalArgumentException`
+- `void unlockDevice(String deviceId)`
+- `void setTemperature(String deviceId, double value)` — rejects non-Thermostats
+- `void setAutomationMode(String modeName)` — translates a UI string to a Strategy
+- `List<Device> getDevicesForRoom(String roomId)` — read-only
+- `List<DeviceEvent> getEventHistory()` — pulls from `DeviceEventDAO`
+- `List<CommandLog> getCommandHistory()` — pulls from `CommandsLogDAO`
+- `boolean undoLastAction()` — exposes Command undo to the UI
 
 ---
-
-## 9. `com.smarthome.persistence`
 
 ### `Database`
-*Owns the singleton SQLite connection.*
-**Pattern roles:** Singleton.
 
-**Notable attributes**
-- `INSTANCE : Database`
-- `connection : Connection`
+Owns the single SQLite JDBC connection. Implemented as a
+**Singleton**. Loads `db/schema.sql` from the classpath on first use
+and runs idempotent schema migrations.
 
-**Possible methods**
-- `getInstance() : Database`
-- `forUrl(String) : Database` — test factory for in-memory databases
-- `getConnection() : Connection`
+**Notable Attributes**
 
-### `User / DeviceEvent / CommandLog`
-*Plain Java records — DTOs returned by DAOs. Immutable, auto-generated
-equals/hashCode/toString.*
+- `INSTANCE` — the lone static instance
+- `connection` — the JDBC connection
 
-### `UserDAO / RoomDAO / DeviceDAO / DeviceEventDAO / CommandsLogDAO`
-*Five DAOs isolating SQL behind plain Java APIs.*
-**Pattern roles:** DAO.
+**Possible Methods**
 
-Each follows the same shape:
+- `static Database getInstance()` — production accessor
+- `static Database forUrl(String url)` — test factory (in-memory SQLite)
+- `Connection getConnection()`
 
-**Notable attributes**
-- `conn : Connection` — injected (production = singleton; tests = in-memory)
+---
 
-**Possible methods (representative — varies by DAO)**
-- `insert(...)` — write a new row using a `PreparedStatement`
-- `findById(String) : T`
-- `findRecent(int limit) : List<T>` — for audit/event tables
-- `findByDevice(String, int) : List<T>`
-- `update...(...)` / `delete(String)`
+### `UserDAO` / `RoomDAO` / `DeviceDAO` / `DeviceEventDAO` / `CommandsLogDAO`
+
+Five **DAO** classes, one per table, isolating SQL behind plain Java
+methods. Every DAO follows the same convention:
+
+- A no-arg production constructor that uses `Database.getInstance().getConnection()`
+- A constructor accepting a `Connection` for tests with in-memory SQLite
+- All queries use `PreparedStatement` to prevent SQL injection
 
 `DeviceDAO` is the most interesting: it round-trips polymorphic device
-subtypes by storing `(type, family)` columns and reconstructing via the
-right concrete `Device` constructor on read.
+subtypes through one row, using the **Abstract Factory** at runtime to
+reconstruct the right concrete `Device` variant.
 
 ---
 
-## 10. `com.smarthome.ui`
+## Design Pattern Roles per Class — Summary
 
-### `App extends javafx.application.Application`
-*JavaFX entry point. Initialises Database, loads or seeds rooms/devices,
-attaches the persistence Observer, and shows the main FXML.*
+| Class | Pattern role(s) |
+|---|---|
+| `SmartHomeHub` | **Singleton**, **Strategy Context**, **Iterator** aggregate |
+| `Database` | **Singleton** |
+| `Room` | **Iterator** host (returns `Enumeration<Device>`) |
+| `RoomIterator` / `HubRoomIterator` | **Iterator** (custom GoF interface) |
+| `Observer` / `Observable` | **Observer** roles |
+| `Device` | **Subject** (Observer), **Receiver** (Command), **Component** (Decorator) |
+| `DeviceFactory` and 2 concrete factories | **Abstract Factory + Factory Methods** |
+| `AutomationMode` and 3 concrete modes | **Strategy** |
+| `DeviceCommand` and 6 concrete commands | **Command** |
+| `CommandInvoker` | **Invoker** (Command) |
+| `DeviceDecorator` and 2 concrete decorators | **Decorator** |
+| `HomeController` (in `facade` package) | **Facade** |
+| `UserDAO` / `RoomDAO` / `DeviceDAO` / `DeviceEventDAO` / `CommandsLogDAO` | **DAO** |
+| `DaoEventBridge` | **Observer** (boundary adapter) |
 
-**Possible methods**
-- `start(Stage primaryStage) : void`
-- `main(String[] args) : void`
-
-### `MainController`
-*Owns the top bar, mode picker, status banner, and bottom navigation.
-Constructs the production Facade and shares it with sub-screens.*
-
-### `HomeController`
-*Renders the home screen — rooms with their device cards, a "+" button
-per room to open the Add-Device modal.*
-
-### `HistoryController`
-*Renders the History tab. Loads past events from `DeviceEventDAO` and
-appends new ones live via Observer.*
-
-### `DecoratorController`
-*Decorator showcase tab. Lets the user wrap a chosen device with
-`LoggingDeviceDecorator`, exercise it, and see the captured log.*
-
-### `AddDeviceController`
-*Modal controller for the Add-Device dialog. Translates user input
-(type + family + name) into the matching factory call, then persists
-via `DeviceDAO`.*
-
-### `DaoEventBridge implements Observer`
-*Boundary adapter between domain Observer events and the persistence
-layer. One instance attaches to every device on startup; each
-`update(d, event)` call writes a row to `device_events` and updates
-the `devices` table's live state.*
-
-### `HomeBus`
-*Tiny static event bus so the top-bar mode/undo actions can tell
-whichever screen is mounted to refresh.*
-
----
-
-## Summary
-
-| Package | Classes | Primary pattern role |
-|---|---|---|
-| `core` | 5 | Singleton + Iterator |
-| `observer` | 2 | Observer |
-| `devices` | 5 + 4 + 4 = 13 | Component (Decorator) + Receiver (Command) |
-| `devices.decorator` | 3 | Decorator |
-| `factory` | 3 | Abstract Factory |
-| `strategy` | 4 | Strategy |
-| `command` | 8 | Command |
-| `facade` | 2 | Facade |
-| `persistence` + `dao` | 1 + 8 = 9 | Singleton + DAO |
-| `ui` | 8 | Presentation + boundary adapter |
-| **Total** | **~57 classes** | **All 9 patterns implemented** |
+All 9 design patterns are implemented; the 4 mandatory ones (Iterator,
+Abstract Factory + Factory Methods, Singleton, Observer) are fully
+covered with their **required methods identified above**.
