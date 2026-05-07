@@ -1,13 +1,5 @@
 # Smart Home Automation — Class Catalog
 
-> Format mirrors the **Airport System** reference example in the
-> CSE3202 / SE 491 brief. Each class is presented as a UML-style card —
-> stereotype, role, attributes, methods, collaborators — using
-> `+` / `-` / `#` for public / private / protected access. Embed in
-> §1–§3 of the report.
-
----
-
 ## I. Project Description
 
 A simplified **Smart Home Automation System** in Java. The user can
