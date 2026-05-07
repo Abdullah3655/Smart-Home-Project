@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>class-diagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------
+   "Studies in Software Design Patterns" — archival editorial style
+   Warm cream paper · deep ink · burnt amber accents
+------------------------------------------------------------------ */
+
+:root {
+  --paper:        #F5EFE3;   /* warm cream */
+  --paper-tint:   #FAF6EC;
+  --paper-deep:   #ECE4D2;
+  --desk:         #2E261C;   /* dark warm taupe (off-page) */
+  --ink:          #1A1611;
+  --ink-soft:     #4A4137;
+  --muted:        #8A7E6B;
+  --accent:       #A4621D;   /* burnt sienna — print-friendly amber */
+  --accent-deep:  #6E3F0E;
+  --accent-tint:  #E9D7B8;
+  --teal:         #0C4A45;
+  --rule:         #C8BCA4;
+  --rule-soft:    #E2D8C2;
+}
+
+@page { size: A4; margin: 18mm 18mm 20mm 18mm; }
+
+* { box-sizing: border-box; }
+
+@media print {
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  html, body { background: var(--paper) !important; }
+  body { max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+}
+
+/* On-screen: paper floats on a warm desk-tone background */
+@media screen {
+  html {
+    background: var(--desk);
+    min-height: 100vh;
+    padding: 28px 0 80px 0;
+  }
+  body {
+    box-shadow: 0 1px 0 rgba(255,240,210,.04), 0 24px 60px -10px rgba(0,0,0,.55);
+  }
+}
+
+html { background: var(--paper); }
+
+body {
+  font-family: 'Newsreader', 'Source Serif Pro', Georgia, 'Iowan Old Style', serif;
+  font-feature-settings: 'liga', 'kern', 'onum';
+  font-variation-settings: 'opsz' 14;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper);
+  max-width: 18cm;
+  margin: 0 auto;
+  padding: 22mm 16mm 26mm 16mm;
+  text-rendering: optimizeLegibility;
+  hanging-punctuation: first last allow-end;
+  hyphens: auto;
+}
+
+/* ------------------------------------------------------------------
+   Masthead — eyebrow + title + colophon line
+------------------------------------------------------------------ */
+
+h1 {
+  font-family: 'Newsreader', Georgia, serif;
+  font-variation-settings: 'opsz' 72, 'wght' 500;
+  font-weight: 500;
+  font-size: 34pt;
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: 0 0 10pt 0;
+  padding: 0;
+  text-wrap: balance;
+}
+
+h1::before {
+  content: "✻  Studies in Software Design Patterns  ✻";
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 8pt;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 16pt 0;
+  padding: 12pt 0 10pt 0;
+  border-top: 2pt solid var(--ink);
+  border-bottom: 0.5pt solid var(--ink);
+  text-align: center;
+}
+
+/* The first paragraph after H1 is a typeset colophon line */
+h1 + p {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 8.5pt;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  margin: 0 0 6pt 0;
+  padding: 8pt 0 10pt 0;
+  border-bottom: 0.5pt solid var(--rule);
+}
+h1 + p strong {
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.92em;
+}
+h1 + p a {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 0.4pt;
+}
+
+/* The horizontal rule right after the colophon disappears (it'd be redundant) */
+h1 + p + hr { display: none; }
+
+/* ------------------------------------------------------------------
+   Section headings
+------------------------------------------------------------------ */
+
+h2 {
+  font-family: 'Newsreader', serif;
+  font-variation-settings: 'opsz' 36, 'wght' 500;
+  font-weight: 500;
+  font-size: 18.5pt;
+  line-height: 1.15;
+  margin: 26pt 0 8pt 0;
+  padding: 10pt 0 0 0;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  border-top: 0.5pt solid var(--ink);
+  break-after: avoid;
+  text-wrap: balance;
+}
+
+h3 {
+  font-family: 'Newsreader', serif;
+  font-variation-settings: 'opsz' 18, 'wght' 500;
+  font-weight: 500;
+  font-style: italic;
+  font-size: 13pt;
+  line-height: 1.25;
+  color: var(--ink);
+  margin: 16pt 0 4pt 0;
+  break-after: avoid;
+}
+
+h4 {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 12pt 0 4pt 0;
+  break-after: avoid;
+}
+
+/* Drop cap on the first paragraph of the very first section */
+h2:first-of-type + p::first-letter {
+  font-family: 'Newsreader', serif;
+  font-variation-settings: 'opsz' 96, 'wght' 500;
+  font-size: 4.4em;
+  float: left;
+  line-height: 0.84;
+  margin: 6pt 8pt -2pt 0;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------
+   Body text
+------------------------------------------------------------------ */
+
+p {
+  margin: 0 0 7pt 0;
+  orphans: 3;
+  widows: 3;
+}
+
+p strong { font-weight: 600; color: var(--ink); }
+p em { font-style: italic; color: var(--ink-soft); }
+
+a {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 0.4pt;
+}
+a:hover { color: var(--accent); }
+
+ul, ol { margin: 6pt 0 8pt 0; padding-left: 1.4em; }
+li { margin: 2pt 0; }
+ul li::marker { color: var(--accent); }
+ol li::marker { color: var(--accent); font-variant-numeric: oldstyle-nums; font-weight: 600; }
+
+/* ------------------------------------------------------------------
+   Code — inline code is *typeset*, not boxed
+------------------------------------------------------------------ */
+
+code {
+  font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.86em;
+  color: var(--accent-deep);
+  letter-spacing: -0.005em;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Code blocks get a tinted card with an accent flag */
+pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5pt;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper-tint);
+  border: 0.5pt solid var(--rule);
+  border-left: 2pt solid var(--accent);
+  padding: 10pt 14pt;
+  margin: 10pt 0;
+  overflow-x: auto;
+  break-inside: avoid;
+}
+pre code { color: var(--ink); font-size: inherit; }
+
+/* ------------------------------------------------------------------
+   Tables — two species:
+     • Layout tables (contain images): no borders, generous gutters
+     • Data tables (have <th>): hairline rows, small-caps headers
+------------------------------------------------------------------ */
+
+table {
+  border-collapse: collapse;
+  margin: 10pt 0 12pt 0;
+  width: 100%;
+  break-inside: avoid;
+  font-size: 9.5pt;
+}
+
+/* --- layout (image grid) tables --- */
+table:has(img) { background: transparent; margin: 14pt 0; }
+table:has(img) td {
+  padding: 12pt 8pt 14pt 8pt;
+  text-align: center;
+  vertical-align: top;
+  border: none;
+}
+table:has(img) td b {
+  display: inline-block;
+  font-family: 'Newsreader', serif;
+  font-variation-settings: 'opsz' 24, 'wght' 500;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 11pt;
+  color: var(--ink);
+  margin: 8pt 0 2pt 0;
+  letter-spacing: 0.005em;
+}
+table:has(img) img {
+  border: 0.5pt solid var(--rule);
+  background: var(--paper);
+  padding: 0;
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 1pt 3pt rgba(26,22,17,.10);
+}
+
+/* --- data tables --- */
+table:has(th) {
+  border-top: 0.75pt solid var(--ink);
+  border-bottom: 0.75pt solid var(--ink);
+  margin: 12pt 0 14pt 0;
+}
+table:has(th) th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+  padding: 8pt 12pt 6pt 0;
+  border-bottom: 0.5pt solid var(--ink);
+  vertical-align: bottom;
+  background: transparent;
+}
+table:has(th) th:last-child,
+table:has(th) td:last-child { padding-right: 0; }
+table:has(th) td {
+  padding: 7pt 12pt 7pt 0;
+  vertical-align: top;
+  border-bottom: 0.25pt solid var(--rule-soft);
+}
+table:has(th) tr:last-child td { border-bottom: none; }
+table:has(th) td:first-child {
+  font-variation-settings: 'opsz' 14, 'wght' 500;
+}
+table:has(th) td:first-child strong {
+  font-weight: 600;
+  color: var(--accent-deep);
+}
+
+/* ------------------------------------------------------------------
+   Blockquote — pull-quote style
+------------------------------------------------------------------ */
+
+blockquote {
+  margin: 12pt 0 12pt 0;
+  padding: 4pt 0 4pt 16pt;
+  border-left: 1.5pt solid var(--accent);
+  font-family: 'Newsreader', serif;
+  font-variation-settings: 'opsz' 18;
+  font-style: italic;
+  font-size: 11.5pt;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  break-inside: avoid;
+}
+blockquote p { margin: 4pt 0; }
+
+/* ------------------------------------------------------------------
+   Images & figures
+------------------------------------------------------------------ */
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Standalone images (not inside a layout table) get a hairline frame */
+p > img,
+p > a > img {
+  border: 0.5pt solid var(--rule);
+  background: var(--paper);
+  box-shadow: 0 1pt 3pt rgba(26,22,17,.08);
+}
+
+/* ------------------------------------------------------------------
+   Horizontal rule — ornamental fleuron asterism
+------------------------------------------------------------------ */
+
+hr {
+  border: none;
+  text-align: center;
+  margin: 22pt 0;
+  height: auto;
+  overflow: visible;
+  page-break-after: avoid;
+}
+hr::before {
+  content: "✦  ✦  ✦";
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 11pt;
+  color: var(--accent);
+  letter-spacing: 0.7em;
+  display: inline-block;
+  padding-left: 0.7em;
+}
+
+/* ------------------------------------------------------------------
+   Print niceties
+------------------------------------------------------------------ */
+
+h2, h3, h4, figure, img, blockquote, pre, table { break-inside: avoid; }
+h1, h2, h3, h4 { page-break-after: avoid; }
+</style>
+</head>
+<body>
+<h1 id="smart-home-class-diagrams-by-layer">Smart Home — Class Diagrams (by layer)</h1>
+<p>The system is organised into <strong>4 layers</strong>: Presentation, Application,
+Domain, and Persistence. Each layer below has its own focused class
+diagram showing the classes inside it. Cross-layer dependencies are
+shown only in the architecture overview at the top — keeping each
+per-layer diagram clean of crossing arrows.</p>
+<blockquote>
+<p><strong>Viewing this:</strong> GitHub renders Mermaid natively — open
+<a href="https://github.com/ahmefarouk1234d/smarthome/blob/main/docs/class-diagram.md">this file on github.com</a>
+and every diagram below appears as an SVG.</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of contents</h2>
+<ol>
+<li><a href="#1-architecture-overview">Architecture overview</a></li>
+<li><a href="#2-layer-a--presentation-javafx-ui">Layer A — Presentation (JavaFX UI)</a></li>
+<li><a href="#3-layer-b--application-facade--command">Layer B — Application (Facade + Command)</a></li>
+<li><a href="#4-layer-c--domain-hub-devices-patterns">Layer C — Domain (Hub, Devices, Patterns)</a></li>
+<li><a href="#5-layer-d--persistence-database--daos">Layer D — Persistence (Database + DAOs)</a></li>
+<li><a href="#6-putting-it-together--request-flow">Putting it together — request flow</a></li>
+</ol>
+<hr />
+<h2 id="1-architecture-overview">1. Architecture overview</h2>
+<p>How the four layers stack and depend on each other. Dependencies flow
+downward only — UI never imports DAOs directly.</p>
+<pre><code class="language-mermaid">flowchart TB
+    subgraph A [A — Presentation]
+        App
+        MainCtrl[MainController]
+        Screens[Home / History / Decorator&lt;br/&gt;+ AddDevice]
+        Bridge[DaoEventBridge]
+    end
+
+    subgraph B [B — Application]
+        Facade[HomeController «Facade»]
+        Invoker[CommandInvoker]
+        Cmds[6× DeviceCommand]
+    end
+
+    subgraph C [C — Domain]
+        Hub[SmartHomeHub «Singleton»]
+        Rooms[Room «Iterator»]
+        Devices[Device hierarchy «Observer»]
+        Factories[2× DeviceFactory «Abstract Factory»]
+        Modes[3× AutomationMode «Strategy»]
+        Decorators[2× DeviceDecorator]
+    end
+
+    subgraph D [D — Persistence]
+        DB[(Database «Singleton»)]
+        DAOs[5× DAO]
+        SQLite[(smarthome.db)]
+    end
+
+    A --&gt; B
+    B --&gt; C
+    A --&gt; C
+    A --&gt; D
+    B --&gt; D
+    DAOs --&gt; DB
+    DB --&gt; SQLite
+</code></pre>
+<hr />
+<h2 id="2-layer-a-presentation-javafx-ui">2. Layer A — Presentation (JavaFX UI)</h2>
+<p>The visible application: an <code>App</code> that boots JavaFX, a <code>MainController</code>
+that owns the chrome (top bar, mode picker, status banner, bottom nav),
+plus three screen controllers swapped through the central host.
+<code>DaoEventBridge</code> is a special Observer that lives at the layer boundary
+and forwards device events to the Persistence layer.</p>
+<p><strong>Depends on:</strong> Application layer (calls Facade), Persistence layer
+(via <code>DaoEventBridge</code>).</p>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class App {
+        «JavaFX entry»
+        +start(Stage)
+    }
+
+    class MainController {
+        «top bar + nav»
+        -sharedFacade : HomeController
+        +applyMode(String)
+        +loadScreen(String)
+    }
+
+    class HomeUIController {
+        «Home screen»
+        +renderAllRooms()
+        +openAddDeviceModal(Room)
+    }
+
+    class HistoryController {
+        «History screen»
+        +loadHistoricalEvents()
+        +attachLiveObserver()
+    }
+
+    class DecoratorController {
+        «Decorator showcase»
+        +onWrap()
+        +onUnwrap()
+    }
+
+    class AddDeviceController {
+        «Add Device modal»
+        +onAdd()
+    }
+
+    class DaoEventBridge {
+        «Observer adapter»
+        +update(Device, String)
+    }
+
+    class HomeBus {
+        «event bus»
+        +subscribe(Runnable)$
+        +notifyDataChanged()$
+    }
+
+    App --&gt; MainController : loads main.fxml
+    MainController --&gt; HomeUIController : swaps in
+    MainController --&gt; HistoryController : swaps in
+    MainController --&gt; DecoratorController : swaps in
+    HomeUIController --&gt; AddDeviceController : opens modal
+</code></pre>
+<p><strong>Pattern roles in this layer:</strong> <code>DaoEventBridge</code> plays the <strong>Observer</strong>
+role at the layer boundary. The whole presentation layer demonstrates
+the <strong>Facade</strong> rubric line — every controller's mutation path goes
+through <code>HomeController</code> exclusively.</p>
+<hr />
+<h2 id="3-layer-b-application-facade-command">3. Layer B — Application (Facade + Command)</h2>
+<p>The orchestration layer. <code>HomeController</code> is the Facade — the single
+class the UI calls into. It wraps every mutation in a <code>DeviceCommand</code>
+and hands it to the <code>CommandInvoker</code>, which executes and stores the
+command on the undo stack.</p>
+<p><strong>Depends on:</strong> Domain layer (Hub + Device receivers), Persistence layer (DAOs).</p>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class HomeController {
+        «Facade»
+        +turnOnDevice(String)
+        +turnOffDevice(String)
+        +lockDevice(String)
+        +setTemperature(String, double)
+        +setAutomationMode(String)
+        +getEventHistory() List~DeviceEvent~
+        +undoLastAction() boolean
+    }
+
+    class CommandInvoker {
+        «Invoker»
+        -history : Deque~DeviceCommand~
+        +execute(DeviceCommand)
+        +undo() DeviceCommand
+        +canUndo() boolean
+    }
+
+    class DeviceCommand {
+        «interface, Command»
+        +execute()
+        +undo()
+        +describe() String
+    }
+
+    class TurnOnCommand {
+        «Concrete Command»
+        +execute()
+        +undo()
+    }
+
+    class TurnOffCommand {
+        «Concrete Command»
+    }
+
+    class SetTemperatureCommand {
+        «Concrete Command»
+    }
+
+    class LockCommand_UnlockCommand {
+        «Concrete Commands»
+    }
+
+    class SetAutomationModeCommand {
+        «Concrete Command»
+    }
+
+    TurnOnCommand ..|&gt; DeviceCommand
+    TurnOffCommand ..|&gt; DeviceCommand
+    SetTemperatureCommand ..|&gt; DeviceCommand
+    LockCommand_UnlockCommand ..|&gt; DeviceCommand
+    SetAutomationModeCommand ..|&gt; DeviceCommand
+
+    HomeController --&gt; CommandInvoker
+    HomeController ..&gt; DeviceCommand : creates
+    CommandInvoker o-- DeviceCommand : history stack
+</code></pre>
+<p><strong>Pattern roles in this layer:</strong> <strong>Facade</strong> (<code>HomeController</code>),
+<strong>Command</strong> (interface + 6 concretes + <code>CommandInvoker</code>). The Invoker
+imports only <code>DeviceCommand</code> — never any concrete Receiver — which is
+RG's litmus test for a correct Command implementation.</p>
+<hr />
+<h2 id="4-layer-c-domain-hub-devices-patterns">4. Layer C — Domain (Hub, Devices, Patterns)</h2>
+<p>The pure business model — no JavaFX imports, no SQL imports. Houses
+six of the nine patterns: Singleton (Hub), Iterator (Room), Observer
+(Device), Abstract Factory (DeviceFactory), Strategy (AutomationMode),
+and Decorator (DeviceDecorator).</p>
+<p><strong>Depends on:</strong> <em>nothing higher in the stack</em>. The Domain is reusable in
+isolation.</p>
+<h3 id="41-core-entities-hub-room-device">4.1 Core entities — Hub, Room, Device</h3>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class SmartHomeHub {
+        «Singleton, Strategy Context»
+        -INSTANCE : SmartHomeHub$
+        -roomsById : Map
+        -automationMode : AutomationMode
+        +getInstance() SmartHomeHub$
+        +addRoom(Room)
+        +applyAutomationMode()
+        +createIterator() RoomIterator
+    }
+
+    class Room {
+        «Iterator host»
+        -devicesById : Map
+        +addDevice(Device)
+        +devices() Enumeration~Device~
+    }
+
+    class RoomIterator {
+        «interface, Iterator»
+        +hasMore() boolean
+        +getNext() Room
+    }
+
+    class Device {
+        «abstract»
+        -id, name, observers
+        +turnOn()
+        +turnOff()
+        +notifyObservers(String)
+    }
+
+    class Light {
+        +setBrightness(int)
+    }
+
+    class Thermostat {
+        +setTemperature(double)
+    }
+
+    class Lock {
+        +lock()
+        +unlock()
+    }
+
+    class Camera
+
+    Light --|&gt; Device
+    Thermostat --|&gt; Device
+    Lock --|&gt; Device
+    Camera --|&gt; Device
+
+    SmartHomeHub o-- Room : &quot;rooms&quot;
+    Room o-- Device : &quot;devices&quot;
+    SmartHomeHub --&gt; RoomIterator : creates
+</code></pre>
+<h3 id="42-observer-device-as-subject">4.2 Observer — Device as Subject</h3>
+<pre><code class="language-mermaid">classDiagram
+    direction LR
+
+    class Observer {
+        «interface»
+        +update(Device, String)
+    }
+
+    class Observable {
+        «interface»
+        +attach(Observer)
+        +detach(Observer)
+        +notifyObservers(String)
+    }
+
+    class Device {
+        «abstract Subject»
+        -observers : List~Observer~
+        +notifyObservers(String)
+    }
+
+    Device ..|&gt; Observable
+    Device o-- Observer : list of
+</code></pre>
+<h3 id="43-abstract-factory-two-device-families">4.3 Abstract Factory — two device families</h3>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class DeviceFactory {
+        «abstract, Abstract Factory»
+        +createLight(String) Device
+        +createThermostat(String) Device
+        +createDoorLock(String) Device
+        +createCamera(String) Device
+    }
+
+    class Version1DeviceFactory {
+        «Concrete Factory»
+        legacy variants
+    }
+
+    class Version2DeviceFactory {
+        «Concrete Factory»
+        modern variants
+    }
+
+    class Version1Light {
+        Version1Thermostat
+        Version1Lock
+        Version1Camera
+    }
+
+    class Version2Light {
+        Version2Thermostat
+        Version2Lock
+        Version2Camera
+    }
+
+    Version1DeviceFactory --|&gt; DeviceFactory
+    Version2DeviceFactory --|&gt; DeviceFactory
+    Version1DeviceFactory ..&gt; Version1Light : creates family
+    Version2DeviceFactory ..&gt; Version2Light : creates family
+</code></pre>
+<h3 id="44-strategy-automation-modes">4.4 Strategy — automation modes</h3>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class AutomationMode {
+        «interface, Strategy»
+        +name() String
+        +apply(SmartHomeHub)
+    }
+
+    class EcoMode {
+        «Concrete Strategy»
+    }
+    class SleepMode {
+        «Concrete Strategy»
+    }
+    class AwayMode {
+        «Concrete Strategy»
+    }
+
+    class SmartHomeHub {
+        «Context»
+        +applyAutomationMode()
+    }
+
+    EcoMode ..|&gt; AutomationMode
+    SleepMode ..|&gt; AutomationMode
+    AwayMode ..|&gt; AutomationMode
+    SmartHomeHub --&gt; AutomationMode : current
+</code></pre>
+<h3 id="45-decorator-wrapping-devices">4.5 Decorator — wrapping devices</h3>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class Device {
+        «Component»
+        +turnOn()
+        +turnOff()
+    }
+
+    class DeviceDecorator {
+        «abstract Decorator»
+        #wrappee : Device
+    }
+
+    class LoggingDeviceDecorator {
+        «Concrete Decorator»
+        -log : List~String~
+    }
+
+    class EnergyTrackedDecorator {
+        «Concrete Decorator»
+        -totalOnMillis : long
+    }
+
+    DeviceDecorator --|&gt; Device
+    LoggingDeviceDecorator --|&gt; DeviceDecorator
+    EnergyTrackedDecorator --|&gt; DeviceDecorator
+    DeviceDecorator o-- Device : wraps
+</code></pre>
+<hr />
+<h2 id="5-layer-d-persistence-database-daos">5. Layer D — Persistence (Database + DAOs)</h2>
+<p>SQL isolation. The <code>Database</code> is a Singleton holding the JDBC connection;
+each DAO wraps a single table behind plain Java methods. The Domain layer
+never sees JDBC.</p>
+<p><strong>Depends on:</strong> Domain (<code>Device</code>, <code>Room</code> as method args) and Factory
+(DeviceDAO uses Abstract Factory at deserialization).</p>
+<pre><code class="language-mermaid">classDiagram
+    direction TB
+
+    class Database {
+        «Singleton»
+        -INSTANCE : Database$
+        +getInstance() Database$
+        +getConnection()
+    }
+
+    class UserDAO {
+        «DAO»
+        +insert(User)
+        +findById(String) User
+        +verifyPin(String, String) boolean
+    }
+
+    class RoomDAO {
+        «DAO»
+        +insert(Room)
+        +findAll() List~Room~
+    }
+
+    class DeviceDAO {
+        «DAO»
+        +insert(Device, roomId)
+        +findByRoom(String) List~Device~
+        +updateState(Device)
+    }
+
+    class DeviceEventDAO {
+        «DAO»
+        +insert(deviceId, eventType)
+        +findRecent(int) List~DeviceEvent~
+    }
+
+    class CommandsLogDAO {
+        «DAO»
+        +insert(...)
+        +findRecent(int) List~CommandLog~
+    }
+
+    class User {
+        «record, DTO»
+    }
+    class DeviceEvent {
+        «record, DTO»
+    }
+    class CommandLog {
+        «record, DTO»
+    }
+
+    UserDAO --&gt; Database
+    RoomDAO --&gt; Database
+    DeviceDAO --&gt; Database
+    DeviceEventDAO --&gt; Database
+    CommandsLogDAO --&gt; Database
+
+    UserDAO ..&gt; User
+    DeviceEventDAO ..&gt; DeviceEvent
+    CommandsLogDAO ..&gt; CommandLog
+</code></pre>
+<p><strong>Pattern roles in this layer:</strong> <strong>Singleton</strong> (Database) and <strong>DAO</strong>
+(5 DAOs). <code>DeviceDAO</code> also uses the Domain's Abstract Factory at
+deserialization to round-trip polymorphic device subtypes.</p>
+<hr />
+<h2 id="6-putting-it-together-request-flow">6. Putting it together — request flow</h2>
+<p>How a single user gesture flows across all four layers, exercising six
+patterns in one trip.</p>
+<pre><code class="language-mermaid">sequenceDiagram
+    actor User
+    participant UI as JavaFX (A)
+    participant F as HomeController «Facade» (B)
+    participant I as CommandInvoker (B)
+    participant C as TurnOnCommand (B)
+    participant D as Device «Receiver» (C)
+    participant Obs as Observers
+    participant DAO as DAOs (D)
+
+    User-&gt;&gt;UI: tap &quot;Turn On&quot;
+    UI-&gt;&gt;F: turnOnDevice(id)
+    F-&gt;&gt;F: findDevice(id)
+    F-&gt;&gt;I: execute(new TurnOnCommand(d))
+    I-&gt;&gt;C: execute()
+    C-&gt;&gt;D: turnOn()
+    D-&gt;&gt;Obs: notifyObservers(&quot;TURNED_ON&quot;)
+    Obs-&gt;&gt;UI: refresh card
+    Obs-&gt;&gt;DAO: persist event
+    I-&gt;&gt;I: history.push(C)
+    Note over I: undoable later
+</code></pre>
+<p>Patterns visible in this single flow:
+- <strong>Facade</strong> — UI calls only <code>HomeController</code>
+- <strong>Command</strong> — every action becomes a <code>TurnOnCommand</code> object
+- <strong>Receiver</strong> (Command) — <code>Device</code> does the actual work
+- <strong>Observer</strong> — <code>notifyObservers</code> fans out to UI and DAO
+- <strong>DAO</strong> — <code>DeviceEventDAO.insert</code> writes to SQLite
+- <strong>Singleton</strong> — <code>HomeController</code> reaches <code>SmartHomeHub.getInstance()</code> to find the device</p>
+<hr />
+<h2 id="pattern-roles-by-layer-at-a-glance">Pattern roles by layer at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Patterns it owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A — Presentation</strong></td>
+<td>Observer (<code>DaoEventBridge</code> at the boundary)</td>
+</tr>
+<tr>
+<td><strong>B — Application</strong></td>
+<td>Facade · Command</td>
+</tr>
+<tr>
+<td><strong>C — Domain</strong></td>
+<td>Singleton · Iterator · Observer · Abstract Factory · Strategy · Decorator</td>
+</tr>
+<tr>
+<td><strong>D — Persistence</strong></td>
+<td>Singleton · DAO</td>
+</tr>
+<tr>
+<td><strong>All 9</strong></td>
+<td>spread across A/B/C/D — but the Domain layer is the heart</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
