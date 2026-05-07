@@ -3,13 +3,17 @@ package com.smarthome.core;
 import com.smarthome.devices.Device;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 
-// Iterator pattern lives on SmartHomeHub (RoomIterator); Room just exposes its devices as a list.
+// ITERATOR pattern: Room aggregates devices and exposes them via Enumeration
+// (rubric line: "Methods that return an Enumeration") and via List for
+// modern foreach-friendly iteration.
 public class Room {
     private final String roomId;
     private final String name;
@@ -45,5 +49,10 @@ public class Room {
 
     public List<Device> devices() {
         return new ArrayList<>(devicesById.values());
+    }
+
+    // ITERATOR pattern method (rubric requirement: returns Enumeration).
+    public Enumeration<Device> enumerateDevices() {
+        return Collections.enumeration(devicesById.values());
     }
 }

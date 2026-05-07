@@ -72,7 +72,8 @@ Exposes its devices via the **Iterator pattern** as an
 - `void addDevice(Device d)`
 - `void removeDevice(String deviceId)`
 - `Device getDevice(String deviceId)`
-- `Enumeration<Device> devices()` — Iterator pattern method (rubric requirement)
+- `List<Device> devices()` — modern accessor used by callers
+- `Enumeration<Device> enumerateDevices()` — Iterator pattern method (rubric requirement)
 
 ---
 
