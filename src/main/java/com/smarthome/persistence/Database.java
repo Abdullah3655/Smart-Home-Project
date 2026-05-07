@@ -8,7 +8,8 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.stream.Collectors;
 
-// SQLite connection holder that also initializes schema and lightweight migrations.
+// SINGLETON pattern: holds the one SQLite JDBC connection for the application.
+// Also initialises schema and runs idempotent migrations on first use.
 public final class Database {
     private static final String PRODUCTION_URL = "jdbc:sqlite:smarthome.db";
     private static final Database INSTANCE = new Database(PRODUCTION_URL);
