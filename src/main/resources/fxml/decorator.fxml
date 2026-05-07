@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Decorator showcase — wrap a device with LoggingDeviceDecorator and
+  EnergyTrackedDecorator, then exercise the wrapped device to see the
+  log captured by the decorator.
+-->
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smarthome.ui.DecoratorController"
+            styleClass="main-scroll"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+
+  <content>
+    <VBox styleClass="content-pane" spacing="14">
+      <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+      <Label text="Decorator pattern showcase" styleClass="decorator-section-title"/>
+      <Label styleClass="decorator-description" wrapText="true"
+             text="Wrap any device to add behavior — logging, energy tracking — without modifying its class. The wrapped device behaves identically but adds an audit log."/>
+
+      <Label text="Pick a device" styleClass="room-name"/>
+      <ChoiceBox fx:id="deviceChoiceBox" maxWidth="Infinity"/>
+
+      <HBox spacing="8">
+        <Button text="Wrap with Logging" onAction="#onWrap"
+                styleClass="action-button-primary, action-button"
+                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Unwrap" onAction="#onUnwrap"
+                styleClass="action-button"
+                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+      </HBox>
+
+      <Label fx:id="wrapStatusLabel" styleClass="pattern-caption"
+             text="No device wrapped." wrapText="true"/>
+
+      <HBox spacing="8">
+        <Button text="Turn On (wrapped)" onAction="#onWrappedTurnOn"
+                styleClass="action-button"
+                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Turn Off (wrapped)" onAction="#onWrappedTurnOff"
+                styleClass="action-button"
+                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+      </HBox>
+
+      <Label text="Captured by the decorator:"
+             styleClass="decorator-section-title"/>
+      <VBox fx:id="logContainer" spacing="2">
+        <Label text="(no events captured yet)" styleClass="empty-state"/>
+      </VBox>
+    </VBox>
+  </content>
+
+</ScrollPane>

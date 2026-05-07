@@ -1,0 +1,304 @@
+/* ─────────────────────────────────────────────────────────────────────
+   Smart Home — mobile-styled dark theme
+   Palette: deep navy / dark slate base + warm amber primary + cool teal
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Color tokens — JavaFX has no real CSS variables, but -fx-... custom
+   properties at the .root level are inheritable, which serves the same
+   purpose. */
+.root {
+    -slate-900: #0e1626;
+    -slate-800: #161f33;
+    -slate-700: #1f2940;
+    -slate-600: #2a3550;
+    -amber-500: #ffb547;
+    -amber-200: #ffd99c;
+    -teal-400:  #3ec3b5;
+    -text-primary: #f5f6fa;
+    -text-muted:   #8a93a8;
+    -text-faint:   #5a6478;
+    -danger:    #ff6b6b;
+
+    -fx-background-color: -slate-900;
+    -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
+    -fx-text-fill: -text-primary;
+}
+
+/* ─── Top bar (fixed 60px) ──────────────────────────────────────── */
+.top-bar {
+    -fx-background-color: -slate-900;
+    -fx-border-color: -slate-700;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 14 16 14 16;
+}
+.app-title {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+.app-title-amber {
+    -fx-text-fill: -amber-500;
+}
+.undo-button {
+    -fx-background-color: -slate-800;
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -slate-700;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.undo-button:hover    { -fx-background-color: -slate-700; }
+.undo-button:disabled { -fx-opacity: 0.35; -fx-cursor: default; }
+
+/* ─── Mode picker row (fixed 72px) ──────────────────────────────── */
+.mode-row {
+    -fx-background-color: -slate-900;
+    -fx-padding: 12 16 16 16;
+    -fx-spacing: 8;
+}
+.mode-row > .label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12px;
+}
+.mode-segment {
+    -fx-background-color: -slate-800;
+    -fx-text-fill: -text-muted;
+    -fx-border-color: -slate-700;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 12 0 12 0;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.mode-segment:hover    { -fx-background-color: -slate-700; -fx-text-fill: -text-primary; }
+.mode-segment-active   { -fx-background-color: -amber-500; -fx-text-fill: -slate-900; }
+.mode-segment-active:hover { -fx-background-color: -amber-200; }
+.mode-segment-first    { -fx-border-radius: 8 0 0 8; -fx-background-radius: 8 0 0 8; }
+.mode-segment-last     { -fx-border-radius: 0 8 8 0; -fx-background-radius: 0 8 8 0; }
+
+/* ─── Status banner (sliding) ───────────────────────────────────── */
+.status-banner {
+    -fx-background-color: -slate-800;
+    -fx-padding: 10 16 10 16;
+    -fx-border-color: -slate-700;
+    -fx-border-width: 1 0 0 0;
+}
+.status-banner-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-primary;
+}
+.status-banner-success { -fx-background-color: derive(-teal-400, -55%); }
+.status-banner-error   { -fx-background-color: derive(-danger, -55%); }
+
+/* ─── Main scroll content ───────────────────────────────────────── */
+.main-scroll {
+    -fx-background-color: -slate-900;
+    -fx-background: -slate-900;
+    -fx-padding: 0;
+}
+.main-scroll .viewport { -fx-background-color: -slate-900; }
+.main-scroll .scroll-bar { -fx-background-color: -slate-900; }
+.main-scroll .scroll-bar .thumb {
+    -fx-background-color: -slate-700;
+    -fx-background-radius: 4;
+}
+
+.content-pane {
+    -fx-padding: 16;
+    -fx-spacing: 16;
+    -fx-background-color: -slate-900;
+}
+
+/* ─── Room header ────────────────────────────────────────────────── */
+.room-header {
+    -fx-padding: 4 4 4 4;
+    -fx-spacing: 8;
+}
+.room-name {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.room-count {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12px;
+}
+
+/* ─── Device card ────────────────────────────────────────────────── */
+.device-card {
+    -fx-background-color: -slate-800;
+    -fx-border-color: -slate-700;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 14;
+    -fx-spacing: 10;
+}
+.device-icon {
+    -fx-font-size: 22px;
+}
+.device-name {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.device-subtitle {
+    -fx-text-fill: -text-faint;
+    -fx-font-size: 11px;
+}
+.device-state-on {
+    -fx-text-fill: -amber-500;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.device-state-off {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.device-state-locked {
+    -fx-text-fill: -teal-400;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.decorator-badge {
+    -fx-text-fill: -teal-400;
+    -fx-font-size: 11px;
+}
+
+/* ─── Action buttons inside cards ───────────────────────────────── */
+.action-button {
+    -fx-background-color: -slate-700;
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -slate-600;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+.action-button:hover { -fx-background-color: -slate-600; }
+.action-button-primary {
+    -fx-background-color: -amber-500;
+    -fx-text-fill: -slate-900;
+    -fx-border-color: transparent;
+    -fx-font-weight: bold;
+}
+.action-button-primary:hover { -fx-background-color: -amber-200; }
+.action-button-danger {
+    -fx-background-color: derive(-danger, -25%);
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -danger;
+}
+
+.spinner-button {
+    -fx-background-color: -slate-700;
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -slate-600;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.spinner-button:hover { -fx-background-color: -slate-600; }
+
+.temperature-display {
+    -fx-text-fill: -amber-500;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-min-width: 60;
+    -fx-alignment: center;
+}
+
+/* ─── Bottom navigation (fixed 64px) ─────────────────────────────── */
+.bottom-nav {
+    -fx-background-color: -slate-800;
+    -fx-border-color: -slate-700;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 6 0 6 0;
+}
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-muted;
+    -fx-border-color: transparent;
+    -fx-padding: 6 0 6 0;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+    -fx-content-display: top;
+    -fx-graphic-text-gap: 2;
+}
+.nav-button:hover { -fx-text-fill: -text-primary; }
+.nav-button-active {
+    -fx-text-fill: -amber-500;
+    -fx-font-weight: bold;
+}
+.nav-icon {
+    -fx-font-size: 18px;
+}
+
+/* ─── History feed rows ─────────────────────────────────────────── */
+.event-row {
+    -fx-background-color: -slate-800;
+    -fx-border-color: -slate-700;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10 12 10 12;
+    -fx-spacing: 10;
+}
+.event-time {
+    -fx-text-fill: -text-faint;
+    -fx-font-size: 11px;
+    -fx-min-width: 60;
+}
+.event-device {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13px;
+}
+.event-type {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11px;
+}
+.event-dot-on     { -fx-text-fill: -amber-500; -fx-font-size: 14px; }
+.event-dot-off    { -fx-text-fill: -text-muted; -fx-font-size: 14px; }
+.event-dot-locked { -fx-text-fill: -teal-400; -fx-font-size: 14px; }
+.event-dot-temp   { -fx-text-fill: -amber-200; -fx-font-size: 14px; }
+
+/* ─── Pattern callout caption (used across screens) ─────────────── */
+.pattern-caption {
+    -fx-text-fill: -text-faint;
+    -fx-font-size: 10px;
+    -fx-font-style: italic;
+}
+
+/* ─── Empty state / muted helper ────────────────────────────────── */
+.empty-state {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+    -fx-padding: 40 16 40 16;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+/* ─── Decorator screen specifics ─────────────────────────────────── */
+.decorator-section-title {
+    -fx-text-fill: -amber-500;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.decorator-description {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+.decorator-log-row {
+    -fx-text-fill: -teal-400;
+    -fx-font-size: 11px;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-padding: 4 0 4 0;
+}

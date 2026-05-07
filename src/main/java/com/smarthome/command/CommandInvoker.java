@@ -1,10 +1,13 @@
 package com.smarthome.command;
 
+import com.smarthome.persistence.dao.CommandsLogDAO;
+
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * COMMAND PATTERN — Invoker.
@@ -17,19 +20,44 @@ import java.util.Objects;
  * Maintains an undo stack (Deque used as LIFO) so the most recent command
  * is undone first. This is RG's "CommandHistory" responsibility, kept here
  * for project simplicity rather than a separate class.
+ *
+ * <p>Optional persistent audit trail: when constructed with a
+ * {@link CommandsLogDAO}, every successful execute() writes a row to the
+ * commands_log table. Pass null to opt out (default for tests).</p>
  */
 public class CommandInvoker {
     private final Deque<DeviceCommand> history = new ArrayDeque<>();
+    private final CommandsLogDAO auditLog;
+
+    /** Default constructor — no audit logging. Used by tests and pre-DB callers. */
+    public CommandInvoker() {
+        this(null);
+    }
+
+    /** Audit-logging constructor — wire to commands_log via the given DAO. */
+    public CommandInvoker(CommandsLogDAO auditLog) {
+        this.auditLog = auditLog;
+    }
 
     /**
      * Run the command and push it onto the undo stack on success.
      * If execute() throws, the command is NOT recorded (failed commands
-     * shouldn't be undone — there's nothing to undo).
+     * shouldn't be undone — there's nothing to undo). If an audit DAO is
+     * configured, a row is written to commands_log on success.
      */
     public void execute(DeviceCommand command) {
         Objects.requireNonNull(command, "command must not be null");
         command.execute();
         history.push(command);
+        if (auditLog != null) {
+            auditLog.insert(
+                UUID.randomUUID().toString(),
+                null,                       // device_id resolution belongs in commands; keep null here
+                command.describe(),
+                "{}",
+                "OK"
+            );
+        }
     }
 
     /** True if there is at least one previously-executed command to undo. */
