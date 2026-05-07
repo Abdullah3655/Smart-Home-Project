@@ -216,19 +216,21 @@ Refactoring-Guru-canonical sense.
 
 ---
 
-## 6. Tests and Verification
+## 6. Verification
 
-The codebase is covered by **48 JUnit tests** across five test classes,
-all green:
+The application is verified by **manual end-to-end exercise** through
+the JavaFX UI:
 
-- `FoundationSmokeTest` — Singleton, Iterator, Observer, Strategy, Abstract Factory
-- `CommandTest` — execute, undo, history, multi-undo replay
-- `DecoratorTest` — wrapping, stacking, identity preservation
-- `FacadeTest` — every Facade method, including invalid-input rejection
-- `PersistenceTest` — schema, all 5 DAOs, polymorphic round-trip
+- Launching the app via `./mvnw javafx:run` boots the SQLite database,
+  seeds three demo rooms with seven devices on first run, then loads
+  persisted state on subsequent launches.
+- Toggling devices, applying automation modes, undoing actions, adding
+  new devices, and wrapping a device with a logging decorator all work
+  through the Facade and persist to SQLite.
+- Closing and reopening the app restores the most recent state of every
+  device — proving the DAO + Abstract Factory deserialization path.
 
-Run with `./mvnw test`. The full source is at
-**https://github.com/ahmefarouk1234d/smarthome**.
+The full source is at **https://github.com/ahmefarouk1234d/smarthome**.
 
 ---
 
