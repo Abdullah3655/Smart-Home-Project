@@ -12,11 +12,19 @@ rooms, controls devices (lights, thermostats, locks, cameras), applies
 whole-home automation modes, views past events, and undoes recent actions
 through an intuitive JavaFX UI.
 
-**Users can:** list rooms · enter a room and view its devices · turn devices
-on/off · lock/unlock doors · adjust thermostat temperature · apply
-automation modes (Eco/Sleep/Away) · add new devices · wrap a device with a
-logging decorator · view persisted device events · undo the most recent
-action · receive real-time state-change notifications.
+**Users can:**
+
+- list rooms
+- enter a room and view its devices
+- turn devices on/off
+- lock/unlock doors
+- adjust thermostat temperature
+- apply automation modes (Eco / Sleep / Away)
+- add new devices
+- wrap a device with a logging decorator
+- view persisted device events
+- undo the most recent action
+- receive real-time state-change notifications
 
 ---
 
