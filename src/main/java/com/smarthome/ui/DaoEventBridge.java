@@ -11,15 +11,17 @@ import java.util.Objects;
 // Observer that persists device events and latest device state to the database.
 public class DaoEventBridge implements Observer {
 
+    // Writes append-only audit events.
     private final DeviceEventDAO eventDao;
+    // Writes current device snapshot (optional for audit-only usage).
     private final DeviceDAO deviceDao;
 
-    
+    // Convenience constructor used where only event history is required.
     public DaoEventBridge(DeviceEventDAO eventDao) {
         this(eventDao, null);
     }
 
-    
+    // Full constructor used by app startup to keep history and live state in sync.
     public DaoEventBridge(DeviceEventDAO eventDao, DeviceDAO deviceDao) {
         this.eventDao = Objects.requireNonNull(eventDao, "eventDao must not be null");
         this.deviceDao = deviceDao;
@@ -27,6 +29,7 @@ public class DaoEventBridge implements Observer {
 
     @Override
     public void update(Device d, String event) {
+        // Observer pattern bridge: domain event -> persistent audit row.
         try {
             eventDao.insert(d.getId(), event);
         } catch (Exception e) {
@@ -34,6 +37,7 @@ public class DaoEventBridge implements Observer {
                 + " for device " + d.getId() + ": " + e.getMessage());
         }
         if (deviceDao != null) {
+            // Keep devices table aligned with latest in-memory state.
             try {
                 deviceDao.updateState(d);
             } catch (Exception e) {

@@ -5,9 +5,11 @@ import com.smarthome.devices.Device;
 import java.util.Objects;
 
 
-// Command object that applies TurnOn to a target device and can undo it.
+// Concrete Command: wraps "turn on" as an object.
 public class TurnOnCommand implements DeviceCommand {
+    // Receiver in Command pattern terms.
     private final Device receiver;
+    // Captured pre-state for accurate undo behavior.
     private boolean wasPoweredOnBefore;
 
     public TurnOnCommand(Device receiver) {
@@ -16,6 +18,7 @@ public class TurnOnCommand implements DeviceCommand {
 
     @Override
     public void execute() {
+        // Capture state before mutating so undo is deterministic.
         wasPoweredOnBefore = receiver.isPoweredOn();
         receiver.turnOn();
     }

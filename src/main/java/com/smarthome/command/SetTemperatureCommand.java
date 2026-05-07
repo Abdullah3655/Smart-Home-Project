@@ -5,10 +5,13 @@ import com.smarthome.devices.Thermostat;
 import java.util.Objects;
 
 
-// Command object that applies SetTemperature to a target device and can undo it.
+// Concrete Command for thermostat setTemperature() action.
 public class SetTemperatureCommand implements DeviceCommand {
+    // Receiver object in Command pattern terms.
     private final Thermostat receiver;
+    // Requested target value from caller.
     private final double newTemperatureC;
+    // Stored old value so undo restores exact previous reading.
     private double previousTemperatureC;
 
     public SetTemperatureCommand(Thermostat receiver, double newTemperatureC) {

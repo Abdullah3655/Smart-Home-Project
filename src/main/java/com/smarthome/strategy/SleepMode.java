@@ -11,7 +11,7 @@ import java.util.Enumeration;
 import java.util.Objects;
 
 
-// Automation strategy that applies sleep rules to hub devices.
+// Concrete Strategy: night profile (lights off, locks on, cooler thermostat).
 public class SleepMode implements AutomationMode {
     @Override
     public String name() {

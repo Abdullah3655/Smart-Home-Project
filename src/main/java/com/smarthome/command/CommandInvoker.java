@@ -10,22 +10,24 @@ import java.util.Objects;
 import java.util.UUID;
 
 
-// Executes commands, stores undo history, and optionally writes command audit logs.
+// Command pattern Invoker: triggers commands and owns undo history.
 public class CommandInvoker {
+    // LIFO stack so undo always affects the most recent action first.
     private final Deque<DeviceCommand> history = new ArrayDeque<>();
+    // Optional DAO used to persist command audit rows.
     private final CommandsLogDAO auditLog;
 
-    
+    // Lightweight mode used by tests or in-memory runs.
     public CommandInvoker() {
         this(null);
     }
 
-    
+    // Production mode with audit logging enabled.
     public CommandInvoker(CommandsLogDAO auditLog) {
         this.auditLog = auditLog;
     }
 
-    
+    // Invoker runs the command but never touches device internals directly.
     public void execute(DeviceCommand command) {
         Objects.requireNonNull(command, "command must not be null");
         command.execute();
@@ -41,12 +43,12 @@ public class CommandInvoker {
         }
     }
 
-    
+    // Used by UI to enable/disable Undo button.
     public boolean canUndo() {
         return !history.isEmpty();
     }
 
-    
+    // Pops one command and asks that command to reverse itself.
     public DeviceCommand undo() {
         if (history.isEmpty()) {
             return null;
@@ -56,12 +58,12 @@ public class CommandInvoker {
         return last;
     }
 
-    
+    // Read-only snapshot for history screens/debugging.
     public List<DeviceCommand> getHistory() {
         return Collections.unmodifiableList(List.copyOf(history));
     }
 
-    
+    // Primarily useful in tests between scenarios.
     public void clearHistory() {
         history.clear();
     }

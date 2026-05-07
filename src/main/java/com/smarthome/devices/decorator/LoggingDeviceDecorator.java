@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-// Decorator that records device actions for later display.
+// Concrete Decorator: adds action logging without changing Device classes.
 public class LoggingDeviceDecorator extends DeviceDecorator {
 
     private final List<String> log = new ArrayList<>();
@@ -18,6 +18,7 @@ public class LoggingDeviceDecorator extends DeviceDecorator {
 
     @Override
     public void turnOn() {
+        // Extra behavior is added before forwarding to wrapped object.
         log.add("turnOn(" + wrappee.getName() + ")");
         super.turnOn();
     }
@@ -28,7 +29,7 @@ public class LoggingDeviceDecorator extends DeviceDecorator {
         super.turnOff();
     }
 
-    
+    // Expose logs as read-only so callers cannot corrupt decorator state.
     public List<String> getLog() {
         return Collections.unmodifiableList(log);
     }

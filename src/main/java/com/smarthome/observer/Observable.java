@@ -1,14 +1,14 @@
 package com.smarthome.observer;
 
 
-// Observable contract for subscribe, unsubscribe, and event notification.
+// Subject side of the Observer pattern.
 public interface Observable {
-    
+    // Register an observer to receive future events.
     void attach(Observer observer);
 
-    
+    // Stop sending events to an observer.
     void detach(Observer observer);
 
-    
+    // Broadcast a named event to all current observers.
     void notifyObservers(String event);
 }

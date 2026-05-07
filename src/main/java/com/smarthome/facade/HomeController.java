@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-// Facade used by UI to run actions and read app state through one API.
+// Facade pattern entry point for UI: one API over many subsystems.
 public class HomeController {
 
     private final SmartHomeHub hub;
@@ -35,7 +35,7 @@ public class HomeController {
     private final DeviceEventDAO eventDAO;
     private final CommandsLogDAO commandsLogDAO;
 
-    
+    // Default wiring for app runtime.
     public HomeController() {
         this(
             SmartHomeHub.getInstance(),
@@ -45,7 +45,7 @@ public class HomeController {
         );
     }
 
-    
+    // Injection-friendly constructor for tests and modular startup.
     public HomeController(SmartHomeHub hub,
                           CommandInvoker invoker,
                           DeviceEventDAO eventDAO,
@@ -57,6 +57,7 @@ public class HomeController {
     }
 
     public void turnOnDevice(String deviceId) {
+        // Facade delegates mutation to Command pattern instead of mutating directly.
         invoker.execute(new TurnOnCommand(findDevice(deviceId)));
     }
 
@@ -89,6 +90,7 @@ public class HomeController {
     }
 
     public void setAutomationMode(String modeName) {
+        // Converts simple UI input into a concrete Strategy instance.
         AutomationMode mode = resolveMode(modeName);
         invoker.execute(new SetAutomationModeCommand(hub, mode));
     }
@@ -108,6 +110,7 @@ public class HomeController {
             throw new IllegalArgumentException("Unknown room: " + roomId);
         }
         List<Device> devices = new ArrayList<>();
+        // Room exposes Enumeration (Iterator pattern requirement), facade converts to List.
         Enumeration<Device> it = room.devices();
         while (it.hasMoreElements()) {
             devices.add(it.nextElement());
@@ -125,13 +128,13 @@ public class HomeController {
         return commandsLogDAO.findRecent(100);
     }
 
-    
+    // Stub intentionally left for the schedule module.
     public void createSchedule(ScheduleRequest request) {
         throw new UnsupportedOperationException(
             "Schedule executor not yet wired — see M4 task. Request: " + request);
     }
 
-    
+    // Local helper keeps device lookup logic out of UI controllers.
     private Device findDevice(String deviceId) {
         for (Room room : hub.getRooms()) {
             Device d = room.getDevice(deviceId);
@@ -140,7 +143,7 @@ public class HomeController {
         throw new IllegalArgumentException("Unknown device: " + deviceId);
     }
 
-    
+    // Strategy factory method by user-facing mode string.
     private AutomationMode resolveMode(String modeName) {
         if (modeName == null) {
             throw new IllegalArgumentException("modeName must not be null");

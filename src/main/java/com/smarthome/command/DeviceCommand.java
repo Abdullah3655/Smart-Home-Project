@@ -1,14 +1,14 @@
 package com.smarthome.command;
 
 
-// Contract for executable actions that support undo.
+// Command pattern contract: every action must execute and be undoable.
 public interface DeviceCommand {
-    
+    // Runs the action on its receiver.
     void execute();
 
-    
+    // Restores the receiver state captured during execute().
     void undo();
 
-    
+    // Readable summary used in history/audit views.
     String describe();
 }

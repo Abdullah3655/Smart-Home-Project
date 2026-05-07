@@ -3,7 +3,7 @@ package com.smarthome.devices.decorator;
 import com.smarthome.devices.Device;
 
 
-// Decorator that tracks how long a device stays powered on.
+// Concrete Decorator: adds on-time tracking to any wrapped device.
 public class EnergyTrackedDecorator extends DeviceDecorator {
 
     private long onSinceMillis = 0L;
@@ -15,6 +15,7 @@ public class EnergyTrackedDecorator extends DeviceDecorator {
 
     @Override
     public void turnOn() {
+        // Capture timestamp only for real off -> on transitions.
         boolean wasOff = !wrappee.isPoweredOn();
         super.turnOn();
         if (wasOff && wrappee.isPoweredOn()) {
@@ -30,7 +31,7 @@ public class EnergyTrackedDecorator extends DeviceDecorator {
         super.turnOff();
     }
 
-    
+    // Includes current live session when device is still on.
     public long getTotalOnMillis() {
         long live = wrappee.isPoweredOn()
             ? System.currentTimeMillis() - onSinceMillis

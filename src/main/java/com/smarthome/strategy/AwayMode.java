@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.util.Objects;
 
 
-// Automation strategy that applies away rules to hub devices.
+// Concrete Strategy: away profile for security and low energy usage.
 public class AwayMode implements AutomationMode {
     @Override
     public String name() {
@@ -33,6 +33,7 @@ public class AwayMode implements AutomationMode {
                     lock.lock();
                 }
                 if (device instanceof Camera camera) {
+                    // Keeps camera power policy in one mode class, not spread across UI code.
                     camera.turnOn();
                 }
                 if (device instanceof Thermostat thermostat) {

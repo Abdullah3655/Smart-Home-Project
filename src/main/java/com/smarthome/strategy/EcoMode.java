@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.Objects;
 
 
-// Automation strategy that applies eco rules to hub devices.
+// Concrete Strategy: reduce energy use without fully shutting the house down.
 public class EcoMode implements AutomationMode {
     @Override
     public String name() {
@@ -20,6 +20,7 @@ public class EcoMode implements AutomationMode {
     @Override
     public void apply(SmartHomeHub hub) {
         Objects.requireNonNull(hub, "hub must not be null");
+        // Strategy owns these decisions; SmartHomeHub only delegates.
         for (Room room : hub.getRooms()) {
             Enumeration<Device> devices = room.devices();
             while (devices.hasMoreElements()) {

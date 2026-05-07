@@ -10,10 +10,11 @@ import java.util.Map;
 import java.util.Objects;
 
 
-// Room entity that owns devices and exposes device iteration in insertion order.
+// Room aggregate that owns device instances by id.
 public class Room {
     private final String roomId;
     private final String name;
+    // LinkedHashMap preserves insertion order for predictable UI rendering.
     private final Map<String, Device> devicesById = new LinkedHashMap<>();
 
     public Room(String roomId, String name) {
@@ -31,6 +32,7 @@ public class Room {
 
     public void addDevice(Device device) {
         Objects.requireNonNull(device, "device must not be null");
+        // Replaces old device if the same id already exists.
         devicesById.put(device.getId(), device);
     }
 
@@ -42,7 +44,7 @@ public class Room {
         return devicesById.get(deviceId);
     }
 
-    
+    // Iterator-pattern style traversal API requested by the assignment.
     public Enumeration<Device> devices() {
         Collection<Device> values = devicesById.values();
         return Collections.enumeration(values);

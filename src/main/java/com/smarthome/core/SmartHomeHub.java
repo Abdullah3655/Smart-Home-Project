@@ -10,11 +10,14 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-// Central in-memory hub that stores rooms and applies automation modes.
+// Singleton + Strategy context + room aggregate in one central hub.
 public class SmartHomeHub implements RoomIterableCollection {
+    // Eager singleton keeps construction simple and thread-safe.
     private static final SmartHomeHub INSTANCE = new SmartHomeHub();
 
+    // roomId -> Room index for fast lookups.
     private final Map<String, Room> roomsById = new ConcurrentHashMap<>();
+    // Current strategy to apply when automation mode is triggered.
     private AutomationMode automationMode;
 
     private SmartHomeHub() {
@@ -34,6 +37,7 @@ public class SmartHomeHub implements RoomIterableCollection {
     }
 
     public Collection<Room> getRooms() {
+        // Return read-only view so callers cannot mutate hub internals by accident.
         return Collections.unmodifiableCollection(roomsById.values());
     }
 
@@ -47,12 +51,14 @@ public class SmartHomeHub implements RoomIterableCollection {
 
     public void applyAutomationMode() {
         if (automationMode != null) {
+            // Strategy pattern delegation point.
             automationMode.apply(this);
         }
     }
 
     @Override
     public RoomIterator createIterator() {
+        // Iterator pattern: returns dedicated iterator instead of exposing map directly.
         return new HubRoomIterator(new ArrayList<>(roomsById.values()));
     }
 }

@@ -6,10 +6,13 @@ import com.smarthome.strategy.AutomationMode;
 import java.util.Objects;
 
 
-// Command object that applies SetAutomationMode to a target device and can undo it.
+// Concrete Command: changes the hub's active Strategy.
 public class SetAutomationModeCommand implements DeviceCommand {
+    // Receiver is the Strategy context (SmartHomeHub).
     private final SmartHomeHub receiver;
+    // Strategy instance to apply.
     private final AutomationMode newMode;
+    // Stored so undo can restore the previous strategy.
     private AutomationMode previousMode;
 
     public SetAutomationModeCommand(SmartHomeHub receiver, AutomationMode newMode) {
@@ -21,6 +24,7 @@ public class SetAutomationModeCommand implements DeviceCommand {
     public void execute() {
         previousMode = receiver.getAutomationMode();
         receiver.setAutomationMode(newMode);
+        // Delegate strategy-specific behavior to the mode itself.
         receiver.applyAutomationMode();
     }
 

@@ -5,13 +5,14 @@ import com.smarthome.observer.Observer;
 
 import java.util.Objects;
 
-// Base decorator that forwards all Device operations to a wrapped instance.
+// Base Decorator: keeps the same Device API while wrapping another Device.
 public abstract class DeviceDecorator extends Device {
 
     // Wrapped device that receives the delegated calls.
     protected final Device wrappee;
 
     protected DeviceDecorator(Device wrappee) {
+        // Preserve id/name so decorated objects still map to the same logical device.
         super(wrappee.getId(), wrappee.getName());
         this.wrappee = Objects.requireNonNull(wrappee, "wrappee must not be null");
     }

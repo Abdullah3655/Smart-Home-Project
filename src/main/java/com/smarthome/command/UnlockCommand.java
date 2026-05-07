@@ -5,9 +5,11 @@ import com.smarthome.devices.Lock;
 import java.util.Objects;
 
 
-// Command object that applies Unlock to a target device and can undo it.
+// Concrete Command for unlock() action on a Lock receiver.
 public class UnlockCommand implements DeviceCommand {
+    // Receiver object that knows how to perform the real operation.
     private final Lock receiver;
+    // Captured state for undo support.
     private boolean wasLockedBefore;
 
     public UnlockCommand(Lock receiver) {

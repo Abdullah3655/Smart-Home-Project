@@ -5,9 +5,11 @@ import com.smarthome.devices.Device;
 import java.util.Objects;
 
 
-// Command object that applies TurnOff to a target device and can undo it.
+// Concrete Command: wraps "turn off" as an object.
 public class TurnOffCommand implements DeviceCommand {
+    // Receiver in Command pattern terms.
     private final Device receiver;
+    // Captured pre-state for accurate undo behavior.
     private boolean wasPoweredOnBefore;
 
     public TurnOffCommand(Device receiver) {
