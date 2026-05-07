@@ -1,25 +1,20 @@
 # Smart Home — Class Diagrams (by layer)
 
 The system is organised into **4 layers**: Presentation, Application,
-Domain, and Persistence. Each layer gets its own focused class diagram
-below — showing the classes inside it plus the boundary arrows pointing
-to the layers it depends on.
-
-To keep each diagram readable, repetitive concrete classes are
-represented by a single example per family (e.g. one `EcoMode` stands
-in for `EcoMode/SleepMode/AwayMode`). Notes call out the omitted siblings.
+Domain, and Persistence. Each layer below has its own focused class
+diagram showing the classes inside it. Cross-layer dependencies are
+shown only in the architecture overview at the top — keeping each
+per-layer diagram clean of crossing arrows.
 
 > **Viewing this:** GitHub renders Mermaid natively — open
 > [this file on github.com](https://github.com/ahmefarouk1234d/smarthome/blob/main/docs/class-diagram.md)
 > and every diagram below appears as an SVG.
-> For the printed report, see the higher-resolution
-> [`class-diagram.puml`](class-diagram.puml).
 
 ---
 
 ## Table of contents
 
-1. [Layered architecture overview](#1-layered-architecture-overview)
+1. [Architecture overview](#1-architecture-overview)
 2. [Layer A — Presentation (JavaFX UI)](#2-layer-a--presentation-javafx-ui)
 3. [Layer B — Application (Facade + Command)](#3-layer-b--application-facade--command)
 4. [Layer C — Domain (Hub, Devices, Patterns)](#4-layer-c--domain-hub-devices-patterns)
@@ -28,20 +23,18 @@ in for `EcoMode/SleepMode/AwayMode`). Notes call out the omitted siblings.
 
 ---
 
-## 1. Layered architecture overview
+## 1. Architecture overview
 
-How the four layers stack. Dependencies flow downward only — UI never
-imports DAOs directly, the Domain layer is reusable in isolation.
+How the four layers stack and depend on each other. Dependencies flow
+downward only — UI never imports DAOs directly.
 
 ```mermaid
 flowchart TB
     subgraph A [A — Presentation]
         App
         MainCtrl[MainController]
-        Screens[Home / History / Decorator<br/>controllers]
-        AddDev[AddDeviceController]
+        Screens[Home / History / Decorator<br/>+ AddDevice]
         Bridge[DaoEventBridge]
-        Bus[HomeBus]
     end
 
     subgraph B [B — Application]
@@ -84,7 +77,8 @@ plus three screen controllers swapped through the central host.
 `DaoEventBridge` is a special Observer that lives at the layer boundary
 and forwards device events to the Persistence layer.
 
-**Imports allowed from:** Application (Facade) and Persistence (DAOs through `DaoEventBridge` only).
+**Depends on:** Application layer (calls Facade), Persistence layer
+(via `DaoEventBridge`).
 
 ```mermaid
 classDiagram
@@ -93,28 +87,23 @@ classDiagram
     class App {
         «JavaFX entry»
         +start(Stage)
-        +seedDemoDataIfEmpty()
-        +loadPersistedState()
-        +attachPersistenceObservers()
     }
 
     class MainController {
         «top bar + nav»
         -sharedFacade : HomeController
-        +applyMode(String, Button)
-        +loadScreen(String, Button)
+        +applyMode(String)
+        +loadScreen(String)
     }
 
     class HomeUIController {
         «Home screen»
-        -facade : HomeController
         +renderAllRooms()
         +openAddDeviceModal(Room)
     }
 
     class HistoryController {
         «History screen»
-        -facade : HomeController
         +loadHistoricalEvents()
         +attachLiveObserver()
     }
@@ -127,14 +116,11 @@ classDiagram
 
     class AddDeviceController {
         «Add Device modal»
-        -targetRoom : Room
         +onAdd()
     }
 
     class DaoEventBridge {
         «Observer adapter»
-        -eventDao : DeviceEventDAO
-        -deviceDao : DeviceDAO
         +update(Device, String)
     }
 
@@ -144,29 +130,17 @@ classDiagram
         +notifyDataChanged()$
     }
 
-    class FacadeRef
-    class DAORef
-
     App --> MainController : loads main.fxml
     MainController --> HomeUIController : swaps in
     MainController --> HistoryController : swaps in
     MainController --> DecoratorController : swaps in
     HomeUIController --> AddDeviceController : opens modal
-
-    %% Boundary arrows leaving this layer
-    MainController ..> FacadeRef : "→ Application layer"
-    HomeUIController ..> FacadeRef : "→ Application layer"
-    AddDeviceController ..> FacadeRef : "→ Application layer"
-    DaoEventBridge ..> DAORef : "→ Persistence layer"
-
-    note for FacadeRef "HomeController «Facade»\n(Application layer)"
-    note for DAORef "DeviceDAO + DeviceEventDAO\n(Persistence layer)"
 ```
 
-**Pattern roles in this layer:** `DaoEventBridge` is an **Observer**.
-The whole presentation layer demonstrates the **Facade** rubric line
-("controllers must call a facade service") — every controller's
-mutation path goes through `HomeController` exclusively.
+**Pattern roles in this layer:** `DaoEventBridge` plays the **Observer**
+role at the layer boundary. The whole presentation layer demonstrates
+the **Facade** rubric line — every controller's mutation path goes
+through `HomeController` exclusively.
 
 ---
 
@@ -177,7 +151,7 @@ class the UI calls into. It wraps every mutation in a `DeviceCommand`
 and hands it to the `CommandInvoker`, which executes and stores the
 command on the undo stack.
 
-**Imports allowed from:** Domain (Hub, Devices, Strategies) and Persistence (DAOs).
+**Depends on:** Domain layer (Hub + Device receivers), Persistence layer (DAOs).
 
 ```mermaid
 classDiagram
@@ -185,16 +159,11 @@ classDiagram
 
     class HomeController {
         «Facade»
-        -hub : SmartHomeHub
-        -invoker : CommandInvoker
-        -eventDAO : DeviceEventDAO
-        -commandsLogDAO : CommandsLogDAO
         +turnOnDevice(String)
         +turnOffDevice(String)
-        +lockDevice / unlockDevice (String)
+        +lockDevice(String)
         +setTemperature(String, double)
         +setAutomationMode(String)
-        +getDevicesForRoom(String) List~Device~
         +getEventHistory() List~DeviceEvent~
         +undoLastAction() boolean
     }
@@ -202,7 +171,6 @@ classDiagram
     class CommandInvoker {
         «Invoker»
         -history : Deque~DeviceCommand~
-        -auditLog : CommandsLogDAO
         +execute(DeviceCommand)
         +undo() DeviceCommand
         +canUndo() boolean
@@ -217,51 +185,60 @@ classDiagram
 
     class TurnOnCommand {
         «Concrete Command»
-        -receiver : Device
-        -wasOnBefore : boolean
+        +execute()
+        +undo()
     }
 
-    class HubRef
-    class DevicesRef
-    class DAORef
+    class TurnOffCommand {
+        «Concrete Command»
+    }
+
+    class SetTemperatureCommand {
+        «Concrete Command»
+    }
+
+    class LockCommand_UnlockCommand {
+        «Concrete Commands»
+    }
+
+    class SetAutomationModeCommand {
+        «Concrete Command»
+    }
 
     TurnOnCommand ..|> DeviceCommand
-    CommandInvoker o-- DeviceCommand : "history stack"
+    TurnOffCommand ..|> DeviceCommand
+    SetTemperatureCommand ..|> DeviceCommand
+    LockCommand_UnlockCommand ..|> DeviceCommand
+    SetAutomationModeCommand ..|> DeviceCommand
+
     HomeController --> CommandInvoker
-    HomeController ..> TurnOnCommand : "creates"
-
-    %% Boundary arrows leaving this layer
-    HomeController ..> HubRef : "→ Domain layer"
-    TurnOnCommand ..> DevicesRef : "→ Domain (Receiver)"
-    HomeController ..> DAORef : "→ Persistence layer"
-    CommandInvoker ..> DAORef : "→ Persistence (audit log)"
-
-    note for TurnOnCommand "+ TurnOffCommand\n+ SetTemperatureCommand\n+ LockCommand\n+ UnlockCommand\n+ SetAutomationModeCommand"
-    note for HubRef "SmartHomeHub\n(Domain layer)"
-    note for DevicesRef "Device hierarchy\n(Domain layer)"
-    note for DAORef "DeviceEventDAO\nCommandsLogDAO\n(Persistence layer)"
+    HomeController ..> DeviceCommand : creates
+    CommandInvoker o-- DeviceCommand : history stack
 ```
 
 **Pattern roles in this layer:** **Facade** (`HomeController`),
-**Command** (interface + 6 concretes + `CommandInvoker`).
+**Command** (interface + 6 concretes + `CommandInvoker`). The Invoker
+imports only `DeviceCommand` — never any concrete Receiver — which is
+RG's litmus test for a correct Command implementation.
 
 ---
 
 ## 4. Layer C — Domain (Hub, Devices, Patterns)
 
-The pure business model — no JavaFX imports, no SQL imports. Owns the
-core entities (`SmartHomeHub`, `Room`, `Device`) and the foundational
-patterns (Singleton, Iterator, Observer, Abstract Factory, Strategy,
-Decorator).
+The pure business model — no JavaFX imports, no SQL imports. Houses
+six of the nine patterns: Singleton (Hub), Iterator (Room), Observer
+(Device), Abstract Factory (DeviceFactory), Strategy (AutomationMode),
+and Decorator (DeviceDecorator).
 
-**Imports allowed from:** *nothing higher in the stack*. The Domain layer
-is reusable in isolation.
+**Depends on:** *nothing higher in the stack*. The Domain is reusable in
+isolation.
+
+### 4.1 Core entities — Hub, Room, Device
 
 ```mermaid
 classDiagram
     direction TB
 
-    %% Singleton + Strategy Context + Iterator host
     class SmartHomeHub {
         «Singleton, Strategy Context»
         -INSTANCE : SmartHomeHub$
@@ -269,7 +246,6 @@ classDiagram
         -automationMode : AutomationMode
         +getInstance() SmartHomeHub$
         +addRoom(Room)
-        +setAutomationMode(AutomationMode)
         +applyAutomationMode()
         +createIterator() RoomIterator
     }
@@ -287,40 +263,73 @@ classDiagram
         +getNext() Room
     }
 
-    %% Observer
+    class Device {
+        «abstract»
+        -id, name, observers
+        +turnOn()
+        +turnOff()
+        +notifyObservers(String)
+    }
+
+    class Light {
+        +setBrightness(int)
+    }
+
+    class Thermostat {
+        +setTemperature(double)
+    }
+
+    class Lock {
+        +lock()
+        +unlock()
+    }
+
+    class Camera
+
+    Light --|> Device
+    Thermostat --|> Device
+    Lock --|> Device
+    Camera --|> Device
+
+    SmartHomeHub o-- Room : "rooms"
+    Room o-- Device : "devices"
+    SmartHomeHub --> RoomIterator : creates
+```
+
+### 4.2 Observer — Device as Subject
+
+```mermaid
+classDiagram
+    direction LR
+
     class Observer {
         «interface»
         +update(Device, String)
     }
+
     class Observable {
         «interface»
-        +attach / detach
+        +attach(Observer)
+        +detach(Observer)
         +notifyObservers(String)
     }
 
-    %% Devices — Component (Decorator) + Receiver (Command) + Subject (Observer)
     class Device {
-        «abstract»
-        -id, name, observers
-        +turnOn() / turnOff()
+        «abstract Subject»
+        -observers : List~Observer~
         +notifyObservers(String)
     }
-    class Light
-    class Thermostat
-    class DeviceDecorator {
-        «abstract Decorator»
-        #wrappee : Device
-    }
-    class LoggingDeviceDecorator
-    class Version2Variants {
-        «represents»
-        Version2Light
-        Version2Thermostat
-        Version2Lock
-        Version2Camera
-    }
 
-    %% Abstract Factory
+    Device ..|> Observable
+    Device o-- Observer : list of
+```
+
+### 4.3 Abstract Factory — two device families
+
+```mermaid
+classDiagram
+    direction TB
+
     class DeviceFactory {
         «abstract, Abstract Factory»
         +createLight(String) Device
@@ -328,62 +337,111 @@ classDiagram
         +createDoorLock(String) Device
         +createCamera(String) Device
     }
-    class Version2DeviceFactory {
+
+    class Version1DeviceFactory {
         «Concrete Factory»
+        legacy variants
     }
 
-    %% Strategy
+    class Version2DeviceFactory {
+        «Concrete Factory»
+        modern variants
+    }
+
+    class Version1Light {
+        Version1Thermostat
+        Version1Lock
+        Version1Camera
+    }
+
+    class Version2Light {
+        Version2Thermostat
+        Version2Lock
+        Version2Camera
+    }
+
+    Version1DeviceFactory --|> DeviceFactory
+    Version2DeviceFactory --|> DeviceFactory
+    Version1DeviceFactory ..> Version1Light : creates family
+    Version2DeviceFactory ..> Version2Light : creates family
+```
+
+### 4.4 Strategy — automation modes
+
+```mermaid
+classDiagram
+    direction TB
+
     class AutomationMode {
         «interface, Strategy»
         +name() String
         +apply(SmartHomeHub)
     }
+
     class EcoMode {
         «Concrete Strategy»
     }
+    class SleepMode {
+        «Concrete Strategy»
+    }
+    class AwayMode {
+        «Concrete Strategy»
+    }
 
-    %% Inheritance + realization
-    Light --|> Device
-    Thermostat --|> Device
-    DeviceDecorator --|> Device
-    LoggingDeviceDecorator --|> DeviceDecorator
-    Version2Variants --|> Device
-    Version2DeviceFactory --|> DeviceFactory
+    class SmartHomeHub {
+        «Context»
+        +applyAutomationMode()
+    }
+
     EcoMode ..|> AutomationMode
-    Device ..|> Observable
-
-    %% Composition + dependencies inside the layer
-    SmartHomeHub o-- Room : "rooms"
-    Room o-- Device : "devices"
-    Device o-- Observer : "observers"
-    DeviceDecorator o-- Device : "wraps"
-    SmartHomeHub --> AutomationMode : "current strategy"
-    SmartHomeHub --> RoomIterator : "creates"
-    Version2DeviceFactory ..> Version2Variants : "creates"
-
-    note for Light "+ Lock\n+ Camera"
-    note for Version2Variants "Version1 family also exists\n(Version1Light/Thermostat/Lock/Camera)"
-    note for Version2DeviceFactory "+ Version1DeviceFactory\n(legacy family)"
-    note for EcoMode "+ SleepMode\n+ AwayMode"
-    note for LoggingDeviceDecorator "+ EnergyTrackedDecorator"
+    SleepMode ..|> AutomationMode
+    AwayMode ..|> AutomationMode
+    SmartHomeHub --> AutomationMode : current
 ```
 
-**Pattern roles in this layer:** **Singleton** (Hub), **Iterator** (Room
-+ RoomIterator), **Observer** (Device implements Observable), **Abstract
-Factory + Factory Methods** (DeviceFactory + 2 family factories),
-**Strategy** (AutomationMode + 3 modes), **Decorator** (DeviceDecorator
-+ 2 wrappers). Six of the nine patterns live entirely in this layer.
+### 4.5 Decorator — wrapping devices
+
+```mermaid
+classDiagram
+    direction TB
+
+    class Device {
+        «Component»
+        +turnOn()
+        +turnOff()
+    }
+
+    class DeviceDecorator {
+        «abstract Decorator»
+        #wrappee : Device
+    }
+
+    class LoggingDeviceDecorator {
+        «Concrete Decorator»
+        -log : List~String~
+    }
+
+    class EnergyTrackedDecorator {
+        «Concrete Decorator»
+        -totalOnMillis : long
+    }
+
+    DeviceDecorator --|> Device
+    LoggingDeviceDecorator --|> DeviceDecorator
+    EnergyTrackedDecorator --|> DeviceDecorator
+    DeviceDecorator o-- Device : wraps
+```
 
 ---
 
 ## 5. Layer D — Persistence (Database + DAOs)
 
 SQL isolation. The `Database` is a Singleton holding the JDBC connection;
-each DAO wraps a single table behind plain Java methods. The domain
-layer never sees JDBC.
+each DAO wraps a single table behind plain Java methods. The Domain layer
+never sees JDBC.
 
-**Imports allowed from:** Domain (`Device`, `Room`, etc. as method args)
-and `factory` (DeviceDAO uses Abstract Factory at deserialization).
+**Depends on:** Domain (`Device`, `Room` as method args) and Factory
+(DeviceDAO uses Abstract Factory at deserialization).
 
 ```mermaid
 classDiagram
@@ -392,9 +450,7 @@ classDiagram
     class Database {
         «Singleton»
         -INSTANCE : Database$
-        -connection : Connection
         +getInstance() Database$
-        +forUrl(String) Database$
         +getConnection()
     }
 
@@ -404,44 +460,41 @@ classDiagram
         +findById(String) User
         +verifyPin(String, String) boolean
     }
+
     class RoomDAO {
         «DAO»
         +insert(Room)
         +findAll() List~Room~
-        +delete(String)
     }
+
     class DeviceDAO {
         «DAO»
         +insert(Device, roomId)
         +findByRoom(String) List~Device~
         +updateState(Device)
     }
+
     class DeviceEventDAO {
         «DAO»
         +insert(deviceId, eventType)
         +findRecent(int) List~DeviceEvent~
     }
+
     class CommandsLogDAO {
         «DAO»
-        +insert(cmdId, deviceId, action, params, result)
+        +insert(...)
         +findRecent(int) List~CommandLog~
     }
 
     class User {
         «record, DTO»
-        userId, name, pin, role
     }
     class DeviceEvent {
         «record, DTO»
-        eventId, deviceId, eventType, timestamp
     }
     class CommandLog {
         «record, DTO»
-        commandId, deviceId, action, paramsJson, result, timestamp
     }
-
-    class FactoryRef
-    class DomainRef
 
     UserDAO --> Database
     RoomDAO --> Database
@@ -449,22 +502,14 @@ classDiagram
     DeviceEventDAO --> Database
     CommandsLogDAO --> Database
 
-    UserDAO ..> User : returns
-    DeviceEventDAO ..> DeviceEvent : returns
-    CommandsLogDAO ..> CommandLog : returns
-
-    %% DeviceDAO uses Abstract Factory at runtime
-    DeviceDAO ..> FactoryRef : "reconstructs via\nAbstract Factory"
-    DeviceDAO ..> DomainRef : "round-trips Device"
-    RoomDAO ..> DomainRef : "round-trips Room"
-
-    note for FactoryRef "DeviceFactory hierarchy\n(Domain layer)"
-    note for DomainRef "Device, Room\n(Domain layer)"
+    UserDAO ..> User
+    DeviceEventDAO ..> DeviceEvent
+    CommandsLogDAO ..> CommandLog
 ```
 
 **Pattern roles in this layer:** **Singleton** (Database) and **DAO**
-(5 DAOs). `DeviceDAO` also calls into the Domain's Abstract Factory
-at deserialization — visible as the dashed arrow leaving the layer.
+(5 DAOs). `DeviceDAO` also uses the Domain's Abstract Factory at
+deserialization to round-trip polymorphic device subtypes.
 
 ---
 
@@ -476,7 +521,7 @@ patterns in one trip.
 ```mermaid
 sequenceDiagram
     actor User
-    participant UI as JavaFX (Layer A)
+    participant UI as JavaFX (A)
     participant F as HomeController «Facade» (B)
     participant I as CommandInvoker (B)
     participant C as TurnOnCommand (B)
@@ -511,7 +556,7 @@ Patterns visible in this single flow:
 
 | Layer | Patterns it owns |
 |---|---|
-| **A — Presentation** | Observer (`DaoEventBridge`) at the boundary |
+| **A — Presentation** | Observer (`DaoEventBridge` at the boundary) |
 | **B — Application** | Facade · Command |
 | **C — Domain** | Singleton · Iterator · Observer · Abstract Factory · Strategy · Decorator |
 | **D — Persistence** | Singleton · DAO |
