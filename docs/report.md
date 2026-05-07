@@ -67,26 +67,97 @@ Concretes: `EcoMode` (24°C, dim 50%), `SleepMode` (off + lock + 20°C),
 
 ## 3. Class Diagram and how each component meets the constraints
 
-Full rendered class diagram (rendered from `class-diagram.puml` via
-PlantUML — every class, all 9 patterns, every relationship):
+Full rendered class diagram (PlantUML — every class, all 9 patterns,
+every relationship):
 
 <p align="center">
-  <img src="images/class-diagram-full.png" alt="Full class diagram of the Smart Home system" width="640"/>
+  <img src="images/class-diagram-full.png" alt="Full class diagram of the Smart Home system" width="900"/>
 </p>
 
-Per-layer mini class diagrams for quick reference:
+Per-pattern detailed class diagrams follow. Each one isolates a single
+pattern so the roles, methods, and relationships are immediately
+visible.
 
-<table>
-  <tr>
-    <td align="center"><img src="images/layer-presentation.svg" width="220" alt="Presentation layer"/><br/><b>A — Presentation</b></td>
-    <td align="center"><img src="images/layer-application.svg" width="220" alt="Application layer"/><br/><b>B — Application</b></td>
-    <td align="center"><img src="images/layer-domain.svg" width="220" alt="Domain layer"/><br/><b>C — Domain</b></td>
-    <td align="center"><img src="images/layer-persistence.svg" width="220" alt="Persistence layer"/><br/><b>D — Persistence</b></td>
-  </tr>
-</table>
+### 3.1 Layer A — Presentation (UI)
+
+<p align="center"><img src="images/pattern-presentation.png" width="540" alt="Presentation layer"/></p>
+
+The UI is composed of `App` (JavaFX entry), `MainController` (top bar +
+nav), three screen controllers swapped through a central host
+(`HomeUIController`, `HistoryController`, `DecoratorController`), the
+`AddDeviceController` modal, and the `DaoEventBridge` boundary
+adapter that forwards device events to the persistence layer.
+
+### 3.2 Layer B — Application (Facade + Command)
+
+<p align="center"><img src="images/pattern-application.png" width="540" alt="Application layer"/></p>
+
+`HomeController` (Facade) is the only class the UI calls. Each mutation
+call routes through `CommandInvoker`, which executes a concrete
+`DeviceCommand` (six exist: `TurnOn / TurnOff / SetTemperature / Lock /
+Unlock / SetAutomationMode`) and pushes it onto the undo stack. The
+Invoker imports zero domain classes — only `DeviceCommand`.
+
+### 3.3 Domain core — Singleton + Iterator + base devices
+
+<p align="center"><img src="images/pattern-core.png" width="540" alt="Core entities"/></p>
+
+`SmartHomeHub` (Singleton + Strategy Context) owns the rooms.
+`Room` is the Iterator host — `enumerateDevices()` returns
+`Enumeration<Device>` per the rubric line. `RoomIterator` provides the
+custom GoF Iterator interface (`hasMore()`, `getNext()`).
+
+### 3.4 Observer — Device as Subject
+
+<p align="center"><img src="images/pattern-observer.png" width="500" alt="Observer pattern"/></p>
+
+`Device` implements `Observable`; observers attach via `attach(Observer)`
+and receive `update(Device, String)` calls when state changes. UI
+controllers, history feeds, and `DaoEventBridge` are all observers —
+each independent of the others.
+
+### 3.5 Abstract Factory — two device families
+
+<p align="center"><img src="images/pattern-abstract-factory.png" width="540" alt="Abstract Factory"/></p>
+
+`DeviceFactory` declares four Factory Methods (`createLight`,
+`createThermostat`, `createDoorLock`, `createCamera`).
+`Version1DeviceFactory` and `Version2DeviceFactory` each implement all
+four methods, returning their family's variants — Liskov-substitutable,
+no `UnsupportedOperationException` stubs.
+
+### 3.6 Strategy — automation modes
+
+<p align="center"><img src="images/pattern-strategy.png" width="540" alt="Strategy pattern"/></p>
+
+`AutomationMode` is the Strategy interface. `EcoMode`, `SleepMode`, and
+`AwayMode` are concrete strategies. `SmartHomeHub` is the Context — it
+holds the active strategy and exposes `applyAutomationMode()` so callers
+never need to know which concrete mode is loaded.
+
+### 3.7 Decorator — wrapping devices
+
+<p align="center"><img src="images/pattern-decorator.png" width="540" alt="Decorator pattern"/></p>
+
+`DeviceDecorator` wraps a `Device` (the Component) and forwards every
+method to it. `LoggingDeviceDecorator` and `EnergyTrackedDecorator`
+override individual methods to add cross-cutting behaviour (logging,
+energy tracking) without modifying any device class.
+
+### How each component meets the constraints
 
 Dependencies flow downward only — UI never imports DAOs directly; the
 Domain layer is self-contained and reusable in isolation.
+
+- **Modularity & ease of expansion** — each pattern lives in its own
+  package; new modes, new factories, or new commands plug in by adding
+  one class with zero edits to existing classes (Open–Closed Principle).
+- **Prevent invalid/unsafe operations** — null-safe constructors,
+  type-checked Facade rejects, idempotent state changes, Command
+  pre-state capture for reliable undo, `PreparedStatement` everywhere.
+- **Intuitive accessible GUI** — mobile-styled 400×800 window; 48 px
+  tap targets; high-contrast palette (8.4 : 1 — WCAG AAA); confirmation
+  dialogs before destructive actions.
 
 - **Modularity & ease of expansion** — patterns isolate concerns by
   package. Adding a new mode (Strategy), device family (Abstract Factory),
