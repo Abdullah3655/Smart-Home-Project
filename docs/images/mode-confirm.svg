@@ -1,34 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" font-family="'Segoe UI', sans-serif">
-  <!-- Dimmed background mimicking the home screen behind the modal -->
-  <rect width="400" height="800" fill="#0e1626"/>
-  <rect width="400" height="60" fill="#0e1626" opacity="0.4"/>
-  <rect width="400" height="800" fill="#000000" opacity="0.45"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" font-family="'Roboto', 'Segoe UI', sans-serif">
+  <!-- Dimmed home behind -->
+  <rect width="400" height="800" fill="#141218"/>
+  <rect width="400" height="800" fill="#000000" opacity="0.55"/>
 
-  <!-- Confirmation dialog (system Alert.AlertType.CONFIRMATION) -->
-  <rect x="40" y="240" width="320" height="280" rx="8" fill="#f0f0f0"
-        stroke="#5a6478" stroke-width="1"/>
+  <!-- Modal (M3 dialog) -->
+  <rect x="40" y="220" width="320" height="280" rx="28" fill="#211F26"
+        filter="url(#shadow)"/>
 
-  <!-- Title bar -->
-  <rect x="40" y="240" width="320" height="32" rx="8" fill="#dde1ea"/>
-  <text x="56" y="261" fill="#1f2940" font-size="13" font-weight="bold">Confirm automation mode</text>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="rgba(0,0,0,0.7)"/>
+    </filter>
+  </defs>
 
-  <!-- Header -->
-  <text x="56" y="306" fill="#0e1626" font-size="15" font-weight="bold">Apply ECO mode?</text>
+  <!-- Title -->
+  <text x="60" y="260" fill="#E6E0E9" font-size="20" font-weight="bold">Apply ECO mode?</text>
 
-  <!-- Body text -->
-  <text x="56" y="338" fill="#1f2940" font-size="12">ECO will set every thermostat to 24°C and dim every</text>
-  <text x="56" y="354" fill="#1f2940" font-size="12">powered-on light to 50%.</text>
+  <!-- Body -->
+  <text x="60" y="298" fill="#CAC4D0" font-size="13">ECO will set every thermostat to 24°C and</text>
+  <text x="60" y="314" fill="#CAC4D0" font-size="13">dim every powered-on light to 50%.</text>
 
-  <text x="56" y="386" fill="#1f2940" font-size="12">This can be reversed with the Undo button.</text>
+  <text x="60" y="354" fill="#79747E" font-size="12" font-style="italic">This can be reversed with the Undo button.</text>
 
-  <!-- Buttons -->
-  <rect x="200" y="464" width="64" height="30" rx="4" fill="#e8e8e8" stroke="#a0a4ad"/>
-  <text x="232" y="484" fill="#0e1626" font-size="12" text-anchor="middle">Cancel</text>
+  <!-- M3 dialog buttons (text + filled-tonal) -->
+  <text x="220" y="464" fill="#FFB870" font-size="13" font-weight="bold" text-anchor="end">Cancel</text>
 
-  <rect x="276" y="464" width="64" height="30" rx="4" fill="#2a4d8f"/>
-  <text x="308" y="484" fill="#ffffff" font-size="12" text-anchor="middle">OK</text>
+  <rect x="240" y="448" width="100" height="32" rx="16" fill="#FFB870"/>
+  <text x="290" y="468" fill="#48290B" font-size="13" font-weight="bold" text-anchor="middle">Apply</text>
 
-  <!-- Hints behind the modal: top bar + mode picker outline -->
-  <text x="200" y="700" fill="#5a6478" font-size="11" text-anchor="middle"
-        font-style="italic">(Home screen dimmed beneath the modal)</text>
+  <text x="200" y="700" fill="#79747E" font-size="11" text-anchor="middle"
+        font-style="italic">(Home screen dimmed beneath the dialog)</text>
 </svg>

@@ -1,46 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" font-family="'Segoe UI', sans-serif">
-  <!-- Dimmed home behind the modal -->
-  <rect width="400" height="800" fill="#0e1626"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" font-family="'Roboto', 'Segoe UI', sans-serif">
+  <!-- Dimmed home behind -->
+  <rect width="400" height="800" fill="#141218"/>
   <rect width="400" height="800" fill="#000000" opacity="0.55"/>
 
-  <!-- Modal -->
-  <rect x="40" y="170" width="320" height="460" rx="12" fill="#161f33"
-        stroke="#1f2940" stroke-width="1.5"/>
+  <!-- Modal (M3 dialog with rounded 28dp corners) -->
+  <rect x="40" y="160" width="320" height="500" rx="28" fill="#211F26"
+        filter="url(#shadow)"/>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="rgba(0,0,0,0.7)"/>
+    </filter>
+  </defs>
 
   <!-- Title -->
-  <text x="60" y="208" fill="#ffb547" font-size="14" font-weight="bold">Add device to Kitchen</text>
+  <text x="64" y="200" fill="#E6E0E9" font-size="18" font-weight="bold">Add device to Kitchen</text>
+  <text x="64" y="222" fill="#79747E" font-size="11" font-style="italic">Pattern in action: Abstract Factory + DAO</text>
 
-  <!-- Pattern caption -->
-  <text x="60" y="232" fill="#5a6478" font-size="10" font-style="italic">Pattern in action: Abstract Factory + DAO</text>
+  <!-- Field: Device type -->
+  <text x="64" y="260" fill="#CAC4D0" font-size="11" letter-spacing="1.5" font-weight="bold">DEVICE TYPE</text>
+  <rect x="64" y="270" width="272" height="40" rx="8" fill="#2B2930" stroke="#49454F"/>
+  <text x="80" y="294" fill="#E6E0E9" font-size="13">Light</text>
+  <text x="320" y="294" fill="#CAC4D0" font-size="13" text-anchor="end">▾</text>
 
-  <!-- Device type -->
-  <text x="60" y="266" fill="#f5f6fa" font-size="13" font-weight="bold">Device type</text>
-  <rect x="60" y="276" width="280" height="32" rx="6" fill="#1f2940" stroke="#2a3550"/>
-  <text x="76" y="297" fill="#f5f6fa" font-size="12">Light</text>
-  <text x="324" y="297" fill="#8a93a8" font-size="12" text-anchor="end">▾</text>
+  <!-- Field: Family -->
+  <text x="64" y="334" fill="#CAC4D0" font-size="11" letter-spacing="1.5" font-weight="bold">FAMILY</text>
+  <rect x="64" y="344" width="272" height="40" rx="8" fill="#2B2930" stroke="#49454F"/>
+  <text x="80" y="368" fill="#E6E0E9" font-size="13">Version2 (modern)</text>
+  <text x="320" y="368" fill="#CAC4D0" font-size="13" text-anchor="end">▾</text>
 
-  <!-- Family -->
-  <text x="60" y="332" fill="#f5f6fa" font-size="13" font-weight="bold">Family</text>
-  <rect x="60" y="342" width="280" height="32" rx="6" fill="#1f2940" stroke="#2a3550"/>
-  <text x="76" y="363" fill="#f5f6fa" font-size="12">Version2 (modern)</text>
-  <text x="324" y="363" fill="#8a93a8" font-size="12" text-anchor="end">▾</text>
-
-  <!-- Name -->
-  <text x="60" y="398" fill="#f5f6fa" font-size="13" font-weight="bold">Name</text>
-  <rect x="60" y="408" width="280" height="32" rx="6" fill="#1f2940" stroke="#2a3550"/>
-  <text x="76" y="429" fill="#f5f6fa" font-size="12">Bedside Lamp</text>
+  <!-- Field: Name -->
+  <text x="64" y="408" fill="#CAC4D0" font-size="11" letter-spacing="1.5" font-weight="bold">NAME</text>
+  <rect x="64" y="418" width="272" height="40" rx="8" fill="#2B2930" stroke="#49454F"/>
+  <text x="80" y="442" fill="#E6E0E9" font-size="13">Bedside Lamp</text>
 
   <!-- Empty error label space -->
-  <text x="60" y="468" fill="#5a6478" font-size="10" font-style="italic"></text>
+  <text x="64" y="488" fill="#79747E" font-size="11" font-style="italic"></text>
 
-  <!-- Buttons -->
-  <rect x="60" y="544" width="130" height="40" rx="8" fill="#1f2940" stroke="#2a3550"/>
-  <text x="125" y="569" fill="#f5f6fa" font-size="13" text-anchor="middle">Cancel</text>
+  <!-- Buttons (M3 dialog: text + filled, right-aligned) -->
+  <text x="232" y="616" fill="#FFB870" font-size="13" font-weight="bold" text-anchor="end">Cancel</text>
 
-  <rect x="210" y="544" width="130" height="40" rx="8" fill="#ffb547"/>
-  <text x="275" y="569" fill="#0e1626" font-size="13" font-weight="bold" text-anchor="middle">Add device</text>
+  <rect x="246" y="600" width="90" height="32" rx="16" fill="#FFB870"/>
+  <text x="291" y="620" fill="#48290B" font-size="13" font-weight="bold" text-anchor="middle">Add device</text>
 
-  <!-- Hint -->
-  <text x="200" y="700" fill="#8a93a8" font-size="11" text-anchor="middle"
-        font-style="italic">(Home screen dimmed beneath the modal)</text>
+  <text x="200" y="700" fill="#79747E" font-size="11" text-anchor="middle"
+        font-style="italic">(Home screen dimmed beneath the dialog)</text>
 </svg>
