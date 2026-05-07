@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <!--
-  History screen — newest-first feed of device events.
+  History screen — newest-first feed of device events, M3 list style.
   Combines events from DeviceEventDAO (past sessions) and live Observer
   callbacks (current session).
 -->
@@ -19,12 +19,12 @@
             vbarPolicy="AS_NEEDED">
 
   <content>
-    <VBox fx:id="eventsContainer" styleClass="content-pane" spacing="8">
-      <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+    <VBox fx:id="eventsContainer" styleClass="content-pane" spacing="10">
+      <padding><Insets top="20" right="16" bottom="20" left="16"/></padding>
 
-      <Label text="Recent device events" styleClass="decorator-section-title"/>
-      <Label text="Persisted via the DAO pattern — survive app restart"
-             styleClass="pattern-caption" wrapText="true"/>
+      <Label text="Activity" styleClass="room-name"/>
+      <Label text="Device events from this session and earlier — persisted via the DAO pattern."
+             styleClass="decorator-description" wrapText="true"/>
 
       <!-- Event rows are appended here at runtime by HistoryController. -->
     </VBox>

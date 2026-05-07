@@ -6,47 +6,55 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <!--
-  Modal dialog for adding a new device to a room.
-  Demonstrates the Abstract Factory pattern at runtime:
-    user picks (type, family) → corresponding factory method runs
-    → device is created, persisted via DeviceDAO, and added to the room.
+  M3 dialog — adding a new device to a room.
+  Demonstrates Abstract Factory + DAO at runtime: the user picks a
+  (type, family) tuple, the matching factory creates the device, and
+  DeviceDAO persists it.
 -->
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.smarthome.ui.AddDeviceController"
       styleClass="content-pane"
-      spacing="14"
-      prefWidth="320">
+      spacing="16"
+      prefWidth="340">
 
-  <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+  <padding><Insets top="24" right="24" bottom="20" left="24"/></padding>
 
   <Label fx:id="titleLabel" text="Add a device"
-         styleClass="decorator-section-title"/>
+         styleClass="room-name"/>
 
   <Label text="Pattern in action: Abstract Factory + DAO"
          styleClass="pattern-caption" wrapText="true"/>
 
-  <Label text="Device type" styleClass="room-name"/>
-  <ChoiceBox fx:id="typeChoice" maxWidth="Infinity"/>
+  <VBox spacing="6">
+    <Label text="DEVICE TYPE" styleClass="form-label"/>
+    <ChoiceBox fx:id="typeChoice" maxWidth="Infinity"/>
+  </VBox>
 
-  <Label text="Family" styleClass="room-name"/>
-  <ChoiceBox fx:id="familyChoice" maxWidth="Infinity"/>
+  <VBox spacing="6">
+    <Label text="FAMILY" styleClass="form-label"/>
+    <ChoiceBox fx:id="familyChoice" maxWidth="Infinity"/>
+  </VBox>
 
-  <Label text="Name" styleClass="room-name"/>
-  <TextField fx:id="nameField" promptText="e.g. Bedside Lamp"/>
+  <VBox spacing="6">
+    <Label text="NAME" styleClass="form-label"/>
+    <TextField fx:id="nameField" promptText="e.g. Bedside Lamp"/>
+  </VBox>
 
   <Label fx:id="errorLabel" styleClass="pattern-caption"
          wrapText="true" text=""/>
 
-  <HBox spacing="10">
+  <Region VBox.vgrow="ALWAYS"/>
+
+  <!-- M3 dialog actions: right-aligned, text + filled button -->
+  <HBox spacing="8" alignment="CENTER_RIGHT">
     <Button text="Cancel" onAction="#onCancel"
-            styleClass="action-button"
-            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            styleClass="action-button"/>
     <Button text="Add device" onAction="#onAdd"
-            styleClass="action-button-primary, action-button"
-            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            styleClass="action-button-primary, action-button"/>
   </HBox>
 </VBox>

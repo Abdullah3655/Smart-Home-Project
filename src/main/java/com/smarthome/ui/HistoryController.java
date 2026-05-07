@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -77,7 +78,22 @@ public class HistoryController implements Initializable {
         String time = e.timestamp() != null
             ? e.timestamp().atZone(ZoneId.systemDefault()).toLocalTime().format(CLOCK)
             : "--:--:--";
-        return buildRow(time, "device " + shortId(e.deviceId()), e.eventType());
+        return buildRow(time, resolveDeviceName(e.deviceId()), e.eventType());
+    }
+
+    /**
+     * Persisted DeviceEvents store only deviceId. Resolve to the live
+     * device's display name when the device still exists in the hub;
+     * fall back to the shortened id for events whose device has since
+     * been removed (so the history row is still readable).
+     */
+    private String resolveDeviceName(String deviceId) {
+        if (deviceId == null) return "Unknown device";
+        for (Room room : SmartHomeHub.getInstance().getRooms()) {
+            Device d = room.getDevice(deviceId);
+            if (d != null) return d.getName();
+        }
+        return "device " + shortId(deviceId);
     }
 
     private HBox buildRowForLive(String deviceName, String eventType) {
@@ -85,27 +101,53 @@ public class HistoryController implements Initializable {
     }
 
     private HBox buildRow(String time, String deviceLabel, String eventType) {
-        HBox row = new HBox(10);
+        HBox row = new HBox(12);
         row.getStyleClass().add("event-row");
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
+        StackPane avatar = new StackPane();
+        avatar.getStyleClass().addAll("event-avatar", avatarClassFor(eventType));
         Label dot = new Label(dotFor(eventType));
         dot.getStyleClass().add(dotClassFor(eventType));
+        avatar.getChildren().add(dot);
 
-        Label timeLabel = new Label(time);
-        timeLabel.getStyleClass().add("event-time");
-
+        VBox textBlock = new VBox(2);
         Label deviceLbl = new Label(deviceLabel);
         deviceLbl.getStyleClass().add("event-device");
+        Label typeLabel = new Label(humanLabelFor(eventType));
+        typeLabel.getStyleClass().add("event-type");
+        textBlock.getChildren().addAll(deviceLbl, typeLabel);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label typeLabel = new Label(eventType);
-        typeLabel.getStyleClass().add("event-type");
+        Label timeLabel = new Label(time);
+        timeLabel.getStyleClass().add("event-time");
+        timeLabel.setMinWidth(Region.USE_PREF_SIZE);
 
-        row.getChildren().addAll(dot, timeLabel, deviceLbl, spacer, typeLabel);
+        row.getChildren().addAll(avatar, textBlock, spacer, timeLabel);
         return row;
+    }
+
+    private String avatarClassFor(String eventType) {
+        return switch (eventType) {
+            case "TURNED_ON" -> "event-avatar-on";
+            case "LOCKED", "UNLOCKED" -> "event-avatar-locked";
+            case "TEMP_CHANGED", "BRIGHTNESS_CHANGED" -> "event-avatar-temp";
+            default -> "event-avatar-off";
+        };
+    }
+
+    private String humanLabelFor(String eventType) {
+        return switch (eventType) {
+            case "TURNED_ON" -> "Turned on";
+            case "TURNED_OFF" -> "Turned off";
+            case "LOCKED" -> "Locked";
+            case "UNLOCKED" -> "Unlocked";
+            case "TEMP_CHANGED" -> "Temperature changed";
+            case "BRIGHTNESS_CHANGED" -> "Brightness changed";
+            default -> eventType.toLowerCase().replace('_', ' ');
+        };
     }
 
     private String dotFor(String eventType) {

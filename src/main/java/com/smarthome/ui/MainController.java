@@ -36,7 +36,6 @@ public class MainController implements Initializable {
     @FXML private StackPane screenHost;
     @FXML private Button navHomeButton;
     @FXML private Button navHistoryButton;
-    @FXML private Button navDecoratorButton;
 
     
     private static HomeController sharedFacade;
@@ -154,9 +153,8 @@ public class MainController implements Initializable {
         fade.play();
     }
 
-    @FXML private void onNavHome()      { loadScreen("/fxml/home.fxml",      navHomeButton);      }
-    @FXML private void onNavHistory()   { loadScreen("/fxml/history.fxml",   navHistoryButton);   }
-    @FXML private void onNavDecorator() { loadScreen("/fxml/decorator.fxml", navDecoratorButton); }
+    @FXML private void onNavHome()    { loadScreen("/fxml/home.fxml",    navHomeButton);    }
+    @FXML private void onNavHistory() { loadScreen("/fxml/history.fxml", navHistoryButton); }
 
     private void loadScreen(String fxmlPath, Button activated) {
         try {
@@ -173,7 +171,7 @@ public class MainController implements Initializable {
     }
 
     private void highlightNav(Button activated) {
-        for (Button b : new Button[]{navHomeButton, navHistoryButton, navDecoratorButton}) {
+        for (Button b : new Button[]{navHomeButton, navHistoryButton}) {
             b.getStyleClass().removeAll("nav-button-active");
         }
         addClass(activated, "nav-button-active");

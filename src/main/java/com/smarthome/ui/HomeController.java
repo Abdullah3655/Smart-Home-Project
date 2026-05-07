@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -76,8 +77,8 @@ public class HomeController implements Initializable {
             section.getChildren().add(buildDeviceCard(device));
         }
 
-        Button addDevice = new Button("+ Add device to " + room.getName());
-        addDevice.getStyleClass().add("action-button");
+        Button addDevice = new Button("＋  Add device to " + room.getName());
+        addDevice.getStyleClass().addAll("action-button", "action-button-outline");
         addDevice.setMaxWidth(Double.MAX_VALUE);
         addDevice.setOnAction(e -> openAddDeviceModal(room));
         section.getChildren().add(addDevice);
@@ -109,14 +110,13 @@ public class HomeController implements Initializable {
     }
 
     private VBox buildDeviceCard(Device device) {
-        VBox card = new VBox(8);
+        VBox card = new VBox(12);
         card.getStyleClass().add("device-card");
 
-        HBox top = new HBox(10);
+        HBox top = new HBox(14);
         top.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        Label icon = new Label(iconFor(device));
-        icon.getStyleClass().add("device-icon");
+        StackPane avatar = buildAvatar(device);
 
         VBox nameBlock = new VBox(2);
         Label nameLabel = new Label(device.getName());
@@ -128,9 +128,9 @@ public class HomeController implements Initializable {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label state = stateBadgeFor(device);
+        Label chip = stateChipFor(device);
 
-        top.getChildren().addAll(icon, nameBlock, spacer, state);
+        top.getChildren().addAll(avatar, nameBlock, spacer, chip);
 
         card.getChildren().add(top);
 
@@ -138,6 +138,37 @@ public class HomeController implements Initializable {
         card.getChildren().add(actions);
 
         return card;
+    }
+
+    /**
+     * Builds an M3 leading-icon avatar — a circular tonal container around
+     * the device's emoji icon. The container's tone shifts based on state
+     * (primary-container when on, secondary-container when locked, neutral
+     * surface-high otherwise) so the card communicates state at a glance
+     * even before the user reads the chip.
+     */
+    private StackPane buildAvatar(Device device) {
+        StackPane avatar = new StackPane();
+        avatar.getStyleClass().add("device-avatar");
+
+        Label icon = new Label(iconFor(device));
+        icon.getStyleClass().add("device-icon");
+
+        if (device instanceof Lock lock) {
+            if (lock.isLocked()) {
+                avatar.getStyleClass().add("device-avatar-locked");
+                icon.getStyleClass().add("device-icon-locked");
+            }
+        } else if (device instanceof Thermostat) {
+            avatar.getStyleClass().add("device-avatar-on");
+            icon.getStyleClass().add("device-icon-on");
+        } else if (device.isPoweredOn()) {
+            avatar.getStyleClass().add("device-avatar-on");
+            icon.getStyleClass().add("device-icon-on");
+        }
+
+        avatar.getChildren().add(icon);
+        return avatar;
     }
 
     private HBox buildActionsFor(Device device) {
@@ -218,21 +249,27 @@ public class HomeController implements Initializable {
         return type + " · " + family;
     }
 
-    private Label stateBadgeFor(Device d) {
-        Label badge = new Label();
+    /**
+     * M3 assist chip showing the device's current state. Pill-shaped,
+     * tonal background that follows the same color logic as the avatar
+     * so the two reinforce each other.
+     */
+    private Label stateChipFor(Device d) {
+        Label chip = new Label();
+        chip.getStyleClass().add("state-chip");
         if (d instanceof Lock lock) {
-            badge.setText(lock.isLocked() ? "🔒 LOCKED" : "🔓 UNLOCKED");
-            badge.getStyleClass().add(lock.isLocked()
-                ? "device-state-locked" : "device-state-off");
+            chip.setText(lock.isLocked() ? "LOCKED" : "UNLOCKED");
+            chip.getStyleClass().add(lock.isLocked()
+                ? "state-chip-locked" : "state-chip-off");
         } else if (d instanceof Thermostat thermostat) {
-            badge.setText(String.format("%.0f°C", thermostat.getTemperature()));
-            badge.getStyleClass().add("device-state-on");
+            chip.setText(String.format("%.0f°C", thermostat.getTemperature()));
+            chip.getStyleClass().add("state-chip-on");
         } else {
-            badge.setText(d.isPoweredOn() ? "● ON" : "○ OFF");
-            badge.getStyleClass().add(d.isPoweredOn()
-                ? "device-state-on" : "device-state-off");
+            chip.setText(d.isPoweredOn() ? "ON" : "OFF");
+            chip.getStyleClass().add(d.isPoweredOn()
+                ? "state-chip-on" : "state-chip-off");
         }
-        return badge;
+        return chip;
     }
 
     private int deviceCount(Room room) {

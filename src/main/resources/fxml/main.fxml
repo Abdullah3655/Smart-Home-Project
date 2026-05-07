@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <!--
-  Mobile-styled root layout (~400×800).
-  Owns the top bar, mode picker, status banner, and bottom nav.
-  Center pane swaps between Home / History / Decorator screens.
+  Mobile-styled root layout (~400×800), Material 3 dark.
+  Owns the top app bar, mode picker, snackbar, and bottom navigation bar.
+  The center pane swaps between Home / History / Decorator screens.
 -->
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -21,18 +20,21 @@
 
   <top>
     <VBox>
-      <!-- Top bar: title + undo -->
-      <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
-        <Label styleClass="app-title-amber" text="●  "/>
-        <Label styleClass="app-title" text="Smart Home"/>
-        <HBox HBox.hgrow="ALWAYS"/>
+      <!-- Top app bar: overline + title (left), undo (right) -->
+      <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="12">
+        <Label styleClass="app-title-amber" text="◐"/>
+        <VBox spacing="0">
+          <Label styleClass="app-overline" text="WELCOME HOME"/>
+          <Label styleClass="app-title" text="Smart Home"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
         <Button fx:id="undoButton" styleClass="undo-button"
                 text="↶  Undo" onAction="#onUndo"/>
       </HBox>
 
-      <!-- Mode picker: segmented buttons (auto-applies on tap) -->
+      <!-- Mode picker: M3 segmented buttons -->
       <VBox styleClass="mode-row">
-        <Label text="AUTOMATION"/>
+        <Label text="AUTOMATION MODE"/>
         <HBox spacing="0">
           <Button fx:id="modeEcoButton"
                   styleClass="mode-segment, mode-segment-first"
@@ -49,7 +51,8 @@
         </HBox>
       </VBox>
 
-      <!-- Status banner: hidden by default, slides in on actions -->
+      <!-- Snackbar (M3 style): hidden by default, shown after actions.
+           Lives flush against the mode-picker bottom edge. -->
       <HBox fx:id="statusBanner" styleClass="status-banner"
             alignment="CENTER_LEFT" managed="false" visible="false">
         <Label fx:id="statusBannerText" styleClass="status-banner-text"
@@ -63,7 +66,7 @@
     <StackPane fx:id="screenHost" styleClass="content-pane"/>
   </center>
 
-  <!-- Bottom nav -->
+  <!-- Bottom navigation: M3 nav bar with pill indicator behind the active icon -->
   <bottom>
     <HBox styleClass="bottom-nav" alignment="CENTER" spacing="0">
       <Button fx:id="navHomeButton"
@@ -72,7 +75,9 @@
               onAction="#onNavHome"
               HBox.hgrow="ALWAYS" maxWidth="Infinity">
         <graphic>
-          <Label styleClass="nav-icon" text="🏠"/>
+          <StackPane styleClass="nav-icon-pill">
+            <Label styleClass="nav-icon" text="🏠"/>
+          </StackPane>
         </graphic>
       </Button>
       <Button fx:id="navHistoryButton"
@@ -81,16 +86,9 @@
               onAction="#onNavHistory"
               HBox.hgrow="ALWAYS" maxWidth="Infinity">
         <graphic>
-          <Label styleClass="nav-icon" text="📋"/>
-        </graphic>
-      </Button>
-      <Button fx:id="navDecoratorButton"
-              styleClass="nav-button"
-              text="Demo"
-              onAction="#onNavDecorator"
-              HBox.hgrow="ALWAYS" maxWidth="Infinity">
-        <graphic>
-          <Label styleClass="nav-icon" text="🎁"/>
+          <StackPane styleClass="nav-icon-pill">
+            <Label styleClass="nav-icon" text="📋"/>
+          </StackPane>
         </graphic>
       </Button>
     </HBox>
