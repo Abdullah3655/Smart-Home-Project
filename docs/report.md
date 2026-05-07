@@ -67,19 +67,21 @@ Concretes: `EcoMode` (24°C, dim 50%), `SleepMode` (off + lock + 20°C),
 
 ## 3. Class Diagram and how each component meets the constraints
 
-The system is organised into **four layers**. One mini class diagram per
-layer is shown below; full per-layer diagrams (with every class) and a
-cross-layer sequence diagram live in the companion document
-`class-diagram.md`.
+Full rendered class diagram (rendered from `class-diagram.puml` via
+PlantUML — every class, all 9 patterns, every relationship):
+
+<p align="center">
+  <img src="images/class-diagram-full.png" alt="Full class diagram of the Smart Home system" width="640"/>
+</p>
+
+Per-layer mini class diagrams for quick reference:
 
 <table>
   <tr>
-    <td align="center"><img src="images/layer-presentation.svg" width="260" alt="Presentation layer"/><br/><b>A — Presentation (JavaFX UI)</b></td>
-    <td align="center"><img src="images/layer-application.svg" width="260" alt="Application layer"/><br/><b>B — Application (Facade + Command)</b></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="images/layer-domain.svg" width="260" alt="Domain layer"/><br/><b>C — Domain (6 of 9 patterns)</b></td>
-    <td align="center"><img src="images/layer-persistence.svg" width="260" alt="Persistence layer"/><br/><b>D — Persistence (Database + DAOs)</b></td>
+    <td align="center"><img src="images/layer-presentation.svg" width="220" alt="Presentation layer"/><br/><b>A — Presentation</b></td>
+    <td align="center"><img src="images/layer-application.svg" width="220" alt="Application layer"/><br/><b>B — Application</b></td>
+    <td align="center"><img src="images/layer-domain.svg" width="220" alt="Domain layer"/><br/><b>C — Domain</b></td>
+    <td align="center"><img src="images/layer-persistence.svg" width="220" alt="Persistence layer"/><br/><b>D — Persistence</b></td>
   </tr>
 </table>
 
