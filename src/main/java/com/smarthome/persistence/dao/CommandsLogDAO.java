@@ -11,14 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * DAO PATTERN — Commands-log audit table accessor.
- *
- * Schema-locked column order: command_id, device_id, action, params_json,
- * result, timestamp. CommandInvoker hooks into this DAO so every executed
- * command leaves a paper trail (rubric: "prevent invalid/unsafe operations"
- * via observable audit).
- */
+
+// DAO for inserting and querying executed command history.
 public class CommandsLogDAO {
     private final Connection conn;
 

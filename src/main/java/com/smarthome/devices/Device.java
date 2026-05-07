@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+// Base observable device with id, name, and shared power-state behavior.
 public abstract class Device implements Observable {
     public static final String EVENT_TURNED_ON = "TURNED_ON";
     public static final String EVENT_TURNED_OFF = "TURNED_OFF";

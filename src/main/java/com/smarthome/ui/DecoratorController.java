@@ -21,15 +21,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/**
- * Decorator showcase — wrap a chosen device with
- * {@link LoggingDeviceDecorator}, then exercise it to see actions captured
- * by the decorator without mutating the underlying Device class.
- *
- * <p>This screen is what makes Decorator visible in the demo video. The
- * pattern is otherwise structural-only and would be invisible to a grader
- * watching the UI without source-code review.</p>
- */
+
+// Screen controller for wrapping devices with decorators and testing wrappers.
 public class DecoratorController implements Initializable {
 
     private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -46,10 +39,6 @@ public class DecoratorController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         populateDeviceChoices();
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Choice population
-    // ─────────────────────────────────────────────────────────────
 
     private void populateDeviceChoices() {
         List<DeviceChoice> choices = new ArrayList<>();
@@ -69,10 +58,6 @@ public class DecoratorController implements Initializable {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Wrap / unwrap
-    // ─────────────────────────────────────────────────────────────
-
     @FXML
     private void onWrap() {
         DeviceChoice choice = deviceChoiceBox.getValue();
@@ -88,8 +73,6 @@ public class DecoratorController implements Initializable {
         unwrappedTarget = choice.device;
         ownerRoom = choice.room;
 
-        // Replace the original device in the room with the decorated wrapper.
-        // The wrapper carries the same id, so room indexing stays consistent.
         ownerRoom.removeDevice(unwrappedTarget.getId());
         wrapped = new LoggingDeviceDecorator(unwrappedTarget);
         ownerRoom.addDevice(wrapped);
@@ -116,10 +99,6 @@ public class DecoratorController implements Initializable {
         ownerRoom = null;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Exercise the wrapped device + render its captured log
-    // ─────────────────────────────────────────────────────────────
-
     @FXML
     private void onWrappedTurnOn() {
         if (wrapped == null) { setStatus("Wrap a device first."); return; }
@@ -143,10 +122,6 @@ public class DecoratorController implements Initializable {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────
-
     private void setStatus(String text) { wrapStatusLabel.setText(text); }
 
     private void clearLog() { logContainer.getChildren().clear(); }
@@ -157,6 +132,6 @@ public class DecoratorController implements Initializable {
         logContainer.getChildren().add(entry);
     }
 
-    /** Pairs a Device with the Room that owns it — needed for swap on wrap. */
+    
     private record DeviceChoice(Room room, Device device) {}
 }

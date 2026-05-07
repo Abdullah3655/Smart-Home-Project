@@ -22,14 +22,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/**
- * History screen — feed of device events.
- *
- * <p>Loads recent events from the DAO once at screen mount, then appends
- * new events live via Observer. Demonstrates DAO + Observer working
- * together: past events come from SQLite (DAO), new events arrive in
- * real time without polling (Observer).</p>
- */
+
+// History screen controller that renders event and command timeline rows.
 public class HistoryController implements Initializable {
 
     private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -50,7 +44,6 @@ public class HistoryController implements Initializable {
 
     private void loadHistoricalEvents() {
         List<DeviceEvent> recent = facade.getEventHistory();
-        // Newest first (DAO returns newest first already)
         for (DeviceEvent e : recent) {
             eventsContainer.getChildren().add(buildRowForPersisted(e));
         }
@@ -74,19 +67,13 @@ public class HistoryController implements Initializable {
     }
 
     private void prependRow(HBox row) {
-        // Insert just below the screen-title labels (positions 0 and 1)
         int insertAt = Math.min(2, eventsContainer.getChildren().size());
         eventsContainer.getChildren().add(insertAt, row);
 
-        // Keep the feed bounded
         while (eventsContainer.getChildren().size() > MAX_ROWS + 2) {
             eventsContainer.getChildren().remove(eventsContainer.getChildren().size() - 1);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Row builders
-    // ─────────────────────────────────────────────────────────────
 
     private HBox buildRowForPersisted(DeviceEvent e) {
         String time = e.timestamp() != null

@@ -11,13 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * DAO PATTERN — Device-event audit table accessor.
- *
- * Designed to be hooked from the Observer chain: when a Device fires
- * notifyObservers(eventType), an Observer can call insert(deviceId, eventType)
- * here to persist the event to the audit log.
- */
+
+// DAO for inserting and querying device event audit history.
 public class DeviceEventDAO {
     private final Connection conn;
 
@@ -85,7 +80,7 @@ public class DeviceEventDAO {
         return events;
     }
 
-    /** SQLite stores TIMESTAMPs as "yyyy-MM-dd HH:mm:ss" text — convert to Instant. */
+    
     private Instant parseTimestamp(String raw) {
         if (raw == null) return null;
         return Instant.parse(raw.replace(' ', 'T') + "Z");

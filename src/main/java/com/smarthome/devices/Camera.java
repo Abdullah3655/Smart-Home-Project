@@ -1,5 +1,7 @@
 package com.smarthome.devices;
 
+
+// Camera device with recording state.
 public class Camera extends Device {
     private boolean recording;
 

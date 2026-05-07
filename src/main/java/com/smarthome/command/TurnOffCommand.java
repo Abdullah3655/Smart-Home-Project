@@ -4,13 +4,8 @@ import com.smarthome.devices.Device;
 
 import java.util.Objects;
 
-/**
- * COMMAND PATTERN — ConcreteCommand.
- * Receiver: {@link Device}.
- *
- * Mirror of {@link TurnOnCommand}: captures pre-state so undo() restores
- * the device only if it was on before.
- */
+
+// Command object that applies TurnOff to a target device and can undo it.
 public class TurnOffCommand implements DeviceCommand {
     private final Device receiver;
     private boolean wasPoweredOnBefore;

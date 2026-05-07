@@ -5,13 +5,8 @@ import com.smarthome.strategy.AutomationMode;
 
 import java.util.Objects;
 
-/**
- * COMMAND PATTERN — ConcreteCommand.
- * Receiver: {@link SmartHomeHub} (the Strategy holder).
- *
- * Captures the previous mode so undo() can restore it AND re-apply it,
- * because device states may have been mutated by the new mode's apply().
- */
+
+// Command object that applies SetAutomationMode to a target device and can undo it.
 public class SetAutomationModeCommand implements DeviceCommand {
     private final SmartHomeHub receiver;
     private final AutomationMode newMode;

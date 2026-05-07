@@ -8,26 +8,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
-/**
- * DAO PATTERN — User table accessor.
- *
- * The DAO pattern (Sun/Oracle Core J2EE Patterns) isolates all SQL behind
- * a Java API so domain code never sees JDBC. Swap SQLite for Postgres later
- * by changing only this file — callers stay untouched.
- *
- * Uses PreparedStatements exclusively to satisfy the rubric's
- * "prevent invalid/unsafe operations" constraint (auto-escapes inputs,
- * preventing SQL injection).
- */
+
+// DAO for user lookup and authentication queries.
 public class UserDAO {
     private final Connection conn;
 
-    /** Production constructor — uses the singleton Database connection. */
+    
     public UserDAO() {
         this(Database.getInstance().getConnection());
     }
 
-    /** Test constructor — inject any connection (e.g. in-memory SQLite). */
+    
     public UserDAO(Connection conn) {
         this.conn = Objects.requireNonNull(conn, "conn must not be null");
     }

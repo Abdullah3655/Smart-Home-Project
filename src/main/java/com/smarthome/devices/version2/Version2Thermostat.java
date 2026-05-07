@@ -2,6 +2,8 @@ package com.smarthome.devices.version2;
 
 import com.smarthome.devices.Thermostat;
 
+
+// Version2 variant of Thermostat.
 public class Version2Thermostat extends Thermostat {
     public Version2Thermostat(String id, String name) {
         super(id, name);
@@ -13,4 +15,3 @@ public class Version2Thermostat extends Thermostat {
         super.setTemperature(clamped);
     }
 }
-

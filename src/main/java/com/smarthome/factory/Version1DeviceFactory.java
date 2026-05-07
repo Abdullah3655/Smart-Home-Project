@@ -6,6 +6,8 @@ import com.smarthome.devices.version1.Version1Light;
 import com.smarthome.devices.version1.Version1Lock;
 import com.smarthome.devices.version1.Version1Thermostat;
 
+
+// Concrete factory that creates Version1 device variants.
 public class Version1DeviceFactory extends DeviceFactory {
     @Override
     public Device createLight(String name) {
@@ -27,4 +29,3 @@ public class Version1DeviceFactory extends DeviceFactory {
         return new Version1Camera(newId(), name);
     }
 }
-

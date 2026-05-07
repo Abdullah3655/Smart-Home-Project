@@ -23,16 +23,8 @@ import java.util.Optional;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * Owns the top bar (title + Undo), the segmented mode picker, the sliding
- * status banner, the bottom navigation, and the central screen-host.
- *
- * Constructs the production {@link HomeController} (Facade) wired with real
- * DAOs so command logging and event history persist to SQLite. Each
- * sub-screen controller (Home / History / Decorator) shares this Facade
- * via a static accessor on the App level so all three see the same
- * {@link CommandInvoker} and audit log.
- */
+
+// Root UI controller for top bar, navigation, and shared facade wiring.
 public class MainController implements Initializable {
 
     @FXML private Button undoButton;
@@ -46,13 +38,11 @@ public class MainController implements Initializable {
     @FXML private Button navHistoryButton;
     @FXML private Button navDecoratorButton;
 
-    /** Singleton Facade shared across all UI screens for this app run. */
+    
     private static HomeController sharedFacade;
 
     public static HomeController getFacade() {
         if (sharedFacade == null) {
-            // Defensive: build a default facade if the UI somehow boots without
-            // App.start() having pre-wired one. Production path always pre-wires.
             sharedFacade = buildProductionFacade();
         }
         return sharedFacade;
@@ -72,32 +62,21 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Build the production Facade once and stash it for sub-controllers.
         sharedFacade = buildProductionFacade();
 
-        // Default landing screen
         loadScreen("/fxml/home.fxml", navHomeButton);
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Top bar
-    // ─────────────────────────────────────────────────────────────
 
     @FXML
     private void onUndo() {
         boolean undone = sharedFacade.undoLastAction();
         if (undone) {
             showBanner("✓ Undid last action.", "status-banner-success");
-            // Notify any active screen to refresh
             HomeBus.notifyDataChanged();
         } else {
             showBanner("Nothing to undo.", null);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Mode picker (segmented)
-    // ─────────────────────────────────────────────────────────────
 
     @FXML private void onModeEco()   { applyMode("ECO",   modeEcoButton);   }
     @FXML private void onModeSleep() { applyMode("SLEEP", modeSleepButton); }
@@ -119,10 +98,7 @@ public class MainController implements Initializable {
         }
     }
 
-    /**
-     * Asks the user to confirm a mode change because mode strategies
-     * mutate every device in the home. Returns true if the user proceeds.
-     */
+    
     private boolean confirmModeChange(String name) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Confirm automation mode");
@@ -160,10 +136,6 @@ public class MainController implements Initializable {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Status banner (sliding, auto-fade)
-    // ─────────────────────────────────────────────────────────────
-
     public void showBanner(String text, String variantClass) {
         statusBannerText.setText(text);
         statusBanner.getStyleClass().removeAll(
@@ -181,10 +153,6 @@ public class MainController implements Initializable {
         });
         fade.play();
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Bottom navigation
-    // ─────────────────────────────────────────────────────────────
 
     @FXML private void onNavHome()      { loadScreen("/fxml/home.fxml",      navHomeButton);      }
     @FXML private void onNavHistory()   { loadScreen("/fxml/history.fxml",   navHistoryButton);   }

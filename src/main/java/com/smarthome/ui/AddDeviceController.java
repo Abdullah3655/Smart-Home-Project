@@ -18,18 +18,8 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * Controller for the Add Device modal.
- *
- * <p>This screen demonstrates the Abstract Factory pattern at runtime —
- * the user picks (type, family) and we route to the matching factory
- * method, creating a fresh device of the right concrete subclass without
- * the controller knowing about the concrete classes.</p>
- *
- * <p>After creation we persist the device via {@link DeviceDAO} so it
- * survives app restarts, then attach a {@link DaoEventBridge} so its
- * future state changes hit the audit log.</p>
- */
+
+// Modal controller for creating a device in a selected room.
 public class AddDeviceController implements Initializable {
 
     @FXML private Label titleLabel;
@@ -38,7 +28,7 @@ public class AddDeviceController implements Initializable {
     @FXML private TextField nameField;
     @FXML private Label errorLabel;
 
-    /** Set by the launcher before showing the dialog. */
+    
     private Room targetRoom;
 
     public void setTargetRoom(Room room) {
@@ -87,17 +77,12 @@ public class AddDeviceController implements Initializable {
                 default -> throw new IllegalArgumentException("Pick a device type");
             };
 
-            // Add to the in-memory room
             targetRoom.addDevice(device);
 
-            // Persist to SQLite (so it survives app restart)
             new DeviceDAO().insert(device, targetRoom.getRoomId());
 
-            // Attach DaoEventBridge so the device's future events hit the
-            // audit log AND the live-state row stays in sync across restarts.
             device.attach(new DaoEventBridge(new DeviceEventDAO(), new DeviceDAO()));
 
-            // Tell the Home screen to refresh
             HomeBus.notifyDataChanged();
 
             close();

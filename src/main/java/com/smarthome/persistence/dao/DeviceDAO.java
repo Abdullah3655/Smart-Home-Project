@@ -26,30 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * DAO PATTERN — Device table accessor.
- *
- * <p>Round-trips concrete {@link Device} subclasses through a single SQL
- * row. The schema captures (type, family, powered_on, state_blob); on
- * read, we use the saved (type, family) pair to pick the right concrete
- * constructor, building the same Version1/Version2 variant the device
- * was created as.</p>
- *
- * <p>This is the runtime expression of the Abstract Factory pattern that
- * the {@link com.smarthome.factory.DeviceFactory} hierarchy declares.
- * Per Refactoring Guru: <i>"work with various families of related
- * products without depending on their concrete classes."</i> The DAO
- * exposes only {@link Device}; the database row decides which family
- * variant gets reconstructed.</p>
- *
- * <p>Type-specific state lives in a {@code key=value;key=value} blob to
- * avoid pulling in a JSON dependency. Light writes brightness, Thermostat
- * writes temp, Lock writes locked. State is restored via the public
- * setters — but the {@link com.smarthome.ui.App} startup sequence loads
- * devices BEFORE attaching the {@link com.smarthome.ui.DaoEventBridge}
- * observer, so the restoration setters fire silently (no phantom events
- * in {@code device_events}).</p>
- */
+
+// DAO for reading and writing device rows and serialized device state.
 public class DeviceDAO {
     private final Connection conn;
 
@@ -60,10 +38,6 @@ public class DeviceDAO {
     public DeviceDAO(Connection conn) {
         this.conn = Objects.requireNonNull(conn, "conn must not be null");
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Insert / update (idempotent — used by seed and Add Device flow)
-    // ─────────────────────────────────────────────────────────────
 
     public void insert(Device device, String roomId) {
         Objects.requireNonNull(device, "device must not be null");
@@ -110,10 +84,6 @@ public class DeviceDAO {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Read
-    // ─────────────────────────────────────────────────────────────
-
     public Device findById(String deviceId) {
         String sql = "SELECT device_id, name, type, family, powered_on, state_blob "
                    + "FROM devices WHERE device_id = ?";
@@ -157,13 +127,7 @@ public class DeviceDAO {
         }
     }
 
-    /**
-     * Updates only the volatile columns (name, powered_on, state_blob)
-     * for an existing device — used by the {@link com.smarthome.ui.DaoEventBridge}
-     * to keep the persisted state in sync after every Observer event.
-     * Silently no-ops if the device isn't in the table (the row is created
-     * by {@link #insert} on first save).
-     */
+    
     public void updateState(Device device) {
         String sql = "UPDATE devices "
                    + "SET name = ?, powered_on = ?, state_blob = ? "
@@ -178,10 +142,6 @@ public class DeviceDAO {
             throw new RuntimeException("Failed to update device state " + device.getId(), e);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Reconstruction — Abstract Factory at runtime
-    // ─────────────────────────────────────────────────────────────
 
     private Device deserialize(ResultSet rs) throws SQLException {
         String id        = rs.getString("device_id");
@@ -201,11 +161,7 @@ public class DeviceDAO {
         return device;
     }
 
-    /**
-     * Constructs the right concrete Device variant directly. Bypasses the
-     * factory's UUID generator so the saved id is preserved across
-     * restarts — keeps room indexing and audit-log linking consistent.
-     */
+    
     private Device constructByTypeAndFamily(String id, String name, String type, String family) {
         boolean v2 = !"VERSION1".equalsIgnoreCase(family);
         return switch (type.toUpperCase(Locale.ROOT)) {
@@ -217,12 +173,7 @@ public class DeviceDAO {
         };
     }
 
-    /**
-     * Restores type-specific state via public setters. Safe because
-     * App.start() loads devices BEFORE attaching DaoEventBridge — the
-     * setters fire notifyObservers, but no observer is listening yet, so
-     * no audit-log spam.
-     */
+    
     private void applyState(Device device, String state) {
         Map<String, String> kv = parseState(state);
         if (device instanceof Light light && kv.containsKey("brightness")) {
@@ -241,10 +192,6 @@ public class DeviceDAO {
             }
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Serialization helpers
-    // ─────────────────────────────────────────────────────────────
 
     private String classifyType(Device d) {
         if (d instanceof Light)      return "LIGHT";

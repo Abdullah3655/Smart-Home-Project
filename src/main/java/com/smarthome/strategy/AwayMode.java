@@ -11,6 +11,8 @@ import com.smarthome.devices.Thermostat;
 import java.util.Enumeration;
 import java.util.Objects;
 
+
+// Automation strategy that applies away rules to hub devices.
 public class AwayMode implements AutomationMode {
     @Override
     public String name() {

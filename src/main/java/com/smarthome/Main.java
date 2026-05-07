@@ -17,16 +17,8 @@ import com.smarthome.strategy.EcoMode;
 
 import java.util.Enumeration;
 
-/**
- * Console entry point — exercises every implemented design pattern
- * end-to-end and prints what each pattern does.
- *
- * <p>Run with: {@code ./mvnw compile} then
- * {@code java -cp target/classes com.smarthome.Main}.</p>
- *
- * <p>Use this when you want to verify the domain layer works without
- * launching the JavaFX UI (handy on headless servers / CI).</p>
- */
+
+// Application entry point.
 public class Main {
 
     public static void main(String[] args) {

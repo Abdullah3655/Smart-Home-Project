@@ -9,6 +9,8 @@ import com.smarthome.devices.Thermostat;
 import java.util.Enumeration;
 import java.util.Objects;
 
+
+// Automation strategy that applies eco rules to hub devices.
 public class EcoMode implements AutomationMode {
     @Override
     public String name() {

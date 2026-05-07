@@ -4,14 +4,8 @@ import com.smarthome.devices.Thermostat;
 
 import java.util.Objects;
 
-/**
- * COMMAND PATTERN — ConcreteCommand.
- * Receiver: {@link Thermostat}.
- *
- * Captures the previous temperature so undo() restores it exactly,
- * regardless of how many other temperature changes happened in between
- * (history is replayed in reverse).
- */
+
+// Command object that applies SetTemperature to a target device and can undo it.
 public class SetTemperatureCommand implements DeviceCommand {
     private final Thermostat receiver;
     private final double newTemperatureC;

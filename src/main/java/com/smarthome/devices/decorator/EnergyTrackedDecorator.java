@@ -2,15 +2,8 @@ package com.smarthome.devices.decorator;
 
 import com.smarthome.devices.Device;
 
-/**
- * DECORATOR PATTERN — ConcreteDecorator.
- *
- * Tracks total time the wrapped Device has spent powered on, accumulating
- * a usage figure that the GUI's "energy report" tab can display.
- *
- * Demonstrates that decorators can carry their own state on top of the
- * wrapped Component without touching the Component's class hierarchy.
- */
+
+// Decorator that tracks how long a device stays powered on.
 public class EnergyTrackedDecorator extends DeviceDecorator {
 
     private long onSinceMillis = 0L;
@@ -37,7 +30,7 @@ public class EnergyTrackedDecorator extends DeviceDecorator {
         super.turnOff();
     }
 
-    /** Total milliseconds powered on, including the current session if still on. */
+    
     public long getTotalOnMillis() {
         long live = wrappee.isPoweredOn()
             ? System.currentTimeMillis() - onSinceMillis

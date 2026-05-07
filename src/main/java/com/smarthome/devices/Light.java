@@ -1,5 +1,7 @@
 package com.smarthome.devices;
 
+
+// Light device with brightness level from 0 to 100.
 public class Light extends Device {
     private int brightness = 100;
 

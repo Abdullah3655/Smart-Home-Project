@@ -4,10 +4,8 @@ import com.smarthome.devices.Lock;
 
 import java.util.Objects;
 
-/**
- * COMMAND PATTERN — ConcreteCommand.
- * Receiver: {@link Lock}.
- */
+
+// Command object that applies Unlock to a target device and can undo it.
 public class UnlockCommand implements DeviceCommand {
     private final Lock receiver;
     private boolean wasLockedBefore;

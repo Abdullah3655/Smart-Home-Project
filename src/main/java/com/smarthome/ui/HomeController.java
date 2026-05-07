@@ -27,14 +27,8 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
 
-/**
- * Home screen — renders all rooms with their device cards.
- *
- * <p>Calls only the Facade ({@link com.smarthome.facade.HomeController})
- * for any state mutation, satisfying the "UI must not touch domain or DAO
- * directly" rubric line. Refreshes itself reactively via the Observer
- * pattern + {@link HomeBus}.</p>
- */
+
+// Home screen controller that renders room and device cards and actions.
 public class HomeController implements Initializable {
 
     @FXML private VBox roomsContainer;
@@ -48,20 +42,14 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Refresh on every device event so cards reflect live state.
         cardRefreshObserver = (device, event) ->
             Platform.runLater(this::renderAllRooms);
         attachToAllDevices(cardRefreshObserver);
 
-        // Refresh on top-bar-driven changes (mode applied, undo).
         HomeBus.subscribe(busListener);
 
         renderAllRooms();
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Card rendering
-    // ─────────────────────────────────────────────────────────────
 
     private void renderAllRooms() {
         roomsContainer.getChildren().clear();
@@ -73,7 +61,6 @@ public class HomeController implements Initializable {
     private VBox buildRoomSection(Room room) {
         VBox section = new VBox(8);
 
-        // Room header
         HBox header = new HBox(8);
         header.getStyleClass().add("room-header");
         Label name = new Label(room.getName());
@@ -91,7 +78,6 @@ public class HomeController implements Initializable {
             section.getChildren().add(buildDeviceCard(it.nextElement()));
         }
 
-        // "+ Add device" full-width button at the end of the room's device list.
         Button addDevice = new Button("+ Add device to " + room.getName());
         addDevice.getStyleClass().add("action-button");
         addDevice.setMaxWidth(Double.MAX_VALUE);
@@ -101,7 +87,7 @@ public class HomeController implements Initializable {
         return section;
     }
 
-    /** Opens the Add Device modal targeting the given room. */
+    
     private void openAddDeviceModal(Room room) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/add-device.fxml"));
@@ -128,7 +114,6 @@ public class HomeController implements Initializable {
         VBox card = new VBox(8);
         card.getStyleClass().add("device-card");
 
-        // Header row: icon + name + state badge
         HBox top = new HBox(10);
         top.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
@@ -151,7 +136,6 @@ public class HomeController implements Initializable {
 
         card.getChildren().add(top);
 
-        // Actions row, contextual to device type
         HBox actions = buildActionsFor(device);
         card.getChildren().add(actions);
 
@@ -180,7 +164,6 @@ public class HomeController implements Initializable {
             return row;
         }
 
-        // Light or Camera — generic on/off
         if (device.isPoweredOn()) {
             row.getChildren().add(
                 actionButton("Turn Off", () -> facade.turnOffDevice(device.getId())));
@@ -209,18 +192,10 @@ public class HomeController implements Initializable {
     private void safeRun(Runnable handler) {
         try {
             handler.run();
-            // Card refresh happens automatically via the Observer attached
-            // on initialize() — no manual refresh call needed.
         } catch (Exception e) {
-            // Errors are surfaced via the top status banner if a parent
-            // controller wires them; for now, log locally.
             System.err.println("Action failed: " + e.getMessage());
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Visual helpers
-    // ─────────────────────────────────────────────────────────────
 
     private String iconFor(Device d) {
         if (d instanceof Light)      return "💡";
@@ -238,7 +213,6 @@ public class HomeController implements Initializable {
         else if (d instanceof Camera)     type = "Security";
         else                              type = "Device";
 
-        // Family inference from package name — Version1 vs Version2 vs base
         String pkg = d.getClass().getPackageName();
         String family = pkg.contains("version2") ? "Version2"
                       : pkg.contains("version1") ? "Version1"
@@ -253,8 +227,6 @@ public class HomeController implements Initializable {
             badge.getStyleClass().add(lock.isLocked()
                 ? "device-state-locked" : "device-state-off");
         } else if (d instanceof Thermostat thermostat) {
-            // Thermostats are always "active" — show their target temperature
-            // instead of an on/off badge (semantically more honest).
             badge.setText(String.format("%.0f°C", thermostat.getTemperature()));
             badge.getStyleClass().add("device-state-on");
         } else {
@@ -271,10 +243,6 @@ public class HomeController implements Initializable {
         while (it.hasMoreElements()) { it.nextElement(); n++; }
         return n;
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Observer attachment
-    // ─────────────────────────────────────────────────────────────
 
     private void attachToAllDevices(Observer obs) {
         for (Room room : SmartHomeHub.getInstance().getRooms()) {

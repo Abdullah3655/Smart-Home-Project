@@ -2,5 +2,6 @@ package com.smarthome.persistence.dao;
 
 import java.time.Instant;
 
-/** A row from the {@code device_events} audit table. */
+
+// Immutable device event row returned from device_events queries.
 public record DeviceEvent(long eventId, String deviceId, String eventType, Instant timestamp) {}

@@ -1,7 +1,5 @@
 package com.smarthome.persistence.dao;
 
-/**
- * Data carrier for a smart-home user account.
- * Records auto-generate equals/hashCode/toString — perfect for DTOs.
- */
+
+// Immutable user row returned from users queries.
 public record User(String userId, String name, String pin, String role) {}

@@ -1,5 +1,7 @@
 package com.smarthome.devices;
 
+
+// Thermostat device storing target temperature in Celsius.
 public class Thermostat extends Device {
     private double temperatureC = 22.0;
 

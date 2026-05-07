@@ -2,6 +2,8 @@ package com.smarthome.core;
 
 import java.util.List;
 
+
+// Iterator over a snapshot list of rooms from SmartHomeHub.
 public class HubRoomIterator implements RoomIterator {
     private final List<Room> rooms;
     private int index;

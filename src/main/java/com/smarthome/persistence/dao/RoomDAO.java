@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * DAO PATTERN — Room table accessor.
- * See {@link UserDAO} for the pattern explanation and dual-constructor convention.
- */
+
+// DAO for creating and listing room records.
 public class RoomDAO {
     private final Connection conn;
 

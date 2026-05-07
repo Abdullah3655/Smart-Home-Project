@@ -26,35 +26,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * FACADE PATTERN — single entry point from UI/JavaFX into the system
- * (Refactoring Guru canonical structure).
- *
- * <h3>RG roles</h3>
- * <ul>
- *   <li><b>Facade</b> — this class.</li>
- *   <li><b>Subsystem</b> — {@link SmartHomeHub}, {@link CommandInvoker},
- *       Strategy modes, DAOs, devices.</li>
- *   <li><b>Client</b> — JavaFX controllers (and tests).</li>
- * </ul>
- *
- * <h3>"Thin" rule</h3>
- * The Facade contains <i>only orchestration</i>: it looks up devices by
- * id, builds Command objects, delegates to {@link CommandInvoker} for
- * mutations, and delegates to DAOs for read operations. It never
- * implements domain logic itself. Renaming this rule per RG: the Facade
- * is a switchboard, not a brain.
- *
- * <h3>Contracts</h3>
- * <ul>
- *   <li>Mutating methods route through Command pattern → audit trail in
- *       {@code commands_log} (when DAO is wired in).</li>
- *   <li>Read methods never mutate state.</li>
- *   <li>Looking up an unknown device throws
- *       {@link IllegalArgumentException} — supports the rubric's
- *       "prevent invalid/unsafe operations" constraint.</li>
- * </ul>
- */
+
+// Facade used by UI to run actions and read app state through one API.
 public class HomeController {
 
     private final SmartHomeHub hub;
@@ -62,7 +35,7 @@ public class HomeController {
     private final DeviceEventDAO eventDAO;
     private final CommandsLogDAO commandsLogDAO;
 
-    /** Production constructor — uses singletons + production DAOs. */
+    
     public HomeController() {
         this(
             SmartHomeHub.getInstance(),
@@ -72,11 +45,7 @@ public class HomeController {
         );
     }
 
-    /**
-     * Test/integration constructor — inject collaborators directly so
-     * tests can use in-memory DAOs and isolated invokers without hitting
-     * the singleton hub or the real {@code smarthome.db}.
-     */
+    
     public HomeController(SmartHomeHub hub,
                           CommandInvoker invoker,
                           DeviceEventDAO eventDAO,
@@ -86,10 +55,6 @@ public class HomeController {
         this.eventDAO = eventDAO;
         this.commandsLogDAO = commandsLogDAO;
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Mutating actions — route through Command pattern (undoable)
-    // ─────────────────────────────────────────────────────────────
 
     public void turnOnDevice(String deviceId) {
         invoker.execute(new TurnOnCommand(findDevice(deviceId)));
@@ -128,11 +93,7 @@ public class HomeController {
         invoker.execute(new SetAutomationModeCommand(hub, mode));
     }
 
-    /**
-     * Reverses the most recently executed action. Returns {@code true}
-     * if something was undone, {@code false} if there was nothing to
-     * undo.
-     */
+    
     public boolean undoLastAction() {
         if (!invoker.canUndo()) {
             return false;
@@ -140,10 +101,6 @@ public class HomeController {
         invoker.undo();
         return true;
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Read methods — never mutate state
-    // ─────────────────────────────────────────────────────────────
 
     public List<Device> getDevicesForRoom(String roomId) {
         Room room = hub.getRoom(roomId);
@@ -168,22 +125,13 @@ public class HomeController {
         return commandsLogDAO.findRecent(100);
     }
 
-    /**
-     * Schedule creation will be wired when the schedule executor (M4
-     * task) lands. The signature is locked here so the UI can be coded
-     * against it; calling it currently throws to make the gap explicit
-     * rather than silently dropping the request.
-     */
+    
     public void createSchedule(ScheduleRequest request) {
         throw new UnsupportedOperationException(
             "Schedule executor not yet wired — see M4 task. Request: " + request);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Private helpers — orchestration only, no domain logic
-    // ─────────────────────────────────────────────────────────────
-
-    /** Walks the hub looking for a device by id. */
+    
     private Device findDevice(String deviceId) {
         for (Room room : hub.getRooms()) {
             Device d = room.getDevice(deviceId);
@@ -192,7 +140,7 @@ public class HomeController {
         throw new IllegalArgumentException("Unknown device: " + deviceId);
     }
 
-    /** Translates a UI-friendly mode name into a Strategy instance. */
+    
     private AutomationMode resolveMode(String modeName) {
         if (modeName == null) {
             throw new IllegalArgumentException("modeName must not be null");

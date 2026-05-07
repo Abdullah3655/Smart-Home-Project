@@ -10,6 +10,8 @@ import com.smarthome.devices.Thermostat;
 import java.util.Enumeration;
 import java.util.Objects;
 
+
+// Automation strategy that applies sleep rules to hub devices.
 public class SleepMode implements AutomationMode {
     @Override
     public String name() {

@@ -1,5 +1,7 @@
 package com.smarthome.devices;
 
+
+// Smart lock device with locked and unlocked state.
 public class Lock extends Device {
     private boolean locked = false;
 
