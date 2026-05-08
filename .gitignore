@@ -1,10 +1,23 @@
 target/
+out/
+build/
 *.class
 *.iml
+*.ipr
+*.iws
 .idea/
 .vscode/
 .DS_Store
+Thumbs.db
 *.db
+*.sqlite
+*.sqlite3
+*.log
+*.tmp
+*.swp
+.env
+.env.*
+!.env.example
 
 # Maven Wrapper: keep the jar, ignore local download/extract caches
 !.mvn/wrapper/maven-wrapper.jar
